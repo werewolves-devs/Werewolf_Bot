@@ -1,6 +1,9 @@
 import discord
 import random
 import asyncio
+
+# Import config data
+from config import prefix
 import config
 
 client = discord.Client()
