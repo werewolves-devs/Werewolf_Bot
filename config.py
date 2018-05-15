@@ -7,6 +7,7 @@ prefix = '!'
 # List of specific files
 
 # List of specific channels
+welcome_channel = #TODO: Channel where the bot says it's gone online.
 
 # List of specific roles
 game_master = # TODO
