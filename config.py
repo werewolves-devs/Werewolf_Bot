@@ -1,6 +1,9 @@
 # Discord API / Login settings
 TOKEN = 'put_token_here'
 
+# Prefix
+prefix = '!'
+
 # List of specific files
 
 # List of specific channels
