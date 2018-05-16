@@ -48,9 +48,11 @@ class Participant:
         if self.activity == 48:
             # GIVE A WARNING
             # TODO
+            pass
         if self.activity == 72:
             # GIVE A NOTIFICATION
             # TODO
+            pass
     def talk(self):
         self.activity = 0
 
@@ -59,9 +61,9 @@ class Mailbox:
     def __init__(self):
         self.gamelog = []
         self.botspam = []
-        self.response = []
-        self.dmcaster = []
-        self.dmvictim = []
+        self.storytime = []
+        self.channel = []
+        self.player = []
     
     def log(self,message):
         self.gamelog.append(message)
@@ -69,39 +71,50 @@ class Mailbox:
         if len(self.gamelog) > 0:
             self.gamelog[-1] += message
             return
-        print("Attempted to add message to non-existent message!\n{}".format(message))
+        print("Attempted to add message to non-existent game-log message!\n{}".format(message))
         
     def spam(self,message):
         self.botspam.append(message)
     def spam_add(self,message):
         if len(self.botspam) > 0:
-            self.botspam[-1] += message
+            self.botspam[-1][1] += message
             return
-        print("Attempted to add message to non-existent message!\n{}".format(message))
+        print("Attempted to add message to non-existent bot-spam message!\n{}".format(message))
         
-    def answer(self,message):
-        self.response.append(message)
-    def answer_add(self,message):
-        if len(self.response) > 0:
-            self.response[-1] += message
+    def story(self,message):
+        self.storytime.append(message)
+    def story_add(self,message):
+        if len(self.storytime) > 0:
+            self.storytime[-1] += message
             return
-        print("Attempted to add message to non-existent message!\n{}".format(message))
+        print("Attempted to add message to non-existent story-time message!\n{}".format(message))
     
-    def dmcaster(self,message):
-        self.dmcaster.append(message)
-    def dmcaster_add(self,message):
-        if len(self.dmcaster) > 0:
-            self.dmcaster[-1] += message
+    def respond(self,message,channel):
+        self.channel.append([message,channel])
+    def respond_add(self,message):
+        if len(self.channel) > 0:
+            self.channel[-1][0] += message
             return
-        print("Attempted to add message to non-existent message!\n{}".format(message))
+        print("Attempted to add message to non-existent response!\n{}".format(message))
 
-    def dmvictim(self,message):
-        self.dmvictim.append(message)
-    def dmvictim_add(self,message):
-        if len(self.dmvictim) > 0:
-            self.dmvictim[-1] += message
+    def dm(self,message,channel):
+        self.player.append([message,channel])
+    def dm_add(self,message):
+        if len(self.player) > 0:
+            self.player[-1][0] += message
             return
-        print("Attempted to add message to non-existent message!\n{}".format(message))
+        print("Attempted to add message to non-existent DM!\n{}".format(message)) 
+
+    # Gain all info from another mailbox and put them inside this one.
+    def suck(self,old_mail):
+        for msg in old_mail.gamelog:
+            self.log(msg)
+        for msg in old_mail.botspam:
+            self.spam(msg)
+        for msg in old_mail.storytime:
+            self.story(msg)
+        for parcel in old_mail.channel:
+            self.respond(msg)   
 
 # This class contains all information that needs to be global. It is used for retrieving and passing on information from different functions.
 class Game_Control:
@@ -112,6 +125,9 @@ class Game_Control:
     # In here, all participants are listed.
     participants = []
 
+    # The time in the game. Either "Day", "Night" or "Undefined"
+    time = "Undefined"
+
     # This command locates the position of a selected player in the participants table.
     def position(self,victim_id):
         for i in len(self.participants):
@@ -121,6 +137,21 @@ class Game_Control:
         return False
     
     # This command adds a victim to the kill_queue.
-    def add_kill(self,victim_id,murderer):
-        self.kill_queue.append([self.position(victim_id),murderer])
+    def add_kill(self,victim_id,murderer,mail):
+        self.kill_queue.append([self.position(victim_id),murderer,mail])
 
+    # This command is executed when the day is started.
+    def start_day(self):
+        self.time = "Day"
+        result = Mailbox()
+
+        for loser in self.kill_queue:
+            msg_table = self.participants[loser[0]].kill(loser[1])
+            result.suck(loser[2])
+    
+    def start_night(self):
+        self.time = "Night"
+    
+    # Unsure if this will have a purpose.
+    def pause(self):
+        self.time = "Undefined"
