@@ -7,11 +7,9 @@ if TYPE_CHECKING:
     from .participant import Participant
 
 
-class Role(metaclass=ABCMeta):
-    @abstractmethod
-    async def night(self, participant: 'Participant'):
-        pass
+class Tag(metaclass=ABCMeta):
 
     @abstractmethod
     async def can_die(self, participant: 'Participant', death_cause: 'DeathCause') -> bool:
         pass
+
