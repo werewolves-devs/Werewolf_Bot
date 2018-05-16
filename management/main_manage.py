@@ -1,9 +1,7 @@
 from roles import Spectator
+from config import game_log
 
 class Participant:
-
-    # This is a universal table among all participants to figure out the position of each participant in the upper table.
-    idTable = []
     
     def __init__(self,name,id,channel):
         self.name = name
@@ -12,9 +10,6 @@ class Participant:
         self.channel = channel # The personal channel of the player, where their special powers will trigger.
         
         self.fakerole = self.role.name # The tanner's role.
-
-        # List of roles that can kill this player
-        self.killers = []
 
         # Set up abilities
         self.uses = 0
@@ -155,3 +150,8 @@ class Game_Control:
     # Unsure if this will have a purpose.
     def pause(self):
         self.time = "Undefined"
+    
+    def signup(self,name,id):
+        self.participants.append(Participant(name,id,game_log))
+        return Mailbox().log("<@{}> has signed up for a game of *Werewolves*!")
+        
