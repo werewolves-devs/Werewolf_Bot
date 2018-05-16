@@ -2,18 +2,9 @@ import roles as role
 
 # This function changes a player's role to a given role.
 # Make sure the player doesn't already have the given role, for this function resets abilities like how many amulets the amulet holder has.
-def swap(rolename,id,channel,uses,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets):
-    # List of people that can kill most players
-    std_killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
-    
-    if rolename == "Innocent":
-        return role.Innocent("Innocent",id,channel,std_killers,0,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets)
-    if rolename == "Alcoholic":
-        return role.Alcoholic("Alcoholic",id,channel,std_killers,0,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets)
-    if rolename == "Amulet Holder":
-        return role.Amulet_Holder("Amulet Holder",id,channel,std_killers,1,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets.append(id))
-    if rolename == "Assassin":
-        return role.Assassin("Assassin",id,channel,std_killers,0,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets)
+def swap(rolename):
+    # TODO
+    pass
 
 # Function that recognizes input of the user and translate it to what role it may refer to.
 # It returns the correct name of the role

@@ -1,3 +1,5 @@
+from main_management import Mailbox, Game_Control
+
 class Spectator:
 
     # NOTE: The spectator class is not meant for spectating!
@@ -21,26 +23,31 @@ class Innocent(Spectator):
         me.bitten = False
         me.fakerole = self.name
     
-    def kill(self,me,murderer):
-        if murderer not in self.killers:
-            return False
+    def standard_kill(self,me,murderer):
+        if murderer == "Innocent":
+            mail = Mailbox().log("The **{}** <@{}> got lynched by the town.".format(self.name,me.id))
+            return mail.log_add(death_phase(me,murderer))
+        if murderer == "Assassin":
+            mail = Mailbox.log(" has attacked <@{}>.".format(me.id))
+            return mail #TODO
     
     def death_phase(self,me,murderer):
-        if len(self.amulets) > 0 and self.name not in ["Amulet Holder", "Town Elder"]:
-            return "Amulets"
-        
+        msg = ""
 
 # ===============================================
 class Alcoholic(Innocent):
 
     def __init__(self):
         self.name = "Alcoholic"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
+
 
 # ===============================================
 class Amulet_Holder(Innocent):
 
     def __init__(self):
         self.name = "Amulet Holder"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
         
     def power(self,me,playertable,victim):
         if me.uses > 0 and me.undead == False and me.id != victim.id:
@@ -62,6 +69,7 @@ class Assassin(Innocent):
 
     def __init__(self):
         self.name = "Assassin"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
         
     def power(self,me,playertable,victim):
         if me.uses > 0 and me.undead == False:
@@ -85,6 +93,7 @@ class Aura_Teller(Assassin):
 
     def __init__(self):
         self.name = "Aura Teller"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
 
     #TODO: Add a function that returns one's aura.
     def power(self,me):
@@ -92,8 +101,14 @@ class Aura_Teller(Assassin):
 
 # ===============================================
 class Baker(Innocent):
-    pass
+    
+    def __init__(self):
+        self.name = "Baker"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
 
 # ===============================================
 class Butcher(Innocent):
-    pass
+    
+    def __init__(self):
+        self.name = "Butcher"
+        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
