@@ -1,5 +1,9 @@
 class Spectator:
-    pass
+
+    # NOTE: The spectator class is not meant for spectating!
+    # Maybe a rename will be useful soon, but the Spectator is supposed to be a role-less participant.
+    def __init__(self):
+        self.name = "Spectator"
 
 # ===============================================
 class Innocent(Spectator):
