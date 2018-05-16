@@ -8,6 +8,8 @@ prefix = '!'
 
 # List of specific channels
 welcome_channel = #TODO: Channel where the bot says it's gone online.
+game_log = #TODO
+bot_spam = #TODO
 
 # List of specific roles
 game_master = # TODO
