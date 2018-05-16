@@ -1,7 +1,8 @@
 class Spectator:
 
-    def __init__(self,personal_channel):
+    def __init__(self,id,personal_channel):
         self.name = "Spectator"
+        self.id = id
         self.channel = personal_channel
 
         # Set up special conditions
@@ -10,6 +11,8 @@ class Spectator:
         self.powdered = False
         self.frozen = False
         self.undead = False
+        self.bites = 0
+        self.bitten = False
 
         # Set up lists of people to kill etc.
         self.lovers = []
@@ -23,10 +26,13 @@ class Spectator:
 # ===============================================
 class Innocent(Spectator):
 
-    def __init__(self,name,id,channel,uses,votes,threatened,enchanted,demonized,powdered,frozen,undead,lovers,zombies,sleepers,souls,amulets):
-        self.name = name
-        self.id = id
-        self.channel = channel
+    def __init__(self,name,id,channel,killers,uses,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets):
+        self.name = name # N.B.: This is the name of the role, not the name of the player!
+        self.id = id # However, this IS the id of the player. :P
+        self.channel = channel # The personal channel of the player, where their special powers will trigger.
+
+        # List of roles that can kill this player
+        self.killers = killers
 
         # Set up abilities
         self.uses = uses
@@ -39,6 +45,8 @@ class Innocent(Spectator):
         self.powdered = powdered
         self.frozen = frozen
         self.undead = undead
+        self.bites = bites
+        self.bitten = bitten
 
         # Set up lists of people to kill or to sleep with
         self.lovers = lovers
@@ -56,7 +64,16 @@ class Innocent(Spectator):
         self.votes = 1
     
     def day(self):
-        pass
+        self.bitten = False
+    
+    def kill(self,murderer):
+        if murderer not in self.killers:
+            return False
+    
+    def death_phase(self,murderer):
+        if len(self.amulets) > 0 and self.name not in ["Amulet Holder", "Town Elder"]:
+            return "Amulets"
+        
 
 # ===============================================
 class Alcoholic(Innocent):
@@ -66,7 +83,8 @@ class Alcoholic(Innocent):
 class Amulet_Holder(Innocent):
 
     def power(self,playertable,victim):
-        if self.uses > 0:
+        if self.uses > 0 and self.undead == False
+        :
             for player in playertable:
                 if victim.id == player.role.id and player.role.name not in ["Spectator", "Dead"]:
                     player.role.amulets.append(self.id)
@@ -84,7 +102,7 @@ class Amulet_Holder(Innocent):
 class Assassin(Innocent):
 
     def power(self,playertable,victim):
-        if self.uses > 0:
+        if self.uses > 0 and self.undead == False:
             for player in playertable:
                 if victim.id == player.role.id and player.role.name not in ["Spectator", "Dead"]:
                     self.uses += -1
@@ -98,6 +116,7 @@ class Assassin(Innocent):
     
     def day(self):
         self.uses = 0
+        self.bitten = False
 
 # ===============================================
 class Aura_Teller(Assassin):
