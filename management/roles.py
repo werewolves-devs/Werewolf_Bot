@@ -25,37 +25,6 @@ class Spectator:
 
 # ===============================================
 class Innocent(Spectator):
-
-    def __init__(self,name,id,channel,killers,uses,votes,threatened,enchanted,demonized,powdered,frozen,undead,bites,bitten,lovers,zombies,sleepers,souls,amulets):
-        self.name = name # N.B.: This is the name of the role, not the name of the player!
-        self.id = id # However, this IS the id of the player. :P
-        self.channel = channel # The personal channel of the player, where their special powers will trigger.
-
-        # List of roles that can kill this player
-        self.killers = killers
-
-        # Set up abilities
-        self.uses = uses
-        self.votes = votes
-        self.threatened = threatened
-
-        # Set up special conditions
-        self.enchanted = enchanted
-        self.demonized = demonized
-        self.powdered = powdered
-        self.frozen = frozen
-        self.undead = undead
-        self.bites = bites
-        self.bitten = bitten
-
-        # Set up lists of people to kill or to sleep with
-        self.lovers = lovers
-        self.zombies = zombies
-        self.sleepers = sleepers
-
-        # Set up the inventory of the player
-        self.souls = souls
-        self.amulets = amulets
     
     def power(self):
         pass
@@ -83,8 +52,7 @@ class Alcoholic(Innocent):
 class Amulet_Holder(Innocent):
 
     def power(self,playertable,victim):
-        if self.uses > 0 and self.undead == False
-        :
+        if self.uses > 0 and self.undead == False:
             for player in playertable:
                 if victim.id == player.role.id and player.role.name not in ["Spectator", "Dead"]:
                     player.role.amulets.append(self.id)
