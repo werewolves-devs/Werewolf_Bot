@@ -1,4 +1,4 @@
-from main_management import Mailbox
+from main_management import Mailbox, Game_Control
 
 class Spectator:
 
@@ -12,7 +12,6 @@ class Innocent(Spectator):
     
     def __init__(self):
         self.name = "Innocent"
-        self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
     
     def power(self,me):
         pass
@@ -24,14 +23,16 @@ class Innocent(Spectator):
         me.bitten = False
         me.fakerole = self.name
     
-    def kill(self,me,murderer):
-        if murderer not in self.killers:
-            return False
+    def standard_kill(self,me,murderer):
+        if murderer == "Innocent":
+            mail = Mailbox().log("The **{}** <@{}> got lynched by the town.".format(self.name,me.id))
+            return mail.log_add(death_phase(me,murderer))
+        if murderer == "Assassin":
+            mail = Mailbox.log(" has attacked <@{}>.".format(me.id))
+            return mail #TODO
     
     def death_phase(self,me,murderer):
-        if len(self.amulets) > 0 and self.name not in ["Amulet Holder", "Town Elder"]:
-            return "Amulets"
-        
+        msg = ""
 
 # ===============================================
 class Alcoholic(Innocent):
@@ -111,5 +112,3 @@ class Butcher(Innocent):
     def __init__(self):
         self.name = "Butcher"
         self.killers = ["Innocent", "Assassin", "Barber", "Cult Leader", "Executioner", "Huntress", "Witch", "Werewolf", "Lone Wolf", "Devil", "Wager", "Horseman", "Pyromancer"]
-
-class 
