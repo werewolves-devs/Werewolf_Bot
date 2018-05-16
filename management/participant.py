@@ -10,6 +10,8 @@ class Participant:
         self.role = Spectator()
         self.id = id
         self.channel = channel # The personal channel of the player, where their special powers will trigger.
+        
+        self.fakerole = self.role.name # The tanner's role.
 
         # List of roles that can kill this player
         self.killers = []
