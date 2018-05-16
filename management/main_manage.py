@@ -65,5 +65,40 @@ class Mailbox:
     
     def log(self,message):
         self.gamelog.append(message)
+    def log_add(self,message):
+        if len(self.gamelog) > 0:
+            self.gamelog[-1] += message
+            return
+        print("Attempted to add message to non-existent message!\n{}".format(message))
+        
     def spam(self,message):
         self.botspam.append(message)
+    def spam_add(self,message):
+        if len(self.botspam) > 0:
+            self.botspam[-1] += message
+            return
+        print("Attempted to add message to non-existent message!\n{}".format(message))
+        
+    def answer(self,message):
+        self.response.append(message)
+    def answer_add(self,message):
+        if len(self.response) > 0:
+            self.response[-1] += message
+            return
+        print("Attempted to add message to non-existent message!\n{}".format(message))
+    
+    def dmcaster(self,message):
+        self.dmcaster.append(message)
+    def dmcaster_add(self,message):
+        if len(self.dmcaster) > 0:
+            self.dmcaster[-1] += message
+            return
+        print("Attempted to add message to non-existent message!\n{}".format(message))
+
+    def dmvictim(self,message):
+        self.dmvictim.append(message)
+    def dmvictim_add(self,message):
+        if len(self.dmvictim) > 0:
+            self.dmvictim[-1] += message
+            return
+        print("Attempted to add message to non-existent message!\n{}".format(message))
