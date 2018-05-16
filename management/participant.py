@@ -5,11 +5,39 @@ class Participant:
     # This is a universal table among all participants to figure out the position of each participant in the upper table.
     idTable = []
     
-    def __init__(self,name,id):
+    def __init__(self,name,id,channel):
         self.name = name
+        self.role = Spectator()
         self.id = id
-        self.role = Spectator(id,"0")
+        self.channel = channel # The personal channel of the player, where their special powers will trigger.
+
+        # List of roles that can kill this player
+        self.killers = []
+
+        # Set up abilities
+        self.uses = 0
+        self.votes = 1
+        self.threatened = 0
+
+        # Set up special conditions
+        self.enchanted = False
+        self.demonized = False
+        self.powdered = False
+        self.frozen = False
+        self.undead = False
+        self.bites = 0
+        self.bitten = False
+
+        # Set up lists of people to kill or to sleep with
+        self.lovers = []
+        self.zombies = []
+        self.sleepers = []
+
+        # Set up the inventory of the player
+        self.souls = -1
+        self.amulets = []
         
+        # Keep track of how many hours the participant hasn't said anything.
         self.activity = 0
     
     # Take care of a participant's activity
