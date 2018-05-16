@@ -23,3 +23,17 @@ class Participant:
             # TODO
     def talk(self):
         self.activity = 0
+
+# This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
+class Mailbox:
+    def __init__(self):
+        self.gamelog = []
+        self.botspam = []
+        self.response = []
+        self.dmcaster = []
+        self.dmvictim = []
+    
+    def log(self,message):
+        self.gamelog.append(message)
+    def spam(self,message):
+        self.botspam.append(message)
