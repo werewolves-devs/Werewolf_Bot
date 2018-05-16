@@ -102,3 +102,25 @@ class Mailbox:
             self.dmvictim[-1] += message
             return
         print("Attempted to add message to non-existent message!\n{}".format(message))
+
+# This class contains all information that needs to be global. It is used for retrieving and passing on information from different functions.
+class Game_Control:
+    
+    # All attacks are listed in here, including the role that attacked them.
+    kill_queue = []
+    
+    # In here, all participants are listed.
+    participants = []
+
+    # This command locates the position of a selected player in the participants table.
+    def position(self,victim_id):
+        for i in len(self.participants):
+            if participants[i].id == victim_id:
+                return i
+        print("The location has been requested of a participant that doesn't exist!")
+        return False
+    
+    # This command adds a victim to the kill_queue.
+    def add_kill(self,victim_id,murderer):
+        self.kill_queue.append([self.position(victim_id),murderer])
+
