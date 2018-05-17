@@ -7,6 +7,7 @@ def signup(client,message):
     #
     # It should check that the variable game_stage is set to zero.
     if game_stage == 0:
+        pass
         # The message must be checked on whether it has a vanilla emoji or not.
         # The function also needs to check if the user has already been signed up.
         # If all are the case, then sign the player up by using Game_Control.signup()
@@ -18,4 +19,4 @@ def signup(client,message):
         #
         # Ask Randium or somebody else if you have any questions.
     else:
-        #Should return a Mailbox, though I'm confused on the implementation
+        return Mailbox().respond("You can't sign up when a game's running, sweetie. :kissing_hearts:",message.channel)
