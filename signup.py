@@ -19,4 +19,4 @@ def signup(client,message):
         #
         # Ask Randium or somebody else if you have any questions.
     else:
-        return Mailbox().respond("You can't sign up when a game's running, sweetie. :kissing_hearts:",message.channel)
+        return Mailbox().respond("You can't sign up when a game's running, sweetie. :kissing_heart:",message.channel)
