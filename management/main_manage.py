@@ -1,12 +1,13 @@
-from roles import Spectator
+import roles
 from config import game_log
 
 class Participant:
     
     def __init__(self,name,id,channel):
         self.name = name
-        self.role = Spectator()
+        self.role = roles.Spectator()
         self.id = id
+        self.emoji = ":smirk:"
         self.channel = channel # The personal channel of the player, where their special powers will trigger.
         
         self.fakerole = self.role.name # The tanner's role.
@@ -37,6 +38,18 @@ class Participant:
         # Keep track of how many hours the participant hasn't said anything.
         self.activity = 0
     
+    # Change the player's role
+    def swap(self,rolename):
+        if rolename == "Innocent":
+            self.role = roles.Innocent()
+            return
+        if rolename == "Alcoholic":
+            self.role = roles.Alcoholic()
+        if rolename == "Amulet Holder":
+            self.role = roles.Amulet_Holder()
+            self.amulets.append(self.id)
+        # TODO
+
     # Take care of a participant's activity
     def hour(self):
         self.activity += 1
@@ -109,7 +122,9 @@ class Mailbox:
         for msg in old_mail.storytime:
             self.story(msg)
         for parcel in old_mail.channel:
-            self.respond(msg)   
+            self.channel.append(parcel)
+        for parcel in old_mail.player:
+            self.player.append(parcel)   
 
 # This class contains all information that needs to be global. It is used for retrieving and passing on information from different functions.
 class Game_Control:
@@ -126,7 +141,7 @@ class Game_Control:
     # This command locates the position of a selected player in the participants table.
     def position(self,victim_id):
         for i in len(self.participants):
-            if participants[i].id == victim_id:
+            if self.participants[i].id == victim_id:
                 return i
         print("The location has been requested of a participant that doesn't exist!")
         return False
