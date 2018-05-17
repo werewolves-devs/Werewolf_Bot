@@ -145,7 +145,7 @@ class Barber(Innocent):
     def power(self,me,victim):
         if me.undead == True:
             return Mailbox().respond("You're undead! You can't use your powers!",me.channel)
-        if me.uses > 0:
+        if me.uses > 0 and me.frozen == False:
             if me.id == victim.id:
                 return Mailbox().respond("Whether suicide is an option or not is for you to find out. However, it is not in this game. Try again, please.",me.channel)
             for player in Game_Control().participants:
@@ -155,7 +155,13 @@ class Barber(Innocent):
                         mail.log_add(" <@{}>, a soulless **{}** who happened to have a soul protecting them.".format(player.id,player.role.name))
                         mail.respond("Though you thought you had cut up your target nicely enough, it seems they have somehow survived! Too bad...",me.channel)
                         return mail
+                    if player.role.name == "Immortal":
+                        mail.log_add(" <@{}>. This failed, as the **Immortal** does  not die to a mere **Barber**.".format(player.id))
+                        mail.respond("Though you thought you had cut up your target nicely enough, it seems they have somehow survived! Too bad...",me.channel)
+                        return mail
                     mail.log_add(" <@{}>, the town's favourite **{}**.")
                     mail.story(barber_kill_story(me.id,player.id))
                     mail.spam(">kill <@{}> {} 1".format(player.id,player.emoji))
                     return mail
+            return Mailbox().respond("Hmmm, it seems like I wasn't able to find the person you were looking for, sorry.",me.channel)
+        return Mailbox().respond("Sorry, bud! Now is not the time to use your powers!",me.channel)
