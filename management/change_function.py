@@ -4,7 +4,7 @@ import roles as role
 # Make sure the player doesn't already have the given role, for this function resets abilities like how many amulets the amulet holder has.
 def swap(rolename):
     # TODO
-    return True
+    return False
 
 # Function that recognizes input of the user and translate it to what role it may refer to.
 # It returns the correct name of the role
