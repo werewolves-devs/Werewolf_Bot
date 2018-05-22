@@ -74,7 +74,7 @@ def users(message,amount = -1, delete_duplicates = True):
     if delete_duplicates == True:
         user_table = list(set(user_table))
     
-    if amount > len(user_table):
+    if max(amount,1) > len(user_table):
         return False
 
     if amount == -1:
@@ -92,7 +92,7 @@ def numbers(message,amount = -1, delete_duplicates = False):
         if check_for_int(argument):
             number_table.append(int(argument))
     
-    if amount > len(number_table):
+    if max(amount,1) > len(number_table):
         return False
     
     if amount == -1:
