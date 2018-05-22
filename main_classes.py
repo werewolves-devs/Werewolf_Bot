@@ -1,69 +1,6 @@
 import roles
 from config import game_log
 
-class Participant:
-    
-    def __init__(self,name,id,channel):
-        self.name = name
-        self.role = roles.Spectator()
-        self.id = id
-        self.emoji = ":smirk:"
-        self.channel = channel # The personal channel of the player, where their special powers will trigger.
-        
-        self.fakerole = self.role.name # The tanner's role.
-
-        # Set up abilities
-        self.uses = 0
-        self.votes = 1
-        self.threatened = 0
-
-        # Set up special conditions
-        self.enchanted = False
-        self.demonized = False
-        self.powdered = False
-        self.frozen = False
-        self.undead = False
-        self.bites = 0
-        self.bitten = False
-
-        # Set up lists of people to kill or to sleep with
-        self.lovers = []
-        self.zombies = []
-        self.sleepers = []
-
-        # Set up the inventory of the player
-        self.souls = -1
-        self.amulets = []
-        
-        # Keep track of how many hours the participant hasn't said anything.
-        self.activity = 0
-    
-    # Change the player's role
-    def swap(self,rolename):
-        if rolename == "Innocent":
-            self.role = roles.Innocent()
-            return
-        if rolename == "Alcoholic":
-            self.role = roles.Alcoholic()
-        if rolename == "Amulet Holder":
-            self.role = roles.Amulet_Holder()
-            self.amulets.append(self.id)
-        # TODO
-
-    # Take care of a participant's activity
-    def hour(self):
-        self.activity += 1
-        if self.activity == 48:
-            # GIVE A WARNING
-            # TODO
-            pass
-        if self.activity == 72:
-            # GIVE A NOTIFICATION
-            # TODO
-            pass
-    def talk(self):
-        self.activity = 0
-
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
     def __init__(self):
@@ -131,42 +68,19 @@ class Game_Control:
     
     # All attacks are listed in here, including the role that attacked them.
     kill_queue = []
-    
-    # In here, all participants are listed.
-    participants = []
 
     # The time in the game. Either "Day", "Night" or "Undefined"
     time = "Undefined"
 
-    # This command locates the position of a selected player in the participants table.
-    def position(self,victim_id):
-        for i in len(self.participants):
-            if self.participants[i].id == victim_id:
-                return i
-        print("The location has been requested of a participant that doesn't exist!")
-        return False
-    
-    # This command adds a victim to the kill_queue.
-    def add_kill(self,victim_id,murderer,mail):
-        self.kill_queue.append([self.position(victim_id),murderer,mail])
-
     # This command is executed when the day is started.
     def start_day(self):
         self.time = "Day"
-        result = Mailbox()
-
-        for loser in self.kill_queue:
-            msg_table = self.participants[loser[0]].kill(loser[1])
-            result.suck(loser[2])
     
+    # This command is executed when the night is started.
     def start_night(self):
         self.time = "Night"
     
     # Unsure if this will have a purpose.
     def pause(self):
         self.time = "Undefined"
-    
-    def signup(self,name,id):
-        self.participants.append(Participant(name,id,game_log))
-        return Mailbox().log("<@{}> has signed up for a game of *Werewolves*!")
         
