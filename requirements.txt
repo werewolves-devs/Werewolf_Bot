@@ -1,1 +1,25 @@
 discord #for later
+
+# List of arguments in the database:
+0 - id
+1 - name
+2 - emoji
+3 - activity
+4 - channel
+5 - role
+6 - fakerole
+7 - uses
+8 - votes
+9 - threatened
+10 - enchanted
+11 - demonized
+12 - powdered
+13 - frozen
+14 - undead
+15 - bites
+16 - bitten
+17 - souls
+18 - lovers
+19 - sleepers
+20 - amulets
+21 - zombies
