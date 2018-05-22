@@ -21,6 +21,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    
     await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
 
 client.run(config.TOKEN)
