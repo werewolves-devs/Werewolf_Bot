@@ -5,7 +5,7 @@ conn = sqlite3.connect(config.database)
 c = conn.cursor()
 
 def reset():
-    confirm = raw_input("Are you sure you want to reset the data? Any current game progress will be deleted.\nType 'Yes' to proceed. ")
+    confirm = input("Are you sure you want to reset the data? Any current game progress will be deleted.\nType 'Yes' to proceed. ")
     if confirm != 'Yes':
         print('Resetting canceled.')
         return
@@ -20,7 +20,7 @@ def reset():
     c.execute("CREATE TABLE 'kill_queue' ('victim' TEXT NOT NULL, 'role' TEXT NOT NULL, 'murderer' TEXT)")
     print('Formatting completed! The bot is now ready for a new game!\n')
 
-    raw_input("Press any button to exit this program.")
+    input("Press any button to exit this program.")
 
 if __name__ == "__main__":
     reset()
