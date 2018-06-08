@@ -33,6 +33,9 @@ def numbers(message,amount = -1, delete_duplicates = False):
         if check_for_int(argument):
             number_table.append(int(argument))
     
+    if delete_duplicates == True:
+        number_table = list(set(number_table))
+    
     if max(amount,1) > len(number_table):
         return False
     
@@ -40,6 +43,26 @@ def numbers(message,amount = -1, delete_duplicates = False):
         return number_table
     
     return [number_table[i] for i in range(amount)]
+
+# Makes sure the message has at least the needed amount of emojis.
+# The command should return the given amount of numbers, or, if equal to -1, should return them all.
+def emojis(message,amount = -1, delete_duplicates = True):
+    emoji_table = []
+
+    for argument in message.content.split(' '):
+        # TODO: Check if the "word" is a vanilla Discord emoji
+        pass
+    
+    if delete_duplicates == True:
+        emoji_table = list(set(emoji_table))
+    
+    if max(amount,1) > len(emoji_table):
+        return False
+    
+    if amount == -1:
+        return emoji_table
+    
+    return [emoji_table[i] for i in range(amount)]
 
 # Checks if a file can be converted into an integer.
 # If it cannot, the function returns false.

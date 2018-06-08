@@ -1,6 +1,6 @@
 import sqlite3
 from config import database
-from management.cmd_requirements import positionof
+from management.position import positionof
 
 conn = sqlite3.connect(database)
 c = conn.cursor()

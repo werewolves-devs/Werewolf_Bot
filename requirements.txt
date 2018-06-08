@@ -23,3 +23,9 @@ discord #for later
 19 - sleepers
 20 - amulets
 21 - zombies
+
+
+# TODO
+- Add emoji checker in ./interpretation/check.py
+- Complete command list in ./interpretation/head.py
+- Add functinos for the command list above in ./roles_n_rules/functions.py
