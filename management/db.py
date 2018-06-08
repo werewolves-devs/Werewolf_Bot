@@ -40,11 +40,11 @@ def get_user(id):
         return None
 
 # Gather a user's bit of information from the database.
-def get(user_id,column):
+def db_get(user_id,column):
     return get_user(user_id)[positionof(column)]
 
 # Change a user's bit of information in the database.
-def set(user_id,column,value):
+def db_set(user_id,column,value):
     c.execute("UPDATE game SET ?=? WHERE id=?", (column,value,user_id))
     conn.commit()
 
@@ -52,6 +52,6 @@ def set(user_id,column,value):
 def db_test():
     print c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')")
     print get_user(1)
-    print get(1,'channel')
+    print db_get(1,'channel')
     # These changes aren't saved, making them safe to test.
-    return get(1,'name')
+    return db_get(1,'name')
