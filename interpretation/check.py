@@ -1,0 +1,60 @@
+from management.db import emoji_to_player
+
+# Makes sure the message has at least the needed amount of users.
+# If the message contains emojis, they should be converted to ids as well. Mentions have priority, however.
+# The command should return the given amount of user ids, or, if equal to -1, should return them all.
+def users(message,amount = -1, delete_duplicates = True):
+    user_table = [person.id for person in message.mentions]
+
+    for argument in message.content.split(' '):
+        response = emoji_to_player(argument)
+
+        if response != None:
+            user_table.append(response)
+    
+    if delete_duplicates == True:
+        user_table = list(set(user_table))
+    
+    if max(amount,1) > len(user_table):
+        return False
+
+    if amount == -1:
+        return user_table
+    
+    return [user_table[i] for i in range(amount)]
+
+
+# Makes sure the message has at least the needed amount of integers.
+# The command should return the given amount of numbers, or, if equal to -1, should return them all.
+def numbers(message,amount = -1, delete_duplicates = False):
+    number_table = []
+
+    for argument in message.content.split(' '):
+        if check_for_int(argument):
+            number_table.append(int(argument))
+    
+    if max(amount,1) > len(number_table):
+        return False
+    
+    if amount == -1:
+        return number_table
+    
+    return [number_table[i] for i in range(amount)]
+
+# Checks if a file can be converted into an integer.
+# If it cannot, the function returns false.
+def check_for_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+if __name__ == "__main__":
+    class message:
+        content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier."
+    
+    x = message()
+    print numbers(x)
+    print numbers(x,3)
+    print numbers(x,5)
