@@ -1,4 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
+import check
 import roles_n_rules.functions as func
 from config import prefix
 
@@ -22,8 +23,11 @@ def process(message, isGameMaster = False):
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
     if message.content.startswith(prefix + 'signup'):
-        # TODO
-        return todo()
+        if check.emojis(message) == False:
+            return func.syntax_signup()
+        
+        return func.signup(user_id,check.emojis(message,1,True)[0],message_channel)
+
     if message.content.startswith(prefix + 'help signup'):
         # TODO
         return todo()
