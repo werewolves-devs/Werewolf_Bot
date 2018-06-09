@@ -28,4 +28,4 @@ discord #for later
 # TODO
 - Add emoji checker in ./interpretation/check.py
 - Complete command list in ./interpretation/head.py
-- Add functinos for the command list above in ./roles_n_rules/functions.py
+- Add functions for the command list above in ./roles_n_rules/functions.py
