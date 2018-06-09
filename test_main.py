@@ -1,4 +1,4 @@
-from management.db import db_test
+from test import database_check
 
 #This file runs CI on Travis
 # It will be better soon
@@ -6,4 +6,5 @@ from management.db import db_test
 def test_universe_is_working_properly():
   assert 1 == 1 #If this fails, something is seriously wrong
 
-  assert db_test() == 'Randium003'
+  # WARNING: DO NOT EXECUTE DURING A GAME
+  assert database_check() == 'Assassin'
