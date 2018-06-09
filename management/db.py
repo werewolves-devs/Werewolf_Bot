@@ -45,13 +45,24 @@ def db_get(user_id,column):
 
 # Change a user's bit of information in the database.
 def db_set(user_id,column,value):
-    c.execute("UPDATE game SET ?=? WHERE id=?", (column,value,user_id))
+    # WARNING: Be VERY cautious with the column argument, as it is exploitable to SQL injection!
+    c.execute("UPDATE game SET {} = ? WHERE id= ?".format(column), (value,user_id))
     conn.commit()
 
+# Add a new participant to the database
+def signup(user_id,name,emoji):
+    c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
 
 def db_test():
+    print c.execute("SELECT * FROM game").fetchall()
     print c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')")
     print get_user(1)
     print db_get(1,'channel')
     # These changes aren't saved, making them safe to test.
-    return db_get(1,'name')
+
+    print signup(2,'Buddy1913',':fire:')
+    print get_user(2)
+    print db_get(2,"role")
+    print db_set(2,"role","Assassin")
+    print get_user(2)
+    return db_get(2,'role')
