@@ -21,10 +21,11 @@ or one could work with the commands like
     emoji_to_player(":smirk:")
 
 #### execute(command)
-This command is used if one directly wishes to use a command upon the SQL database. Use of this function is discouraged, as it may not always be SQL-injection proof.
-An example is
+This command is used if one directly wishes to use a command upon the SQL database. Use of this function is discouraged, as it may not always be SQL-injection proof. If you need a certain function and it is not listed down here, please consult another developer or write your own function.
+Examples are
 
     execute("SELECT * FROM game")
+    execute("DELETE FROM death-row WHERE id = 1")
 
 #### emoji_to_player(emoji)
 The **emoji_to_player()**-function takes a given emoji as an input and looks through the database if there's a participant with that emoji. This function is resistant to SQL-injection, and returns a user's id if it has found a match, and returns None if it cannot find a participant.
@@ -46,7 +47,7 @@ The **user_id** value can be either a string or an integer. If it cannot find th
     db_get("248158876799729664","sleepers")
     db_get("248158876799729664","uses")
     
-#### db_set(user_id,column,value)
+#### <a head="#db_set"></a> db_set(user_id,column,value)
 Change a certain aspect of a given participant. Note that SQL does not understand True or False, so values like *demonized* and *enchanted* have values like 0 and 1. The function does not return anything. If the program doesn't raise an error, you may assume the function worked as intended.
 **Watch out:** the value **column** is not SQL-injection proof! Always make sure to type the **column** value yourself rather than filling in a variable. Never blindly trust the user!
 Once again, **user_id** can be either an integer or a string, and **value** van be either, depending on what the database wants.
@@ -72,6 +73,13 @@ This function gets an order to kill from the kill queue (for the ones asking in 
 
 The first element isn't too relevant; it's used in the database to distinguish kills and to handle a rare scenario of two identical attacks. The second argument is the id of the victim. The third is the killer's "role" and the last one is either an empty string or the id of an appointed murderer.
 **Watch out:** After calling the function **get_kill()**, the retrieved data is removed from the database. This is a good and efficient property, but keep in mind that you need to store its output in a variable, and not expect **get_kill()** to return the same thing when re-calling the function.
+
+#### signup(user_id,name,emoji)
+To add a participant to the list, one must use this command. Note that [db_set()](#db_set) only changes data, while **signup()** allows the bot to add a new participant.
+
+    signup(248158876799729664,'Randium#6521',":smirk:")
+
+**user_id** can be either an integer or a string, while **name** and **emoji** must be strings.
 
 #### db_test()
 This function is to be ignored. It is used for testing purposes and should not be used in actual code.
