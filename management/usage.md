@@ -61,3 +61,28 @@ This function is to be ignored. It is used for testing purposes and should not b
 ### <a head="#position"></a>position.py
 
 This function is not needed to be used, but it lists what column is present and to which number it translates. However, if you need to look up what columns there are, you can find them listed down here;
+
+0 - id
+1 - name
+2 - emoji
+3 - activity
+4 - channel
+5 - role
+6 - fakerole
+7 - uses
+8 - votes
+9 - threatened
+10 - enchanted
+11 - demonized
+12 - powdered
+13 - frozen
+14 - undead
+15 - bites
+16 - bitten
+17 - souls
+18 - lovers
+19 - sleepers
+20 - amulets
+21 - zombies
+
+If you need another column to be added, ask @Randium#6521 about it, or discuss it with the community.
