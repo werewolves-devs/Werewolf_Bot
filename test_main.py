@@ -22,7 +22,7 @@ def test_functions_module():
 
 # Check positionof() function
 def test_positionof():
-  assert db_test() == 'Randium003'
+  assert database_check() == 'Assassin'
 
   assert positionof("frozen") == 13
   assert positionof("fakerole") == 6
