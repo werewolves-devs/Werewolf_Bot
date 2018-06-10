@@ -14,8 +14,6 @@ def test_universe_is_working_properly():
 
 # Check positionof() function
 def test_positionof():
-  assert database_check() == 'Assassin'
-
   assert positionof("frozen") == 13
   assert positionof("fakerole") == 6
   assert positionof("votes") == 8
