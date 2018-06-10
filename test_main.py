@@ -1,6 +1,5 @@
 # This file runs CI on Travis
 # It will be better soon
-
 from management.db import db_test
 from management.position import positionof
 
