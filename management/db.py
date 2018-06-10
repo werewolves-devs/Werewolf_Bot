@@ -48,6 +48,9 @@ def db_set(user_id,column,value):
     c.execute("UPDATE game SET ?=? WHERE id=?", (column,value,user_id))
     conn.commit()
 
+# Add a new participant to the database
+def signup(user_id,name,emoji):
+    c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
 
 def db_test():
     print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))

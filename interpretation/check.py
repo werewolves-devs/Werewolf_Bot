@@ -1,3 +1,4 @@
+from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player
 
 # Makes sure the message has at least the needed amount of users.
@@ -50,8 +51,8 @@ def emojis(message,amount = -1, delete_duplicates = True):
     emoji_table = []
 
     for argument in message.content.split(' '):
-        # TODO: Check if the "word" is a vanilla Discord emoji
-        pass
+        if argument in UNICODE_EMOJI:
+            emoji_table.append(argument)
     
     if delete_duplicates == True:
         emoji_table = list(set(emoji_table))
