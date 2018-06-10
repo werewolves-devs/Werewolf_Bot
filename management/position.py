@@ -52,7 +52,7 @@ def positionof(column):
 # It will not run if the file is being imported by another file.
 if __name__ == "__main__":
 
-    print positionof("demonized")
-    print positionof("bites")
-    print positionof("id")
-    print positionof("Something that doesn't exist! :D")
+    print(positionof("demonized"))
+    print(positionof("bites"))
+    print(positionof("id"))
+    print(positionof("Something that doesn't exist! :D"))
