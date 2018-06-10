@@ -1,5 +1,5 @@
 discord #for later
-
+emoji
 # List of arguments in the database:
 0 - id
 1 - name
