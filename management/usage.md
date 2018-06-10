@@ -38,9 +38,13 @@ Gather all information of a participant. However, this information is still unpa
     get_user("248158876799729664")
 
 #### db_get(user_id,column)
-Find a certain aspect of a participant. Find out if they're enchanted, demonized, what their emoji is, how many amulets they carry, et cetera. It is SQL-injection proof, but will raise an error if **column** does not exist in the database. Read the subsection [link](#position) for the possible values for **column**.
+Find a certain aspect of a participant. Find out if they're enchanted, demonized, what their emoji is, how many amulets they carry, et cetera. It is SQL-injection proof, but will raise an error if **column** does not exist in the database. Read the subsection [position.py](#position) for the possible values for **column**.
+The **user_id** value can be either a string or an integer. If it cannot find the user, however, it will return None. **column** does need to be a string.
 
-    db_get("")
+    db_get("248158876799729664","enchanted")
+    db_get("248158876799729664","id") # Stupid, but who knows. Perhaps needed, at some point.
+    db_get("248158876799729664","sleepers")
+    db_get("248158876799729664","uses")
     
 ### <a head="#position"></a>position.py
 
