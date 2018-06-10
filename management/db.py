@@ -50,8 +50,8 @@ def db_set(user_id,column,value):
 
 
 def db_test():
-    print c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')")
-    print get_user(1)
-    print db_get(1,'channel')
+    print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))
+    print(get_user(1))
+    print(db_get(1,'channel'))
     # These changes aren't saved, making them safe to test.
     return db_get(1,'name')
