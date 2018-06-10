@@ -19,3 +19,16 @@ def test_positionof():
   assert positionof("bitten") == 16
   assert positionof("id") == 0
 # There isn't actually any other tests yet
+
+# Check if the kill_queue is fully functional
+import management.db as db
+import reset
+
+def kill_queue_test():
+  db.add_kill(12738912739821,"Barber")
+  db.add_kill(12347892374923,"White Werewolf","7289347983274")
+  assert db.get_kill() == [1,u'12738912739821',u'Barber',u'']
+  assert db.get_kill() == [2,u'12347892374923',u'White Werewolf',u'7289347983274']
+  assert db.get_kill() == None
+  reset.reset(True)
+  return True

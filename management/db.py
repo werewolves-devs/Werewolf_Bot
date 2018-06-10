@@ -48,9 +48,38 @@ def db_set(user_id,column,value):
     c.execute("UPDATE game SET ?=? WHERE id=?", (column,value,user_id))
     conn.commit()
 
+# Add a kill to the kill queue.
+# Apply in case of an end-effect kill.
+def add_kill(victim_id,role,murderer = ""):
+    data = [victim_id,role,murderer]
+    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)    
+    conn.commit()
+    return
+
+# Gather a kill from the kill queue. Pay attention; the function auto-deletes the kill from the list
+def get_kill():
+    c.execute("SELECT * FROM 'death-row'")
+
+    try:
+        order = c.fetchone()
+        
+        if order == None:
+            return None
+    except TypeError:
+        return None
+    except IndexError:
+        return None
+
+    kill = [order[i] for i in range(4)]
+    c.execute("DELETE FROM 'death-row' WHERE (id =?)",(kill[0],))
+    conn.commit()
+    return kill
+
+
 # Add a new participant to the database
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
+    conn.commit()
 
 def db_test():
     print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))
