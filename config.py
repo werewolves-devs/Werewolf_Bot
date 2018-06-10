@@ -21,3 +21,5 @@ participant = "22" #TODO
 dead_participant = "33" #TODO
 frozen_participant = "44" #TODO
 suspended = "55" #TODO
+
+# BenTechy sucks lol
