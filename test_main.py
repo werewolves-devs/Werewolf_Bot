@@ -4,7 +4,6 @@
 from management.db import db_test
 from management.position import positionof
 
-
 # Sanity checks
 def test_universe_is_working_properly():
   assert 1 == 1 #If this fails, something is seriously wrong
