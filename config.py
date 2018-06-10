@@ -3,8 +3,10 @@ TOKEN = 'put_token_here'
 
 game_stage = 0
 
-# Prefix
+# Prefixes      yes, I thought it would be prefices, but no, it's not, unfortunately. :(
+#               Source: https://english.stackexchange.com/questions/277945/is-the-plural-of-prefix-really-prefixes-rather-than-prefices
 prefix = '!'
+universal_prefix = "#!003-88-6521"
 
 # List of specific files
 database = 'database.db'
