@@ -55,6 +55,24 @@ Once again, **user_id** can be either an integer or a string, and **value** van 
     db_set("248158876799729664","votes","1")
     db_set(248158876799729664,"powdered","1")
 
+#### add_kill(victim_id,role,murderer)
+This function adds a player to the kill queue for the end of the night/day, when all end effects apply. The argument **murderer** is optional. **victim_id** is the participant that is about to be killed.
+**role** is the role by whom they were attacked, but this does vary. A daily lynch counts as a kill by the Innocent role, while the cult lynch is by the Cult Leader and the werewolf kill is done by the Werewolf role.
+The reason that **murderer** is optional, is because it isn't always relevant. There is no killer to blame when being lynched. However, it is relevant for the game log if there are, for example, multiple assassins, to keep track of who killed whom. This **murderer** argument is also used to give the Macho a name; if a werewolf group attacks the macho, a random wolf member will be placed in this argument. A function for this is to be made.
+As both **victim_id** and **murderer** are ids, they can be either a string or an integer. **role** does need to be a string, however.
+
+    add_kill(248158876799729664,"Innocent")
+    add_kill("248158876799729664","Priest",247096918923149313) # This does not kill everybody - however, it is determined at the end of the night who dies
+
+#### get_kill()
+This function gets an order to kill from the kill queue (for the ones asking in which order, I ask thee; is it called a kill *stack* or a kill *queue*?) and returns a table with the relevant information. Once the kill queue is empty, the function will return **None**.
+
+    get_kill() # => [1,u'248158876799729664',u'Innocent',u'']
+    get_kill() # => [2,u'248158876799729664',u'Priest',u'247096918923149313']
+
+The first element isn't too relevant; it's used in the database to distinguish kills and to handle a rare scenario of two identical attacks. The second argument is the id of the victim. The third is the killer's "role" and the last one is either an empty string or the id of an appointed murderer.
+**Watch out:** After calling the function **get_kill()**, the retrieved data is removed from the database. This is a good and efficient property, but keep in mind that you need to store its output in a variable, and not expect **get_kill()** to return the same thing when re-calling the function.
+
 #### db_test()
 This function is to be ignored. It is used for testing purposes and should not be used in actual code.
 
