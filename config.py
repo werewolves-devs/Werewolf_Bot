@@ -7,6 +7,7 @@ game_stage = 0
 prefix = '!'
 
 # List of specific files
+database = 'database.db'
 
 # List of specific channels
 welcome_channel = "0" #TODO: Channel where the bot says it's gone online.

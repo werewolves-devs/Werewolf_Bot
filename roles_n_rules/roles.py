@@ -1,4 +1,4 @@
-from main_manage import Mailbox, Game_Control
+from main_classes import Mailbox, Game_Control
 from story_time.barber_kills import barber_kill_story
 
 class Spectator:
