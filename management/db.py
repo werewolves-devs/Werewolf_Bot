@@ -75,6 +75,12 @@ def get_kill():
     conn.commit()
     return kill
 
+
+# Add a new participant to the database
+def signup(user_id,name,emoji):
+    c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
+    conn.commit()
+
 def db_test():
     print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))
     print(get_user(1))
