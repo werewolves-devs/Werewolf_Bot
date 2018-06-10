@@ -46,6 +46,18 @@ The **user_id** value can be either a string or an integer. If it cannot find th
     db_get("248158876799729664","sleepers")
     db_get("248158876799729664","uses")
     
+#### db_set(user_id,column,value)
+Change a certain aspect of a given participant. Note that SQL does not understand True or False, so values like *demonized* and *enchanted* have values like 0 and 1. The function does not return anything. If the program doesn't raise an error, you may assume the function worked as intended.
+**Watch out:** the value **column** is not SQL-injection proof! Always make sure to type the **column** value yourself rather than filling in a variable. Never blindly trust the user!
+Once again, **user_id** can be either an integer or a string, and **value** van be either, depending on what the database wants.
+
+    db_set(248158876799729664,"uses",0)
+    db_set("248158876799729664","votes","1")
+    db_set(248158876799729664,"powdered","1")
+
+#### db_test()
+This function is to be ignored. It is used for testing purposes and should not be used in actual code.
+
 ### <a head="#position"></a>position.py
 
-This is a test.
+This function is not needed to be used, but it lists what column is present and to which number it translates. However, if you need to look up what columns there are, you can find them listed down here;
