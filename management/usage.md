@@ -6,10 +6,10 @@ This folder contains all the management with the database directly, or, possibly
 
 The folder contains a few files. Here's an explanation of what everything is and what it all does.
 
-###__init__.py
+### __init__.py
 This file is merely to add the folder to the PYTHONPATH and have it seen as a module. This means that ./management can be imported as a package (management)
 
-###db.py
+### db.py
 This is the relevant file that contains all the commands you need. If one wishes to import these functions, one could either use
     import management.db as db
     db.execute("SELECT * FROM game")
