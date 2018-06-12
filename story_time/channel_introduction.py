@@ -27,6 +27,18 @@ sworn to be up to no good!
 **You are the Aura Teller. Each night, you may inspect a player and find out if they are part of the wolf pack.\
 Remember that a positive aura does not necessarily mean they are on your team! Good luck.**\
 """
-        
+    
+    if role == "Baker":
+        msg = """\
+**=========================**
+**WELCOME, BAKERS**
+**=========================**
+As it is crucial that the bread is distributed evenly among the town, you have a trusted league with each other. \
+You all know each other well enough, and can be sure to count on each other. \
+Let's hope that the rest of the town is trustworthy as well...
+**You are the bakers. All other members of this channel are bakers. Assuming their roles do not change, you can trust them completely.\
+Use this group to share information, plan strategies and catch liars! Good luck.**\
+"""
+    
     # Ignore this. This allows us to see your message.
     return msg
