@@ -32,11 +32,11 @@ def kill_queue_test():
 
 # Check the database
 def test_database():
-  assert poll_list() == []
+  assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
-  assert get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'')
-  assert db_get(1,'channel') == '#gamelog'
-  assert isParticipant(1) == True
-  assert isParticipant(2) == False
-  db_set(1,'frozen',1)
-  assert poll_list() == [(u'1',u'Randium003',u'1')]
+  assert db.get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'')
+  assert db.db_get(1,'channel') == '#gamelog'
+  assert db.isParticipant(1) == True
+  assert db.isParticipant(2) == False
+  db.db_set(1,'frozen',1)
+  assert sb.poll_list() == [(u'1',u'Randium003',u'1')]
