@@ -38,7 +38,7 @@ Gather all information of a participant. However, this information is still unpa
 
     get_user("248158876799729664")
 
-#### isParticipant(id,spectator = False)
+#### isParticipant(id,spectator)
 Look up in the database if the message author, having **id** as their id, is a participant in the current game.  The value **id** can be either a string or an integer. **spectator**, if given, must be a boolean value.
 By default, the value **spectator** is set to False, but can be set to True if needed. It is the value that should be returned if the player has the spectator role. For example, being a spectator should not be taken as a participant for ingame commands (spectators should not be allowed to create cc's), while it is important to find them while assigning roles at the start of the game.
 
