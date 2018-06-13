@@ -33,7 +33,7 @@ def kill_queue_test():
 # Check the database
 def test_database():
   assert poll_list() == []
-  db.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')")
+  db.signup(1,'Randium003',u':smirk:')
   assert get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'')
   assert db_get(1,'channel') == '#gamelog'
   assert isParticipant(1) == True
