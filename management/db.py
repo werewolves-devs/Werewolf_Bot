@@ -12,6 +12,11 @@ def execute(cmd_string):
 
     return c.fetchall()
 
+def poll_list():
+    c.execute("SELECT id, emoji, frozen FROM game")
+
+    return c.fetchall()
+
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
 def emoji_to_player(emoji):
@@ -45,7 +50,7 @@ def isParticipant(id,spectator = False):
     
     if spectator == False and db_get(id,"role") == u'Spectator':
         return False
-        
+
     return True
 
 # Gather a user's bit of information from the database.
@@ -54,7 +59,7 @@ def db_get(user_id,column):
 
 # Change a user's bit of information in the database.
 def db_set(user_id,column,value):
-    c.execute("UPDATE game SET ?=? WHERE id=?", (column,value,user_id))
+    c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
     conn.commit()
 
 # Add a kill to the kill queue.
@@ -88,10 +93,3 @@ def get_kill():
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
     conn.commit()
-
-def db_test():
-    print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))
-    print(get_user(1))
-    print(db_get(1,'channel'))
-    # These changes aren't saved, making them safe to test.
-    return db_get(1,'name')
