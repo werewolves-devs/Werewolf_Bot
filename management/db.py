@@ -39,6 +39,15 @@ def get_user(id):
     else:
         return None
 
+def isParticipant(id,spectator = False):
+    if get_user(id) in [None, []]:
+        return False
+    
+    if spectator == False and db_get(id,"role") == u'Spectator':
+        return False
+        
+    return True
+
 # Gather a user's bit of information from the database.
 def db_get(user_id,column):
     return get_user(user_id)[positionof(column)]
@@ -74,12 +83,6 @@ def get_kill():
     c.execute("DELETE FROM 'death-row' WHERE (id =?)",(kill[0],))
     conn.commit()
     return kill
-
-
-# Add a new participant to the database
-def signup(user_id,name,emoji):
-    c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
-    conn.commit()
 
 def db_test():
     print(c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES ('1','Randium003',':smirk:','#gamelog','Spectator','Spectator','','','','')"))
