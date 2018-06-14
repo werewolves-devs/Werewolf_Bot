@@ -54,6 +54,25 @@ def process(message, isGameMaster = False):
     #
     # =============================================================
 
+    '''cc'''
+    # This command allows users to create a conspirachy channel.
+    if message.content.startswith(prefix + 'cc'):
+        # TODO
+        return todo()
+    if message.content.startswith(prefix + 'help cc'):
+        # TODO
+        return todo()
+
+    '''info'''
+    # This command allows users to view information about a conspiracy channel.
+    # Says the user must be in a cc if they're not.
+    if message.content.startswith(prefix + 'info'):
+        # TODO
+        return todo()
+    if message.content.startswith(prefix + 'help info'):
+        # TODO
+        return todo()
+
     '''myrole'''
     # This command sends the user's role back to them in a DM
     if message.content.startswith(prefix + 'myrole'):
@@ -68,6 +87,25 @@ def process(message, isGameMaster = False):
     #                         EVERYONE
     #
     # =============================================================
+
+    '''age'''
+    # Allows users to set their age.
+    if message.content.startswith(prefix + 'age'):
+        # TODO
+        return todo()
+    if message.content.startswith(prefix + 'help age'):
+        # TODO
+        return todo()
+
+    '''profile'''
+    # This command allows one to view their own profile
+    # When giving another player's name, view that player's profile
+    if message.content.startswith(prefix + 'profile'):
+        # TODO
+        return todo()
+    if message.content.startswith(prefix + 'help profile'):
+        # TODO
+        return todo()
 
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
