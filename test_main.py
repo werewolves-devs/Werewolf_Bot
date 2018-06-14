@@ -32,6 +32,7 @@ def kill_queue_test():
 
 # Check the database
 def test_database():
+  reset.reset(True)
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
   assert db.get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'')
