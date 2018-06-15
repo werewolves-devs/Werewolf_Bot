@@ -1,4 +1,4 @@
-import discord
+from discord.ext import commands
 import random
 import asyncio
 
@@ -6,7 +6,7 @@ import asyncio
 from config import prefix
 import config
 
-client = discord.Client()
+client = commands.Bot(command_prefix=commands.when_mentioned_or(prefix))
 
 '''
 To spare some time, the program should keep track of channels that it has sent messages in before.
@@ -30,7 +30,9 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    
-    await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
+
+    #await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
+    # Testing
+    bot.load_extension('conspiracy_channels.main')
 
 client.run(config.TOKEN)
