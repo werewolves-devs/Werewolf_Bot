@@ -30,7 +30,6 @@ def reset(skip = False):
     for i in range(number - 1):
         poll_str += " 'part{}' TEXT,".format(i+2)
     poll_str += " PRIMARY KEY ('id', 'part1'))"
-    print poll_str
     c.execute(poll_str)
     print('Formatting completed! The bot is now ready for a new game!\n')
 
