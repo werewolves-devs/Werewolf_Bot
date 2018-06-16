@@ -53,6 +53,13 @@ def isParticipant(id,spectator = False):
 
     return True
 
+# This function returns a user's personal channel.
+def personal_channel(user_id,channel_id):
+    if db_get(user_id,"channel") == str(channel_id):
+        return True
+    
+    return False
+
 # Gather a user's bit of information from the database.
 def db_get(user_id,column):
     return get_user(user_id)[positionof(column)]
