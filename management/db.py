@@ -47,7 +47,7 @@ def get_user(id):
 def isParticipant(id,spectator = False):
     if get_user(id) in [None, []]:
         return False
-    
+
     if spectator == False and db_get(id,"role") == u'Spectator':
         return False
 
@@ -66,7 +66,7 @@ def db_set(user_id,column,value):
 # Apply in case of an end-effect kill.
 def add_kill(victim_id,role,murderer = ""):
     data = [victim_id,role,murderer]
-    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)    
+    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)
     conn.commit()
     return
 
@@ -76,7 +76,7 @@ def get_kill():
 
     try:
         order = c.fetchone()
-        
+
         if order == None:
             return None
     except TypeError:
@@ -88,6 +88,11 @@ def get_kill():
     c.execute("DELETE FROM 'death-row' WHERE (id =?)",(kill[0],))
     conn.commit()
     return kill
+
+# Add a channel to the database
+def new_channel(channel_id):
+    pass #TODO: Randium should finish this
+
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):
