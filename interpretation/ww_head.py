@@ -1,9 +1,10 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get
+from management.db import isParticipant, personal_channel, db_get, db_set
 from check import is_command
 import roles_n_rules.functions as func
 from main_classes import Mailbox
 from config import prefix
+import check
 
 def todo():
     return [Mailbox().msg("I am terribly sorry! This command doesn't exist yet!","",True)]
@@ -37,12 +38,25 @@ def process(message, isGameMaster = False):
         # This command is used at the start of the game to assign all roles.
         # This will actually set their "fakerole" value, which will be transferred to their actual role once the game starts.
         if is_command(message,['assign']):
-            # TODO
-            return todo()
+            role = check.roles(message,1)
+            user = check.users(message,1)
+
+            db_set(user,'role',role)
+            return Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user,role))
+
         if is_command(message,['assign'],True):
             # TODO
             return todo()
         
+        '''day'''
+        # This command is used to initialize the day.
+        if is_command(message,['day']):
+            # TODO
+            return todo()
+        if is_command(message,['day'],True):
+            # TODO
+            return todo()
+
         '''open_signup'''
         # This command is started when a new game can be started.
         # Make sure the bot has reset itself beforehand.
