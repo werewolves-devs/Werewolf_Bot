@@ -105,7 +105,7 @@ This function gets an order to kill from the kill queue (for the ones asking in 
     get_kill() # => [1,u'248158876799729664',u'Innocent',u'']
     get_kill() # => [2,u'248158876799729664',u'Priest',u'247096918923149313']
 
-The first element isn't too relevant; it's used in the database to distinguish kills and to handle a rare scenario of two identical attacks. The second argument is the id of the victim. The third is the killer's "role" and the last one is either an empty string or the id of an appointed murderer.
+The first element isn't too relevant; it's used in the database to distinguish kills and to handle a rare scenario of two identical attacks. The second argument is the id of the victim. The third is the killer's "role" and the last one is either an empty string or the id of an appointed murderer.  
 **Watch out:** After calling the function **get_kill()**, the retrieved data is removed from the database. This is a good and efficient property, but keep in mind that you need to store its output in a variable, and not expect **get_kill()** to return the same thing when re-calling the function.
 
 #### <a head="#channel"></a>Channel commands
