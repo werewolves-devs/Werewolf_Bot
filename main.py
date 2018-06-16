@@ -1,20 +1,19 @@
 from discord.ext import commands
+from discord import Embed, Color
 import random
 import asyncio
+
+
+initial_extensions = ['conspiracy_channels.main',
+                      'management.admin']
+
 
 # Import config data
 from config import prefix
 import config
 
 client = commands.Bot(command_prefix=commands.when_mentioned_or(prefix))
-
-'''
-To spare some time, the program should keep track of channels that it has sent messages in before.
-This way, sending messages to the right channels should (hopefully) save some time,
-as the bot doesn't need to ask the API for a channel for every message.
-Instead, it should save a table with the channel objects.
-'''
-channel_table = []
+bot = client # Either one can be referred to, though I believe we should be using bot
 
 # Whenever a message is sent.
 @client.event
@@ -31,8 +30,14 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-    #await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
-    # Testing
-    bot.load_extension('conspiracy_channels.main')
+    await client.send_message(client.get_channel(config.welcome_channel),'Beep boop! I just went online!')
+    # Load extensions
+    for extension in initial_extensions:
+        bot.load_extension(extension)
+
+@bot.command(name='Test')
+async def test():
+    print("Hi")
+
 
 client.run(config.TOKEN)
