@@ -50,7 +50,7 @@ def test_database():
   db.add_channel('1234555',1)
   db.add_channel('12211',1)
   assert db.channel_get('1234555') == (u'1234555',u'1',u'0')
-  assert db.channel_change_all(1,0,1) == [(u'1234555',u'1',u'1'),(u'12211',u'1',u'1')]
+  assert db.channel_change_all(1,0,1) == [u'1234555',u'12211']
   assert db.channel_get('1234555') == (u'1234555',u'1',u'1')
   assert db.channel_get('12211') == (u'12211',u'1',u'1')
   db.set_user_in_channel('1234555',1,2)
