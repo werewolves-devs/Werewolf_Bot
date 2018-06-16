@@ -1,3 +1,4 @@
+from config import prefix
 from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player
 
@@ -73,6 +74,15 @@ def check_for_int(s):
         return True
     except ValueError:
         return False
+
+# Checks if an input requests a given command
+def is_command(message,commandlist,help=False):
+    for command in commandlist:
+        if message.content.startswith(prefix + command) and help == False:
+            return True
+        if message.content.startswith(prefix + 'help ' + command) and help == True:
+            return True
+    return False
 
 if __name__ == "__main__":
     class message:
