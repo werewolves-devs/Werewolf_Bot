@@ -109,7 +109,7 @@ The first element isn't too relevant; it's used in the database to distinguish k
 **Watch out:** After calling the function **get_kill()**, the retrieved data is removed from the database. This is a good and efficient property, but keep in mind that you need to store its output in a variable, and not expect **get_kill()** to return the same thing when re-calling the function.
 
 #### <a head="#channel"></a>Channel commands
-These commands are for administrating the cc's and a few other channels. Remember that this only _registers_ changes; it doesn't actually change them. For this database, numbers are used to indicate a participant's status;
+These commands are for administrating the cc's and a few other channels. Remember that this only _registers_ changes; it doesn't actually change them. For this database, numbers are used to indicate a participant's status;  
 0 - no access  
 1 - access  
 2 - frozen  
@@ -132,13 +132,20 @@ This command changes all **user_id**'s properties to **new** in channels where t
 There are a few specific versions of this commmand that allow for easy and quick database management.
 
 ###### abduct(user_id)
-Remove a user's access to all channels.
+Remove a user's access to all channels.  
+    abduct(248158876799729664)
+
 ###### unabduct(user_id)
 Give a user access back to all channels they used to have access to.
+    unabduct("248158876799729664")
+
 ###### freeze(user_id)
 Remove a user's ability to talk in all channels.
+    freeze(248158876799729664)
+
 ###### unfreeze(user_id)
 Give a user the abilty to talk back in all channels.
+    freeze("248158876799729664")
 
 All of these commands return the channels they've changed.
 
