@@ -1,9 +1,10 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
 import roles_n_rules.functions as func
+from main_classes import Mailbox
 from config import prefix
 
 def todo():
-    raise SyntaxError("This command isn't finished yet!")
+    return [Mailbox().msg("I am terribly sorry! This command doesn't exist yet!","",True)]
 
 def process(message, isGameMaster = False):
 
@@ -16,6 +17,18 @@ def process(message, isGameMaster = False):
     #
     # =============================================================
     if isGameMaster == True:
+
+        '''addrole'''
+        # Before the game starts, a list of roles is kept track of.
+        # That list is the list of roles that will be dealt among the participants.
+        # If the list is greater than the amount of participants, some random roles will be left out.
+        # The game cannot start as long as this list is incomplete.
+        if message.content.startswith(prefix + 'addrole'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help addrole'):
+            # TODO
+            return todo()
 
         '''assign'''
         # This command is used at the start of the game to assign all roles.
@@ -54,33 +67,55 @@ def process(message, isGameMaster = False):
     #
     # =============================================================
 
-    '''cc'''
-    # This command allows users to create a conspirachy channel.
-    if message.content.startswith(prefix + 'cc'):
-        # TODO
-        return todo()
-    if message.content.startswith(prefix + 'help cc'):
-        # TODO
-        return todo()
+    if False: #TODO: check if user is a participant
 
-    '''info'''
-    # This command allows users to view information about a conspiracy channel.
-    # Says the user must be in a cc if they're not.
-    if message.content.startswith(prefix + 'info'):
-        # TODO
-        return todo()
-    if message.content.startswith(prefix + 'help info'):
-        # TODO
-        return todo()
+        '''add'''
+        # This command allows users to add users to a conspiracy.
+        # This command will not trigger if the user doesn't own the conspiracy channel.
+        if message.content.startswith(prefix + 'add'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help add'):
+            # TODO
+            return todo()
 
-    '''myrole'''
-    # This command sends the user's role back to them in a DM
-    if message.content.startswith(prefix + 'myrole'):
-        # TODO
-        return todo()
-    if message.content.startswith(prefix + 'help myrole'):
-        # TODO
-        return todo()
+        '''cc'''
+        # This command allows users to create a conspirachy channel.
+        if message.content.startswith(prefix + 'cc'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help cc'):
+            # TODO
+            return todo()
+
+        '''info'''
+        # This command allows users to view information about a conspiracy channel.
+        # Says the user must be in a cc if they're not.
+        if message.content.startswith(prefix + 'info'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help info'):
+            # TODO
+            return todo()
+
+        '''myrole'''
+        # This command sends the user's role back to them in a DM.
+        if message.content.startswith(prefix + 'myrole'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help myrole'):
+            # TODO
+            return todo()
+        
+        '''remove'''
+        # This command removes a given user from a conspiracy channel.
+        # A user should not get removed if they're the channel owner.
+        if message.content.startswith(prefix + 'remove'):
+            # TODO
+            return todo()
+        if message.content.startswith(prefix + 'help remove')
+            # TODO
+            return todo()
 
     # =============================================================
     #
