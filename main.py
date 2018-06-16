@@ -29,10 +29,13 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
-    await bot.send_message(bot.get_channel(config.welcome_channel),'Beep boop! I just went online!')
     # Load extensions
     for extension in initial_extensions:
-        bot.load_extension(extension)
+        try:
+            bot.load_extension(extension)
+        except:
+            await bot.send_message(bot.get_channel(config.bot_spam),'Error whilst loading module ' + extension)
+    await bot.send_message(bot.get_channel(config.welcome_channel),'Beep boop! I just went online!')
 
 @bot.command(name='Test')
 async def test():
