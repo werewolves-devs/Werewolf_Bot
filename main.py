@@ -4,8 +4,10 @@ import asyncio
 
 # Import config data
 from config import prefix
+from management.db import db_set
 from interpretation.ww_head import process
 import config
+
 
 client = discord.Client()
 
@@ -81,6 +83,12 @@ async def on_message(message):
             # All you need to do is create a channel where only the channel owner has access.
             # The other members are given access through another Mailbox.
             # You could make the work easier if you also posted a cc channel message already over here.
+
+            # TODO
+
+            for buddy in element.settlers:
+                db_set(buddy,"channel",'''id of the channel you just created''')
+
 
 # Whenever the bot regains his connection with the Discord API.
 @client.event
