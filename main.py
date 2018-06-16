@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 from discord import Embed, Color
 import random
 import asyncio
@@ -30,6 +31,9 @@ async def on_ready():
         except:
             await bot.get_channel(bot_spam).send('Error whilst loading module ' + extension)
     await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
+    watching = discord.ActivityType.watching
+    activity = discord.Activity(type=watching, name='Werewolves')
+    await bot.change_presence(activity=activity)
 
 @bot.command(name='Test')
 async def test():
