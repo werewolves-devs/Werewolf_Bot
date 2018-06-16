@@ -1,7 +1,9 @@
 # Discord API / Login settings
 TOKEN = 'put_token_here'
 
+# Rules 'n' settings
 game_stage = 0
+max_participants = 40
 
 # Prefixes      yes, I thought it would be prefices, but no, it's not, unfortunately. :(
 #               Source: https://english.stackexchange.com/questions/277945/is-the-plural-of-prefix-really-prefixes-rather-than-prefices
@@ -23,5 +25,3 @@ participant = 456881451745411089 #TODO
 dead_participant = 457498358077063170 #TODO
 frozen_participant = 457498631344357387 #TODO
 suspended = "55" #TODO
-
-# BenTechy sucks lol

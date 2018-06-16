@@ -91,6 +91,7 @@ def get_kill():
 
 # Add a channel to the database
 def new_channel(channel_id):
+    pass #TODO: Randium should finish this
 
 
 # Add a new participant to the database
