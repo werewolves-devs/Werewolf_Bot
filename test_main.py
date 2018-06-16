@@ -43,3 +43,14 @@ def test_database():
   assert db.isParticipant(2,True) == False
   db.db_set(1,'frozen',1)
   assert db.poll_list() == [(u'1',u':smirk:',1)]
+
+  assert db.channel_get('1234555') == None
+  db.add_channel('1234555')
+  db.add_channel('12211')
+  assert db.channel_get('1234555') == (u'1234555',u'0')
+  db.set_user_in_channel('1234555',1,2)
+  assert db.channel_get('1234555') == (u'1234555',u'2')
+  assert db.channel_get('1234555','1') == (u'2',)
+  assert db.channel_change_all(1,2,4) == ['1234555']
+  assert db.channel_get('1234555') == (u'1234555',u'0')
+  reset.reset(True)
