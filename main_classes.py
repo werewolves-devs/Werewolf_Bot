@@ -4,83 +4,68 @@ from config import game_log
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
     def __init__(self):
-        self.gamelog = []
-        self.botspam = []
-        self.storytime = []
-        self.channel = []
-        self.player = []
+        self.gamelog = []       # Send message to gamelog channel
+        self.botspam = []       # Send message to botspam channel
+        self.storytime = []     # Send message to storytime channel
+        self.channel = []       # Send message to channel
+        self.player = []        # Send message to user
+        self.newchannels = []   # Create new channel
+        self.oldchannels = []   # Edit existing channel
     
-    def log(self,message):
-        self.gamelog.append(message)
-    def log_add(self,message):
-        if len(self.gamelog) > 0:
-            self.gamelog[-1] += message
-            return
-        print("Attempted to add message to non-existent game-log message!\n{}".format(message))
-        
-    def spam(self,message):
-        self.botspam.append(message)
-    def spam_add(self,message):
-        if len(self.botspam) > 0:
-            self.botspam[-1][1] += message
-            return
-        print("Attempted to add message to non-existent bot-spam message!\n{}".format(message))
-        
-    def story(self,message):
-        self.storytime.append(message)
-    def story_add(self,message):
-        if len(self.storytime) > 0:
-            self.storytime[-1] += message
-            return
-        print("Attempted to add message to non-existent story-time message!\n{}".format(message))
+    def log(self,content,temporary = False):
+        self.gamelog.append(Message(content,temporary))
+    def log_add(self,moar_content):
+        self.gamelog[-1].add(moar_content)
     
-    def respond(self,message,channel):
-        self.channel.append([message,channel])
-    def respond_add(self,message):
-        if len(self.channel) > 0:
-            self.channel[-1][0] += message
-            return
-        print("Attempted to add message to non-existent response!\n{}".format(message))
+    def spam(self,content,temporary = False):
+        self.botspam.append(Message(content,temporary))
+    def spam_add(self,moar_content):
+        self.botspam[-1].add(moar_content)
 
-    def dm(self,message,channel):
-        self.player.append([message,channel])
-    def dm_add(self,message):
-        if len(self.player) > 0:
-            self.player[-1][0] += message
-            return
-        print("Attempted to add message to non-existent DM!\n{}".format(message)) 
-
-    # Gain all info from another mailbox and put them inside this one.
-    def suck(self,old_mail):
-        for msg in old_mail.gamelog:
-            self.log(msg)
-        for msg in old_mail.botspam:
-            self.spam(msg)
-        for msg in old_mail.storytime:
-            self.story(msg)
-        for parcel in old_mail.channel:
-            self.channel.append(parcel)
-        for parcel in old_mail.player:
-            self.player.append(parcel)   
-
-# This class contains all information that needs to be global. It is used for retrieving and passing on information from different functions.
-class Game_Control:
+    def story(self,content,temporary = False):
+        self.storytime.append(Message(content,temporary))
+    def story_add(self,moar_content):
+        self.storytime[-1].add(moar_content)
     
-    # All attacks are listed in here, including the role that attacked them.
-    kill_queue = []
-
-    # The time in the game. Either "Day", "Night" or "Undefined"
-    time = "Undefined"
-
-    # This command is executed when the day is started.
-    def start_day(self):
-        self.time = "Day"
+    def msg(self,content,destination,temporary = False):
+        self.channel.append(Message(content,temporary,destination))
+    def msg_add(self,moar_content):
+        self.channel[-1].add(moar_content)
     
-    # This command is executed when the night is started.
-    def start_night(self):
-        self.time = "Night"
+    def dm(self,content,user_id,temporary = False):
+        self.player.append(Message(content,temporary,user_id))
+    def dm_add(self,moar_content):
+        self.player[-1].add(moar_content)
     
-    # Unsure if this will have a purpose.
-    def pause(self):
-        self.time = "Undefined"
+    def create_cc(self,channel_name,channel_owner):
+        self.newchannels.append(ChannelComm(0,channel_name,channel_owner))
+    def edit_cc(self,channel_id,user_id,number):
+        change_list = [[],[],[],[],[]]
+        change_list[number].append(user_id)
+        self.oldchannels.append(ChannelComm(channel_id,'','',change_list))
+
+# Class used to send messages through the mailbox
+class Message:
+    def __init__(self,content,temporary = False,destination = ''):
+        self.content = content
+        self.temporary = temporary
+        self.destination = destination
+    
+    def add(self,moar_content):
+        self.content += str(moar_content)
+
+# Class for sending commands back to main.py to create/alter channels
+class ChannelComm:
+    def __init__(self,channel_id,channel_name,channel_owner,sett = [[],[],[],[],[]]):
+        # If channel_id == 0, then it should create a new channel
+        self.channel = channel_id
+        self.name = channel_name
+        self.settings = sett
+        self.owner = channel_owner
+
+    def set_to(self,user_id,number):
+        for i in range(5):
+            if user_id in self.settings[i]:
+                self.settings[i].remove(user_id)
+        self.settings[number].append(user_id)
         
