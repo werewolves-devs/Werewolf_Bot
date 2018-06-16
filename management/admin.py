@@ -1,5 +1,5 @@
 from discord.ext import commands
-
+from utils import game_masters_only, is_active, chunks
 
 # TODO: GM-Only checks
 class Admin:
@@ -9,6 +9,7 @@ class Admin:
         self.bot = bot
 
     @commands.command(hidden=True)
+    @game_masters_only()
     async def load(self, ctx, *, module: str):
         """Loads a module."""
         try:
@@ -20,6 +21,7 @@ class Admin:
             await ctx.channel.send('\N{OK HAND SIGN}')
 
     @commands.command(hidden=True)
+    @game_masters_only()
     async def unload(self, ctx, *, module: str):
         """Unloads a module."""
         try:
@@ -31,6 +33,7 @@ class Admin:
             await ctx.channel.send('\N{OK HAND SIGN}')
 
     @commands.command(name='reload', hidden=True)
+    @game_masters_only()
     async def _reload(self, ctx, *, module: str):
         """Reloads a module."""
         try:

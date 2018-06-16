@@ -8,7 +8,8 @@ import asyncio
 
 
 initial_extensions = ['conspiracy_channels.main',
-                      'management.admin']
+                      'management.admin',
+                      'polls']
 
 
 # Import config data
@@ -41,7 +42,7 @@ async def on_command_error(ctx: commands.Context, exc: BaseException):
         raise exc
 
 
-client.on_command_error = on_command_error
+bot.on_command_error = on_command_error
 # Whenever the bot regains his connection with the Discord API.
 @bot.event
 async def on_ready():
@@ -55,12 +56,13 @@ async def on_ready():
     for extension in initial_extensions:
         try:
             bot.load_extension(extension)
-        except:
-    await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
-            await bot.get_channel(bot_spam).send('Error whilst loading module ' + extension)
+        except Exception as e:
+            await bot.get_channel(bot_spam).send('Error whilst loading module ' + extension + '\nErr: ```' + str(e) + '```\n\n*See the console for more details*')
+            print(str(e))
     watching = discord.ActivityType.watching
     activity = discord.Activity(type=watching, name='Werewolves')
     await bot.change_presence(activity=activity)
+    await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 @bot.command(name='Test')
 async def test():
