@@ -1,5 +1,7 @@
+from config import prefix
 from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player
+from management.position import roles_list
 
 # Makes sure the message has at least the needed amount of users.
 # If the message contains emojis, they should be converted to ids as well. Mentions have priority, however.
@@ -65,6 +67,26 @@ def emojis(message,amount = -1, delete_duplicates = True):
     
     return [emoji_table[i] for i in range(amount)]
 
+# Makes sure the message has at least the needed amount of roles.
+# The command should return the given amount of numbers, or, if equal to -1, should return them all.
+def roles(message,amount=-1,delete_duplicates = False):
+    role_table = []
+
+    for argument in message.content.split(' '):
+        if argument in roles_list:
+            role_table.append(argument)
+    
+    if delete_duplicates == True:
+        role_table = list(set(role_table))
+    
+    if max(amount,1) > len(role_table):
+        return False
+    
+    if amount == -1:
+        return role_table
+    
+    return [role_table[i] for i in range(amount)]
+
 # Checks if a file can be converted into an integer.
 # If it cannot, the function returns false.
 def check_for_int(s):
@@ -73,6 +95,15 @@ def check_for_int(s):
         return True
     except ValueError:
         return False
+
+# Checks if an input requests a given command
+def is_command(message,commandlist,help=False):
+    for command in commandlist:
+        if message.content.startswith(prefix + command) and help == False:
+            return True
+        if message.content.startswith(prefix + 'help ' + command) and help == True:
+            return True
+    return False
 
 if __name__ == "__main__":
     class message:

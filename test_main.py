@@ -36,7 +36,7 @@ def test_database():
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
-  assert db.get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'')
+  assert db.get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'',0)
   assert db.db_get(1,'channel') == '#gamelog'
   assert db.isParticipant(1) == False
   assert db.isParticipant(1,True) == True
