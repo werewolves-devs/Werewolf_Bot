@@ -37,12 +37,10 @@ class Mailbox:
     def dm_add(self,moar_content):
         self.player[-1].add(moar_content)
     
-    def create_cc(self,channel_name,channel_owner):
-        self.newchannels.append(ChannelComm(0,channel_name,channel_owner))
+    def create_cc(self,channel_name,channel_owner,settlers=[]):
+        self.newchannels.append(ChannelComm(0,channel_name,channel_owner,'',0,settlers))
     def edit_cc(self,channel_id,user_id,number):
-        change_list = [[],[],[],[],[]]
-        change_list[number].append(user_id)
-        self.oldchannels.append(ChannelComm(channel_id,'','',change_list))
+        self.oldchannels.append(ChannelComm(channel_id,'','',user_id,number))
 
 # Class used to send messages through the mailbox
 class Message:
@@ -56,16 +54,12 @@ class Message:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelComm:
-    def __init__(self,channel_id,channel_name,channel_owner,sett = [[],[],[],[],[]]):
+    def __init__(self,channel_id,channel_name,channel_owner,victim = '',number = 0,settlers=[]):
         # If channel_id == 0, then it should create a new channel
         self.channel = channel_id
         self.name = channel_name
-        self.settings = sett
+        self.victim = victim
+        self.number = number
         self.owner = channel_owner
-
-    def set_to(self,user_id,number):
-        for i in range(5):
-            if user_id in self.settings[i]:
-                self.settings[i].remove(user_id)
-        self.settings[number].append(user_id)
+        self.settlers = []
         
