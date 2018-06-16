@@ -13,8 +13,8 @@ def reset(skip = False):
 
     # Reset the game table.
     print('\nDeleting any old progress...')
-    c.execute("DROP TABLE 'game'")
-    c.execute("DROP TABLE 'death-row'")
+    c.execute("DROP TABLE IF EXISTS 'game'")
+    c.execute("DROP TABLE IF EXISTS 'death-row'")
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new game....')
