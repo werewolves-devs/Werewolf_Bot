@@ -9,17 +9,10 @@ initial_extensions = ['conspiracy_channels.main',
 
 
 # Import config data
-from config import prefix
+from config import prefix, welcome_channel, bot_spam
 import config
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix))
-
-# Whenever a message is sent.
-@bot.event
-async def on_message(message):
-    # we do not want the bot to reply to itself
-    if message.author == bot.user:
-        return
 
 # Whenever the bot regains his connection with the Discord API.
 @bot.event
@@ -34,8 +27,8 @@ async def on_ready():
         try:
             bot.load_extension(extension)
         except:
-            await bot.send_message(bot.get_channel(config.bot_spam),'Error whilst loading module ' + extension)
-    await bot.send_message(bot.get_channel(config.welcome_channel),'Beep boop! I just went online!')
+            await bot.get_channel(bot_spam).send('Error whilst loading module ' + extension)
+    await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 @bot.command(name='Test')
 async def test():
