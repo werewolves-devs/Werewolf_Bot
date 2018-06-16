@@ -21,6 +21,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    print('--Reminder: You don\'t need to restart the bot to load new changes, just !reload the cog--')
 
     # Load extensions
     for extension in initial_extensions:
