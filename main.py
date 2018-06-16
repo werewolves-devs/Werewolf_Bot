@@ -88,6 +88,11 @@ async def on_message(message):
 
             for buddy in element.settlers:
                 db_set(buddy,"channel",'''id of the channel you just created''')
+    
+    # Delete all temporary messages after "five" seconds.
+    await asyncio.sleep(5)
+    for msg in temp_msg:
+        await delete_message(msg)
 
 
 # Whenever the bot regains his connection with the Discord API.
