@@ -3,14 +3,14 @@
 This folder contains all the management with the database directly, or, possibly later on, with the self-built API. You can use it in any Python file that is connected with the bot.
 
 ## Jump
-[init.py](#init)
-[db.py](#db)
--> [Raw commands](#raw)
--> [Game-related data](#game)
--> [Kill queue](#kill)
--> [Channel commands](#channel)
--> [Other commands](#other)
-[position.py](#position)
+[init.py](#init)  
+[db.py](#db)  
+-> [Raw commands](#raw)  
+-> [Game-related data](#game)  
+-> [Kill queue](#kill)  
+-> [Channel commands](#channel)  
+-> [Other commands](#other)  
+[position.py](#position)  
 
 ## Relevant files
 
