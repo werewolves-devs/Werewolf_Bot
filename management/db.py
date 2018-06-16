@@ -89,10 +89,9 @@ def get_kill():
     conn.commit()
     return kill
 
-def add_channel(channel_id):
-    c.execute("INSERT INTO 'channels' ('channel_id') VALUES (?)",(channel_id,))
+def add_channel(channel_id,owner):
+    c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
     conn.commit()
-
 
 def set_user_in_channel(channel_id,user_id,number):
     # 0 - no access
@@ -101,22 +100,34 @@ def set_user_in_channel(channel_id,user_id,number):
     # 3 - abducted
     # 4 - dead
     data = [number,channel_id]
-    c.execute("UPDATE 'channels' SET '{}'=? WHERE 'channel_id' =?".format(user_id),data)
+    c.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id),data)
     conn.commit()
 
 def channel_change_all(user_id,old,new):
-    c.execute("SELECT channel_id FROM 'channels' WHERE {}=?".format(user_id),(old,))
+    c.execute("SELECT channel_id FROM 'channels' WHERE id{} =?".format(user_id),(old,))
     change_list = c.fetchall()
-    print(change_list)
     data = [new,old]
-    c.execute("UPDATE 'channels' SET '{0}'=? WHERE '{0}'=?".format(user_id),data)
+    c.execute("UPDATE 'channels' SET 'id{0}'=? WHERE id{0} =?".format(user_id),data)
+
     conn.commit()
 
-    return change_list
+    return [element[0] for element in change_list]
 
-def channel_get(channel_id,user_id = '*'):
-    c.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(user_id),(channel_id,))
-    print 'We got', c.fetchone()
+def channel_get(channel_id,user_id = ''):
+    if user_id == '':
+        c.execute("SELECT * FROM 'channels' WHERE channel_id =?",(channel_id,))
+    elif user_id == 'owner':
+        c.execute("SELECT owner FROM 'channels' WHERE channel_id =?",(channel_id,))
+        try:
+            return c.fetchone()[1]
+        except ValueError:
+            return None
+        else:
+            return None
+    else:
+        column = 'id' + str(user_id)
+        c.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(column),(channel_id,))
+    return c.fetchone()
 
 def get_columns():
     c.execute("SELECT * FROM channel_rows")
@@ -140,6 +151,6 @@ def kill(user_id):
 # Add a new participant to the database
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
-    c.execute("ALTER TABLE channels ADD COLUMN '{}' TEXT NOT NULL DEFAULT 0".format(user_id))
+    c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
     c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
     conn.commit()
