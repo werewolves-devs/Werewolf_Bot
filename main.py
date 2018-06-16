@@ -64,9 +64,5 @@ async def on_ready():
     await bot.change_presence(activity=activity)
     await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
-@bot.command(name='Test')
-async def test():
-    print("Hi")
-
 
 bot.run(config.TOKEN)
