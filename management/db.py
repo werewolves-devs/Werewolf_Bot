@@ -13,7 +13,7 @@ def execute(cmd_string):
     return c.fetchall()
 
 def poll_list():
-    c.execute("SELECT id, emoji, frozen FROM game")
+    c.execute("SELECT id, emoji, frozen, abducted FROM game")
 
     return c.fetchall()
 
@@ -31,7 +31,7 @@ def emoji_to_player(emoji):
     else:
         return None
 
-# Get a user from the database
+# Get all of a user's data from the database
 def get_user(id):
     c.execute("SELECT * FROM game WHERE id=?", (id,))
 
@@ -44,14 +44,23 @@ def get_user(id):
     else:
         return None
 
+# This function makes sure the user is a participant.
+# If the user is a spectator, it returns whatever spectator is set to.
 def isParticipant(id,spectator = False):
     if get_user(id) in [None, []]:
         return False
-
-    if spectator == False and db_get(id,"role") == u'Spectator':
-        return False
+    
+    if db_get(id,"role") == u'Spectator':
+        return spectator
 
     return True
+
+# This function returns a user's personal channel.
+def personal_channel(user_id,channel_id):
+    if db_get(user_id,"channel") == str(channel_id):
+        return True
+    
+    return False
 
 # Gather a user's bit of information from the database.
 def db_get(user_id,column):
@@ -66,7 +75,7 @@ def db_set(user_id,column,value):
 # Apply in case of an end-effect kill.
 def add_kill(victim_id,role,murderer = ""):
     data = [victim_id,role,murderer]
-    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)
+    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)    
     conn.commit()
     return
 
@@ -76,7 +85,7 @@ def get_kill():
 
     try:
         order = c.fetchone()
-
+        
         if order == None:
             return None
     except TypeError:
@@ -89,12 +98,75 @@ def get_kill():
     conn.commit()
     return kill
 
-# Add a channel to the database
-def new_channel(channel_id):
-    pass #TODO: Randium should finish this
+# Register a new channel to the database
+def add_channel(channel_id,owner):
+    c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
+    conn.commit()
 
+# Change a user's value in a specific channel
+def set_user_in_channel(channel_id,user_id,number):
+    # 0 - no access
+    # 1 - access
+    # 2 - frozen
+    # 3 - abducted
+    # 4 - dead
+    data = [number,channel_id]
+    c.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id),data)
+    conn.commit()
+
+# This function visits every channel where the user has value "old" and sets it to value "new"
+# It then returns all channels that it has changed.
+def channel_change_all(user_id,old,new):
+    c.execute("SELECT channel_id FROM 'channels' WHERE id{} =?".format(user_id),(old,))
+    change_list = c.fetchall()
+    data = [new,old]
+    c.execute("UPDATE 'channels' SET 'id{0}'=? WHERE id{0} =?".format(user_id),data)
+
+    conn.commit()
+
+    return [element[0] for element in change_list]
+
+# Gain all information of a channel
+# If the channel does not exist, it returns None
+# When given a specific user_id or the argument owner, it returns that specific bit of data
+def channel_get(channel_id,user_id = ''):
+    if user_id == '':
+        c.execute("SELECT * FROM 'channels' WHERE channel_id =?",(channel_id,))
+    elif user_id == 'owner':
+        c.execute("SELECT owner FROM 'channels' WHERE channel_id =?",(channel_id,))
+        try:
+            return c.fetchone()[1]
+        except ValueError:
+            return None
+        else:
+            return None
+    else:
+        column = 'id' + str(user_id)
+        c.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(column),(channel_id,))
+    return c.fetchone()
+
+def get_columns():
+    c.execute("SELECT * FROM channel_rows")
+    return c.fetchall()
+
+def abduct(user_id):
+    return channel_change_all(user_id,1,3)
+
+def unabduct(user_id):
+    return channel_change_all(user_id,3,1)
+
+def freeze(user_id):
+    return channel_change_all(user_id,1,2)
+
+def unfreeze(user_id):
+    return channel_change_all(user_id,2,1)
+
+def kill(user_id):
+    return [channel_change_all(user_id,i,4) for i in range(4)]
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
+    c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
+    c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
     conn.commit()
