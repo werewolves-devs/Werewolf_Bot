@@ -231,7 +231,7 @@ def process(message, isGameMaster = False):
                 # TODO
                 return todo()
             
-            '''see'''
+            '''inspect'''
             # The fortune teller's command.
             if is_command(message,['forsee','inspect','see','tell']) and user_role == "Fortune Teller":
                 # TODO
@@ -300,6 +300,169 @@ def process(message, isGameMaster = False):
                 # TODO
                 return todo()
             if is_command(message,['heal','light','purify','sacrify'],True) and user_role == "Priestess":
+                # TODO
+                return todo()
+
+            '''threaten'''
+            # The Raven's command
+            if is_command(message,['threaten','raven']) and user_role == "Raven":
+                # TODO
+                return todo()
+            if is_command(message,['threaten','raven'],True) and user_role == "Raven":
+                # TODO
+                return todo()
+            
+            '''reveal'''
+            # The Royal Knight's command
+            if is_command(message,['end','prevent','reveal','stop']) and user_role == "Royal Knight":
+                # TODO
+                return todo()
+            if is_command(message,['end','prevent','reveal','stop'],True) and user_role == "Royal Knight":
+                # TODO
+                return todo()
+
+            '''life'''
+            # The witch' command to use her life potion
+            if is_command(message,['heal','life','save']) and user_role == "Witch":
+                # TODO
+                return todo()
+            if is_command(message,['heal','life','save'],True) and user_role == "Witch":
+                # TODO
+                return todo()
+            
+            '''death'''
+            # The witch' command to use her death potion
+            if is_command(message,['death','kill','murder','poison']) and user_role == "Witch":
+                # TODO
+                return todo()
+            if is_command(message,['death','kill','murder','poison'],True) and user_role == "Witch":
+                # TODO
+                return todo()
+            
+            '''çurse'''
+            # The curse caster's command
+            if is_command(message,['cast','corrupt','curse']) and user_role == "Curse Caster":
+                # TODO
+                return todo()
+            if is_command(message,['cast','corrupt','curse'],True) and user_role == "Curse Caster":
+                # TODO
+                return todo()
+
+            '''infect'''
+            # The infected wolf's command
+            if is_command(message,['cough','infect','sneeze','turn']) and user_role == "Infected Wolf":
+                # TODO
+                return todo()
+            if is_command(message,['cough','infect','sneeze','turn'],True) and user_role == "Infected Wolf":
+                # TODO
+                return todo()
+            
+            '''devour'''
+            # The Lone wolf's command
+            if is_command(message,['chew','devour','eat','kill','munch']) and user_role == "Lone Wolf":
+                # TODO
+                return todo()
+            if is_command(message,['chew','devour','eat','kill','munch'],True) and user_role == "Lone Wolf":
+                # TODO
+                return todo()
+            
+            '''disguise'''
+            # The tanner's command
+            if is_command(message,['change','cloth','disguise','hide']) and user_role == "Tanner":
+                # TODO
+                return todo()
+            if is_command(message,['change','cloth','disguise','hide'],True) and user_role == "Tanner":
+                # TODO
+                return todo()
+            
+            '''inspect'''
+            # The Warlock's command
+            if is_command(message,['forsee','inspect','see','tell']) and user_role == "Priestess":
+                # TODO
+                return todo()
+            if is_command(message,['forsee','inspect','see','tell'],True) and user_role == "Priestess":
+                # TODO
+                return todo()
+            
+            '''devour'''
+            # The white werewolf's command
+            if is_command(message,['chew','devour','eat','kill','munch']) and user_role == "White Werewolf":
+                # TODO
+                return todo()
+            if is_command(message,['chew','devour','eat','kill','munch'],True) and user_role == "White Werewolf":
+                # TODO
+                return todo()
+            
+            '''wager'''
+            # The devil's command
+            if is_command(message,['choose','wager']) and user_role == "Devil":
+                # TODO
+                return todo()
+            if is_command(message,['choose','wager'],True) and user_role == "Devil":
+                # TODO
+                return todo()
+            
+            '''enchant'''
+            # The flute player's command
+            if is_command(message,['enchant','flute']) and user_role == "Flute Player":
+                # TODO
+                return todo()
+            if is_command(message,['enchant','flute'],True) and user_role == "Flute Player":
+                # TODO
+                return todo()
+            
+            '''unite'''
+            # The horseman's command
+            if is_command(message,['apocalypse','clean','unite']) and user_role == "Horseman":
+                # TODO
+                return todo()
+            if is_command(message,['apocalypse','clean','unite'],True) and user_role == "Horseman":
+                # TODO
+                return todo()
+            
+            '''guess'''
+            # The ice king's command to add a guess about a user to their list.
+            # Note that this command could/should be usable at any time, as long as the submit command isn't
+            if is_command(message,['add','guess','freeze']) and user_role == "Ice King":
+                # TODO
+                return todo()
+            if is_command(message,['add','guess','freeze'],True) and user_role == "Ice King":
+                # TODO
+                return todo()
+            
+            '''submit'''
+            # The ice king's command to submit the list of people of whom they have guessed their roles.
+            if is_command(message,['guess_that','freeze_all','submit']) and user_role == "Ice King":
+                # TODO
+                return todo()
+            if is_command(message,['guess_that','freeze_all','submit'],True) and user_role == "Ice King":
+                # TODO
+                return todo()
+            
+            '''powder'''
+            # Powder a player
+            if is_command(message,['creeper','powder']) and user_role == "Pyromancer":
+                # TODO
+                return todo()
+            if is_command(message,['creeper','powder'],True) and user_role == "Pyromancer":
+                # TODO
+                return todo()
+            
+            '''abduct'''
+            # To kidnap players
+            if is_command(message,['abduct','add','kidnap','swamp']) and user_role == "The Thing":
+                # TODO
+                return todo()
+            if is_command(message,['abduct','add','kidnap','swamp'],True) and user_role == "The Thing":
+                # TODO
+                return todo()
+            
+            '''create_swamp'''
+            # To create a new swamp with all victims
+            if is_command(message,['abduct_all','create_swamp','start_cliche_horror_movie']) and user_role == "The Thing":
+                # TODO
+                return todo()
+            if is_command(message,['abduct_all','create_swamp','start_cliche_horror_movie'],True) and user_role == "The Thing":
                 # TODO
                 return todo()
 
