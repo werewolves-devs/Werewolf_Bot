@@ -145,12 +145,3 @@ def is_command(message,commandlist,help=False):
         if message.content.startswith(prefix + 'help ' + command) and help == True:
             return True
     return False
-
-if __name__ == "__main__":
-    class message:
-        content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier."
-
-    x = message()
-    print(numbers(x))
-    print(numbers(x,3))
-    print(numbers(x,5))
