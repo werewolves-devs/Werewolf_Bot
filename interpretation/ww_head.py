@@ -3,8 +3,8 @@ from management.db import isParticipant, personal_channel, db_get, db_set
 from interpretation.check import is_command
 import roles_n_rules.functions as func
 from main_classes import Mailbox, Message
+import interpretation.check as check
 from config import prefix
-import interpretation.check
 
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!",True)]
