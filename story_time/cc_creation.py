@@ -13,6 +13,12 @@ def cc_intro(list):
 This is what <@{}> was looking for... solitude. Nowhere in town could they find a place with such peace, \
 but this was JUST the spot. Excellent!'''.format(list[0])
         msgtable.append(msg)
+
+        msg = '''\
+Some believed the hidden room behind <@{}>'s stairs was a silent place to take notes. \
+Others thought they were just... \"testing\", whatever that may mean.
+In reality, they were wrong. Only <@{}> knew this channel\'s **TRUE** purpose...'''.format(list[0])
+        msgtable.append(msg)
     
     if amount == 2:
         msg = '''\
@@ -123,6 +129,15 @@ start.'''.format(list[0],list[1],list[2],list[3],list[4])
 How many people fit in one lavatory if you want to say something secret? \
 It seemed <@{0}>, <@{1}>, <@{2}>, <@{3}> and <@{4}> were breaking a new record without telling anyone...'''.format(list[0],list[1],list[2],list[3],list[4])
         msgtable.append(msg)
+
+        msg = '''\
+<@{3}> was trying to drink his misery away, and as they drunkenly walked home from the tavern, <@{3}> fell into a wall - or so it seemed.\
+The wall turned out to be a (magical?) curtain that looked like a wall, and <@{3}> just walked in on <@{2}>, <@{0}>, <@{4}> \
+who were about to have a conversation! They couldn\'t resist keeping <@{3}> in - else they'd speak their mind for *sure*.\ 
+ '''.format(list[0],list[1],list[2],list[3],list[4])
+
+    if amount == 69:
+        return 'Heh. Nice.'
 
     if msgtable == []:
         return 'Look, look, over @here! A new **conspiracy channel** has been created!'
