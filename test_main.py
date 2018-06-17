@@ -43,7 +43,7 @@ def test_database():
   assert db.isParticipant(2) == False
   assert db.isParticipant(2,True) == False
   db.db_set(1,'frozen',1)
-  assert db.poll_list() == [(u'1',u':smirk:',1)]
+  assert db.poll_list() == [(u'1',u':smirk:',1,0)]
 
   assert db.get_columns() == [(u'1',)]
   assert db.channel_get('1234555') == None
