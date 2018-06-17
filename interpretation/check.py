@@ -69,7 +69,7 @@ def emojis(message,amount = -1, delete_duplicates = True):
 
 # Makes sure the message has at least the needed amount of roles.
 # The command should return the given amount of numbers, or, if equal to -1, should return them all.
-def roles(message,amount=-1,delete_duplicates = False):
+def roles(message,amount= -1,delete_duplicates = False):
     role_table = []
 
     for argument in message.content.split(' '):
