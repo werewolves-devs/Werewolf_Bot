@@ -13,7 +13,7 @@ def execute(cmd_string):
     return c.fetchall()
 
 def poll_list():
-    c.execute("SELECT id, emoji, frozen FROM game")
+    c.execute("SELECT id, emoji, frozen, abducted FROM game")
 
     return c.fetchall()
 
