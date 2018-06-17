@@ -3,7 +3,7 @@ import random
 import asyncio
 
 # Import config data
-from config import prefix
+from config import prefix, welcome_channel
 from management.db import db_set
 from interpretation.ww_head import process
 import config
@@ -18,10 +18,10 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-    
+
     # Check if the message author has the Game Master role
     isGameMaster = False
-    if False:
+    if False: # somebody fix this
         isGameMaster = True
 
     result = process(message,isGameMaster)
@@ -43,22 +43,22 @@ async def on_message(message):
             msg = await client.send_message(botspam_channel,element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
-        
+
         for element in mailbox.storytime:
             msg = await client.send_message(storytime_channel,element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
-        
+
         for element in mailbox.channel:
             msg = await client.send_message(client.get_channel(element.destination),element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
-        
+
         for element in mailbox.player:
             msg = await client.send_message('''How did we do this again?''',element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
-        
+
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
@@ -68,7 +68,7 @@ async def on_message(message):
                 # 2 - frozen        (view, no type)
                 # 3 - abducted      (no view, no type)
                 # 4 - dead          (dead role?)
-            
+
             # TODO
             pass
 
@@ -88,11 +88,11 @@ async def on_message(message):
 
             for buddy in element.settlers:
                 db_set(buddy,"channel",'''id of the channel you just created''')
-    
+
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(5)
     for msg in temp_msg:
-        await delete_message(msg)
+        await client.delete_message(msg)
 
 
 # Whenever the bot regains his connection with the Discord API.
@@ -102,7 +102,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    
+
     await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
 
 client.run(config.TOKEN)
