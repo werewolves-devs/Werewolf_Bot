@@ -1,4 +1,3 @@
-import roles
 from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
@@ -11,36 +10,48 @@ class Mailbox:
         self.player = []        # Send message to user
         self.newchannels = []   # Create new channel
         self.oldchannels = []   # Edit existing channel
-    
+
     def log(self,content,temporary = False):
         self.gamelog.append(Message(content,temporary))
+        return self
     def log_add(self,moar_content):
         self.gamelog[-1].add(moar_content)
-    
+        return self
+
     def spam(self,content,temporary = False):
         self.botspam.append(Message(content,temporary))
+        return self
     def spam_add(self,moar_content):
         self.botspam[-1].add(moar_content)
+        return self
 
     def story(self,content,temporary = False):
         self.storytime.append(Message(content,temporary))
+        return self
     def story_add(self,moar_content):
         self.storytime[-1].add(moar_content)
-    
+        return self
+
     def msg(self,content,destination,temporary = False):
         self.channel.append(Message(content,temporary,destination))
+        return self
     def msg_add(self,moar_content):
         self.channel[-1].add(moar_content)
-    
+        return self
+
     def dm(self,content,user_id,temporary = False):
         self.player.append(Message(content,temporary,user_id))
+        return self
     def dm_add(self,moar_content):
         self.player[-1].add(moar_content)
-    
+        return self
+
     def create_cc(self,channel_name,channel_owner,settlers=[]):
         self.newchannels.append(ChannelComm(0,channel_name,channel_owner,'',0,settlers))
+        return self
     def edit_cc(self,channel_id,user_id,number):
         self.oldchannels.append(ChannelComm(channel_id,'','',user_id,number))
+        return self
 
 # Class used to send messages through the mailbox
 class Message:
@@ -48,9 +59,9 @@ class Message:
         self.content = content
         self.temporary = temporary
         self.destination = destination
-    
     def add(self,moar_content):
         self.content += str(moar_content)
+        return self
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelComm:
@@ -62,4 +73,4 @@ class ChannelComm:
         self.number = number
         self.owner = channel_owner
         self.settlers = []
-        
+
