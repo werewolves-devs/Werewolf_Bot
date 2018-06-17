@@ -1,6 +1,7 @@
 # This file runs CI on Travis
 # It will be better soon
 from management.position import positionof
+import interpretation.check as check
 import management.db as db
 import reset
 
@@ -63,3 +64,19 @@ def test_database():
   assert db.freeze('1') == [u'1234555',u'12211']
   assert db.abduct('420') == []
   reset.reset(True)
+
+  
+# Make sure the check module is working as intended
+def check_check():
+  class message:
+      content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier. Zoiets zou een Hooker zoals jij nooit opmerken."
+
+  x = message()
+  assert check.numbers(x) == [4,1999,8,1]
+  assert check.numbers(x,3) == [4,1999,8]
+  assert check.numbers(x,5) == False
+  assert check.emojis(x) == False
+  assert check.roles(x) == ['Hooker']
+  assert check.roles(x,1) == ['Hooker']
+  assert check.roles(x,2) == False
+  
