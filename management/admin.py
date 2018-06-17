@@ -38,6 +38,7 @@ class Admin:
         """Reloads a module."""
         try:
             self.bot.unload_extension(module)
+            print('\n\n\n--Extension restart: ' + module + '--\n\n\n')
             self.bot.load_extension(module)
         except Exception as e:
             await ctx.channel.send('\N{PISTOL}')
