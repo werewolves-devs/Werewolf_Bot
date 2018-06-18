@@ -31,6 +31,9 @@ class ConspiracyCog:
         # TODO: Checks to ensure a correct number of users,
         # plus other things
 
+        if not ctx.message.author in members:
+            members = members + (ctx.message.author,)
+
         member_ids = []
         for member in members:
             member_ids.append(member.id) # Create a list of member IDs to be sent to CC intro
