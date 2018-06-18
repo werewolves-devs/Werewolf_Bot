@@ -99,7 +99,6 @@ def personal_channel(user_id,channel_id):
     """
     if db_get(user_id,"channel") == str(channel_id):
         return True
-
     return False
 
 # Gather a user's bit of information from the database.
@@ -164,6 +163,7 @@ def get_kill():
 
 # Register a new channel to the database
 def add_channel(channel_id,owner):
+
     """Add a channel to the database.
 
     Keyword arguments:
@@ -175,17 +175,18 @@ def add_channel(channel_id,owner):
 
 # Change a user's value in a specific channel
 def set_user_in_channel(channel_id,user_id,number):
-    """Set a specific user's value in a given channel.
-    # 0 - no access
-    # 1 - access
-    # 2 - frozen
-    # 3 - abducted
-    # 4 - dead
 
-    Keyword arguments:
-    channel_id -> the channel's id
-    user_id -> the user's id
-    number -> the value to set
+    """Set a specific user's value in a given channel.  
+    0 - no access  
+    1 - access  
+    2 - frozen  
+    3 - abducted  
+    4 - dead  
+
+    Keyword arguments:  
+    channel_id -> the channel's id  
+    user_id -> the user's id  
+    number -> the value to set  
     """
     data = [number,channel_id]
     c.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id),data)
