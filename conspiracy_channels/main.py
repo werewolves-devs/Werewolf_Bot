@@ -27,8 +27,9 @@ class ConspiracyCog:
     @cc.command(name='create')
     async def cc_create(self, ctx: Context, name: str, *members: Member):
         # TODO: Randium needs to do database things to check if a user has correct privileges to add a user,
-        # create a channel, is abducted, etc etc, and other things. TODO: Checks to ensure a correct number of users,
-        #  plus other things
+        # create a channel, is abducted, etc etc, and other things.
+        # TODO: Checks to ensure a correct number of users,
+        # plus other things
 
         member_ids = []
         for member in members:
@@ -73,6 +74,7 @@ class ConspiracyCog:
                         reason='Conspiracy Channel creation requested by ' + ctx.author.mention)
                     await channel.send(message)
                 except Exception as e:
+                    await ctx.channel.send('There was an error creating the channel, likely role finding. Please contact a Game Master for more info.\n\n*Game Masters: Check the console*')
                     raise e
         except Exception as e:
             # Category was invalid, create a new one now
