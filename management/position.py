@@ -1,3 +1,10 @@
+roles_list = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller","Baker","Butcher","Barber","Crowd Seeker",
+"Cult Leader","Cult Member","Cupid","Cursed Civilian","Dog","Executioner","Exorcist","Fortune Teller","Fortune Apprentice",
+"Grandma","Hooker","Huntress","Idiot","Innkeeper","Jack Robinson","Look-Alike","Macho","Mad Scientist","Priest","Priestess",
+"Raven","Robin Jackson","Royal Knight","Runner","Town Elder","Witch","Werewolf","Bloody Butcher","Curse Caster","Hell Hound",
+"Infected Wolf","Lone Wolf","Sacred Wolf","Tanner","Warlock","White Werewolf","Wolf's Cub","Angel","Despot","Devil","Demon",
+"Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer","The Thing","Undead","Vampire"," Zombie"]
+
 # Converts the required string to its position in the SQLite database.
 # Raises an error if it cannot find the string.
 def positionof(column):
