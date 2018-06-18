@@ -20,6 +20,6 @@ story_time = 446205631159074818
 # List of specific roles
 game_master = 456884637638328332
 participant = 456881451745411089
-dead_participant = "33"  # TODO
-frozen_participant = "44"  # TODO
+dead_participant = 457498358077063170  # TODO
+frozen_participant = 457498631344357387  # TODO
 suspended = "55"  # TODO
