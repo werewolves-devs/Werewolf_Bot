@@ -33,56 +33,56 @@ class ConspiracyCog:
 
         member_ids = []
         for member in members:
-            member_ids.append(member.id)
+            member_ids.append(member.id) # Create a list of member IDs to be sent to CC intro
         message = creation_messages.cc_intro(
             member_ids)  # This is the message that will be sent to users once the channel is created
 
         # Role objects (based on ID)
-        main_guild = self.bot.get_channel(bot_spam).guild
-        roles = main_guild.roles
-        game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-        dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-        frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+        main_guild = self.bot.get_channel(bot_spam).guild # Find the guild we're in
+        roles = main_guild.roles # Roles from the guild
+        game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)                     # \
+        dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)           # | Find various role objects
+        frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)       # /
         default_permissions = {
-            main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-            dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-            game_master_role: discord.PermissionOverwrite(read_messages=True),  # Allow GM access
-            self.bot.user: discord.PermissionOverwrite(read_messages=True),
-            **{
-                member: discord.PermissionOverwrite(read_messages=True) for member in members
-            },
+            main_guild.default_role: discord.PermissionOverwrite(read_messages=False),                     # \
+            frozen_participant_role: discord.PermissionOverwrite(send_messages=False),                     # |
+            dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),   # | Set the permissions for each role and the bot user
+            game_master_role: discord.PermissionOverwrite(read_messages=True),                             # |
+            self.bot.user: discord.PermissionOverwrite(read_messages=True),                                # /
+            **{                                                                               # \
+                member: discord.PermissionOverwrite(read_messages=True) for member in members # | Set permissions for each member
+            },                                                                                # /
         }
 
         with open("conspiracy_channels/cc_data.json") as cc_data:
             try:
-                data = json.load(cc_data)
+                data = json.load(cc_data) # Try to load conspiracy channel data from a file, ./cc_data.json
             except JSONDecodeError:
-                return await ctx.send('cc_data was not found or is invalid.')
+                return await ctx.send('cc_data was not found or is invalid.') # If we can't find it or it's invalid, throw an error
         try:
-            category = self.bot.get_channel(data['category_id'])
+            category = self.bot.get_channel(data['category_id']) # Find the category based on the data from cc_data
             if len(category.channels) > 49:
                 # TODO: Category is full, make a new one
                 pass
             else:
                 # Use current category
                 try:
-                    channel = await ctx.guild.create_text_channel(
-                        name,
-                        category=category,
-                        overwrites=default_permissions,
-                        reason='Conspiracy Channel creation requested by ' + ctx.author.mention)
-                    await channel.send(message)
-                except Exception as e:
+                    channel = await ctx.guild.create_text_channel( # Create a text channel
+                        name, # With the name 'name'
+                        category=category, # In the category 'category' (A variable we just defined earlier)
+                        overwrites=default_permissions, # Set the permissions to the 'default_permissions' object we created earlier
+                        reason='Conspiracy Channel creation requested by ' + ctx.author.mention) # Set the reason for the Audit Log
+                    await channel.send(message) # Send our welcome message from cc_intro
+                except Exception as e: # Catch any thrown exceptions and send an error to the user
                     await ctx.channel.send('There was an error creating the channel, likely role finding. Please contact a Game Master for more info.\n\n*Game Masters: Check the console*')
-                    raise e
+                    raise e # Send the full info to console
         except Exception as e:
             # Category was invalid, create a new one now
             raise e
 
         with open("conspiracy_channels/cc_data.json", 'w') as cc_data:
-            json.dump(data, cc_data)
+            json.dump(data, cc_data) # Rewrite our 'data' back to disk, as it may have been modified
 
 
 def setup(bot):
-    bot.add_cog(ConspiracyCog(bot))
+    bot.add_cog(ConspiracyCog(bot)) # Add cog to bot
