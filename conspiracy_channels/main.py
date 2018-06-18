@@ -64,25 +64,29 @@ class ConspiracyCog:
                 return await ctx.send('cc_data was not found or is invalid.') # If we can't find it or it's invalid, throw an error
         try:
             category = self.bot.get_channel(data['category_id']) # Find the category based on the data from cc_data
-            if len(category.channels) > 49:
-                # TODO: Category is full, make a new one
-                pass
-            else:
-                # Use current category
-                try:
-                    channel = await ctx.guild.create_text_channel( # Create a text channel
-                        name, # With the name 'name'
-                        category=category, # In the category 'category' (A variable we just defined earlier)
-                        overwrites=default_permissions, # Set the permissions to the 'default_permissions' object we created earlier
-                        reason='Conspiracy Channel creation requested by ' + ctx.author.mention) # Set the reason for the Audit Log
-                    await channel.send(message) # Send our welcome message from cc_intro
-                except Exception as e: # Catch any thrown exceptions and send an error to the user
-                    await ctx.channel.send('There was an error creating the channel, likely role finding. Please contact a Game Master for more info.\n\n*Game Masters: Check the console*')
-                    raise e # Send the full info to console
+        except:
+            #Category couldn't be found, let's make a new one
+            category = await main_guild.create_category('Conspiracy Channels') # TODO: Include season code etc
+        if len(category.channels) > 49:
+            # Current category is full, make a new one!
+            category = await main_guild.create_category('Conspiracy Channels') # TODO: Include season code etc
+        try:
+            try:
+                channel = await ctx.guild.create_text_channel( # Create a text channel
+                    name, # With the name 'name'
+                    category=category, # In the category 'category' (A variable we just defined earlier)
+                    overwrites=default_permissions, # Set the permissions to the 'default_permissions' object we created earlier
+                    reason='Conspiracy Channel creation requested by ' + ctx.author.mention) # Set the reason for the Audit Log
+                await channel.send(message) # Send our welcome message from cc_intro
+            except Exception as e: # Catch any thrown exceptions and send an error to the user
+                await ctx.channel.send('There was an error creating the channel, likely role finding. Please contact a Game Master for more info.\n\n*Game Masters: Check the console*')
+                raise e # Send the full info to console
         except Exception as e:
-            # Category was invalid, create a new one now
+            # Something went wrong. Let's tell the user.
+            ctx.message.channel.send("Something went wrong. Please contact a Game Master for additional assistance.\n\n*Game Masters: Check the console*")
             raise e
 
+        data['category_id'] = category.id
         with open("conspiracy_channels/cc_data.json", 'w') as cc_data:
             json.dump(data, cc_data) # Rewrite our 'data' back to disk, as it may have been modified
 
