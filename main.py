@@ -104,9 +104,9 @@ async def on_message(message):
                 dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),   # | Set the permissions for each role and the bot user
                 game_master_role: discord.PermissionOverwrite(read_messages=True),                             # |
                 self.bot.user: discord.PermissionOverwrite(read_messages=True),                                # /
-                **{                                                                               # \
+                **{                                                                                       # \
                     member: discord.PermissionOverwrite(read_messages=True) for member in element.members # | Set permissions for each member
-                },                                                                                # /
+                },                                                                                        # /
             }
 
             with open("conspiracy_channels/cc_data.json") as cc_data:
