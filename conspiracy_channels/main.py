@@ -66,10 +66,10 @@ class ConspiracyCog:
             category = self.bot.get_channel(data['category_id']) # Find the category based on the data from cc_data
         except:
             #Category couldn't be found, let's make a new one
-            category = await main_guild.create_category('Conspiracy Channels') # TODO: Include season code etc
+            category = await main_guild.create_category('Conspiracy Channels', reason='Old CC Category not found; Creating new one') # TODO: Include season code etc
         if len(category.channels) > 49:
             # Current category is full, make a new one!
-            category = await main_guild.create_category('Conspiracy Channels') # TODO: Include season code etc
+            category = await main_guild.create_category('Conspiracy Channels', reason='Old CC Category full; Creating new one') # TODO: Include season code etc
         try:
             try:
                 channel = await ctx.guild.create_text_channel( # Create a text channel
