@@ -1,68 +1,108 @@
-from discord import Embed, Color
-from discord.ext import commands
-from discord.ext.commands import CommandNotFound, MissingPermissions, MissingRequiredArgument
 import discord
-from discord import Embed, Color
 import random
 import asyncio
 
-
-initial_extensions = ['conspiracy_channels.main',
-                      'management.admin',
-                      'polls']
-
-
 # Import config data
-from config import welcome_channel
-from utils import GameMastersOnly
-from config import prefix, welcome_channel, bot_spam
+from config import prefix, welcome_channel
+from management.db import db_set
+from interpretation.ww_head import process
 import config
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(prefix))
 
-async def on_command_error(ctx: commands.Context, exc: BaseException):
-    if isinstance(exc, CommandNotFound):
-        await ctx.send(exc.args[0])
-    if isinstance(exc, MissingPermissions):
-        await ctx.send(
-            embed=Embed(
-                description='You need to be an admin to execute this command - sorry',
-                color=Color.red()))
-    if isinstance(exc, MissingRequiredArgument):
-        await ctx.send(
-            embed=Embed(
-                color=Color.red(),
-                description='You are missing a required argument: ' + str(exc.param)))
-    if isinstance(exc, GameMastersOnly):
-        await ctx.send(
-            embed=Embed(
-                description='This command is only for GMs. Sorry.',
-                color=Color.red()))
-    else:
-        raise exc
+client = discord.Client()
 
 
-bot.on_command_error = on_command_error
+# Whenever a message is sent.
+@client.event
+async def on_message(message):
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return
+
+    # Check if the message author has the Game Master role
+    isGameMaster = False
+    if False: # somebody fix this
+        isGameMaster = True
+
+    result = process(message,isGameMaster)
+
+    temp_msg = []
+
+    gamelog_channel = client.get_channel(config.game_log)
+    botspam_channel = client.get_channel(config.bot_spam)
+    storytime_channel = client.get_channel(config.story_time)
+
+    for mailbox in result:
+
+        for element in mailbox.gamelog:
+            msg = await client.send_message(gamelog_channel,element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
+        for element in mailbox.botspam:
+            msg = await client.send_message(botspam_channel,element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
+        for element in mailbox.storytime:
+            msg = await client.send_message(storytime_channel,element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
+        for element in mailbox.channel:
+            msg = await client.send_message(client.get_channel(element.destination),element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
+        for element in mailbox.player:
+            msg = await client.send_message('''How did we do this again?''',element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
+        for element in mailbox.oldchannels:
+            # element.channel - channel to be edited;
+            # element.victim - person's permission to be changed;
+            # element.number - type of setting to set to:
+                # 0 - no access     (no view, no type)
+                # 1 - access        (view + type)
+                # 2 - frozen        (view, no type)
+                # 3 - abducted      (no view, no type)
+                # 4 - dead          (dead role?)
+
+            # TODO
+            pass
+
+        for element in mailbox.newchannels:
+            # element.name - name of the channel;
+            # element.owner - owner of the channel;
+            #
+            # @Participant      - no view + type
+            # @dead Participant - view + no type
+            # @everyone         - no view + no type
+
+            # All you need to do is create a channel where only the channel owner has access.
+            # The other members are given access through another Mailbox.
+            # You could make the work easier if you also posted a cc channel message already over here.
+
+            # TODO
+
+            for buddy in element.settlers:
+                db_set(buddy,"channel",'''id of the channel you just created''')
+
+    # Delete all temporary messages after "five" seconds.
+    await asyncio.sleep(5)
+    for msg in temp_msg:
+        await client.delete_message(msg)
+
+
 # Whenever the bot regains his connection with the Discord API.
-@bot.event
+@client.event
 async def on_ready():
     print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
+    print(client.user.name)
+    print(client.user.id)
     print('------')
-    print('--Reminder: You don\'t need to restart the bot to load new changes, just !reload the cog--')
 
-    # Load extensions
-    for extension in initial_extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            await bot.get_channel(bot_spam).send('Error whilst loading module ' + extension + '\nErr: ```' + str(e) + '```\n\n*See the console for more details*')
-            print(str(e))
-    watching = discord.ActivityType.watching
-    activity = discord.Activity(type=watching, name='Werewolves')
-    await bot.change_presence(activity=activity)
-    await bot.get_channel(welcome_channel).send('Beep boop! I just went online!')
+    await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
 
-
-bot.run(config.TOKEN)
+client.run(config.TOKEN)
