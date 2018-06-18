@@ -9,7 +9,7 @@
 8888P   Y8888 Y8b.     888     Y8b.     Y88b 888 d88P Y88..88P 888 888          888   d88P Y88..88P Y88b.  
 888P     Y888  "Y8888  888      "Y8888   "Y8888888P"   "Y88P"  888 888          8888888P"   "Y88P"   "Y888 
                                                                                                            
-                         - = https://github.com/werewolves-devs/werewolf bot = -
+                         - = https://github.com/werewolves-devs/werewolf_bot = -
                                                                                                            
 '''
 
