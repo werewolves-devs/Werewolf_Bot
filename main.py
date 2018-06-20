@@ -28,34 +28,34 @@ async def on_message(message):
 
     temp_msg = []
 
-    gamelog_channel = client.get_channel(config.game_log)
-    botspam_channel = client.get_channel(config.bot_spam)
-    storytime_channel = client.get_channel(config.story_time)
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
 
     for mailbox in result:
 
         for element in mailbox.gamelog:
-            msg = await client.send_message(gamelog_channel,element.content)
+            msg = await gamelog_channel.send(element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.botspam:
-            msg = await client.send_message(botspam_channel,element.content)
+            msg = await botspam_channel.send(element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.storytime:
-            msg = await client.send_message(storytime_channel,element.content)
+            msg = await storytime_channel.send(element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.channel:
-            msg = await client.send_message(client.get_channel(element.destination),element.content)
+            msg = await client.get_channel(element.destination).send(element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.player:
-            msg = await client.send_message('''How did we do this again?''',element.content)
+            msg = await client.get_channel('''How did we do this again?''').send(element.content)
             if element.temporary == True:
                 temp_msg.append(msg)
 
