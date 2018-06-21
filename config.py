@@ -8,8 +8,9 @@ max_participants = 40
 prefix = '!'
 universal_prefix = "#!003-88-6521"
 
-# List of specific files
+# Database settings
 database = 'database.db'
+max_channels_per_category = 50
 
 # List of specific channels
 welcome_channel = 456880220486631424
