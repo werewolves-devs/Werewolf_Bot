@@ -20,7 +20,6 @@ def test_positionof():
   assert positionof("sleepers") == 19
   assert positionof("bitten") == 16
   assert positionof("id") == 0
-# There isn't actually any other tests yet
 
 def kill_queue_test():
   db.add_kill(12738912739821,"Barber")
@@ -34,6 +33,7 @@ def kill_queue_test():
 # Check the database
 def test_database():
   reset.reset(True)
+  assert db.get_category() == None
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
@@ -46,10 +46,14 @@ def test_database():
   db.db_set(1,'frozen',1)
   assert db.poll_list() == [(u'1',u':smirk:',1,0)]
 
+  db.add_category('24')
+  assert db.get_category() == 24
   assert db.get_columns() == [(u'1',)]
   assert db.channel_get('1234555') == None
   db.add_channel('1234555',1)
+  assert db.get_category() == 24
   db.add_channel('12211',1)
+  assert db.get_category() == 24
   assert db.channel_get('1234555') == (u'1234555',u'1',u'0')
   assert db.channel_change_all(1,0,1) == [u'1234555',u'12211']
   assert db.channel_get('1234555') == (u'1234555',u'1',u'1')
@@ -63,6 +67,11 @@ def test_database():
   assert db.channel_get('12211') == (u'12211',u'1',u'1',u'0')
   assert db.freeze('1') == [u'1234555',u'12211']
   assert db.abduct('420') == []
+
+  for i in range(48):
+    assert db.get_category() == 24
+    db.add_channel(10*i,608435446804+7864467*i)
+  assert db.get_category() == None
   reset.reset(True)
 
   
@@ -79,4 +88,3 @@ def check_check():
   assert check.roles(x) == ['Hooker']
   assert check.roles(x,1) == ['Hooker']
   assert check.roles(x,2) == False
-  
