@@ -1,5 +1,5 @@
 import sqlite3
-from config import database
+from config import database, max_channels_per_category
 from management.position import positionof
 
 conn = sqlite3.connect(database)
@@ -170,6 +170,9 @@ def add_channel(channel_id,owner):
     channel_id -> the channel's id
     owner -> the owner's id
     """
+    # Tell the categories database the given category has yet received another channel
+    c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+
     c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
     conn.commit()
 
@@ -280,6 +283,28 @@ def kill(user_id):
     user_id -> the user's id
     """
     return [channel_change_all(user_id,i,4) for i in range(4)]
+
+def get_category():
+    """Receives the category that the current cc should be created in. If it cannot find a category, 
+    or if the category is full, it will return None with the intention that a new category is created in main.py"""
+    c.execute("SELECT * FROM categories WHERE current = 1")
+    category = c.fetchone()
+    
+    if category == None:
+        return None
+    if category[2] >= max_channels_per_category:
+        return None
+    
+    return int(category[1])
+
+def add_category(id):
+    """Let the datbase know a new category has been appointed for the cc's, which has the given id.
+    
+    Keyword arguments:
+    id -> the id of the category"""
+    c.execute("UPDATE categories SET current = 0;")
+    c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+    conn.commit()
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):
