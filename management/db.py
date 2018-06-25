@@ -332,7 +332,7 @@ def is_owner(id,channel):
 
 def count_categories():
     """This function counts how many categories are currently registered, and returns the value as an integer."""
-    c.execute("SELECT COUNT(*) FROM (SELECT `_rowid_`,* FROM `categories` ORDER BY `_rowid_` ASC);")
+    c.execute("SELECT COUNT(*) FROM (SELECT `_rowid_`,* FROM 'categories' ORDER BY `_rowid_` ASC);")
     return c.fetchone()[0]
 
 # Add a new participant to the database
