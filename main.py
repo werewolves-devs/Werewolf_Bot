@@ -121,6 +121,15 @@ async def on_message(message):
 
                 intro_msg = creation_messages.cc_intro(element.members)
 
+                viewers = []
+                abductees = []
+                for member in db.player_list():
+                    if db_get(member,'abducted') == 1:
+                        abductees.append(member)
+                    else:
+                        if member in element.members or db_get(member,'role') in ['Dead','Spectator']:
+                            viewers.append(member)
+
                 # Role objects (based on ID)
                 main_guild = botspam_channel.guild # Find the guild we're in
                 roles = main_guild.roles # Roles from the guild
@@ -134,25 +143,38 @@ async def on_message(message):
                     game_master_role: discord.PermissionOverwrite(read_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
-                        member: discord.PermissionOverwrite(read_messages=True) for member in element.members if db_get(member,'abducted') == 0
+                        member: discord.PermissionOverwrite(read_messages=True) for member in viewers
                     },
                 }
 
                 # Create a new category if needed
                 if db.get_category() == None:
-                    category = await main_guild.create_category('CC part {}'.format(db.count_categories(), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.)
+                    category = await main_guild.create_category('CC part {}'.format(db.count_categories(), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
                     db.add_category(category)
                 else:
                     category = db.get_category()
 
                 try:
-                    channel = await main_guild.create_text_channel( # Create a text channel
+                    # Create the text channel
+                    channel = await main_guild.create_text_channel(
                         name="s{}_".format(config.season) + element.name,
                         category=category,
                         overwrites=default_permissions,
                         reason='CC requested by ' + message.author.mention)
                     db.add_channel(channel.id,element.owner)
                     await channel.send(intro_msg)
+
+                    # Set all access rules in the database
+                    for victim in abductees:
+                        db.set_user_in_channel(channel.id,victim,3)
+                    for user in viewers:
+                        if db_get(user,'role') in ['Dead','Spectator']:
+                            db.set_user_in_channel(channel.id,user,4)
+                        elif db_get(user,'frozen') == 1:
+                            db.set_user_in_channel(channel.id,user,2)
+                        else:
+                            db.set_user_in_channel(channel.id,user,1)
+
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
                     await botspam_channel.send("Oi, Game Masters! Please check the console, I got a problem concerning channel creation for ya to fix.")
