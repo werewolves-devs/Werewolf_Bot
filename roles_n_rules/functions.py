@@ -17,3 +17,11 @@ def signup(user_id,emoji,channel):
 
 def syntax_signup():
     pass
+
+def suicide(user_id):
+    if db.db_get(user_id,'role') in ["Spectator", "Dead"]:
+        return Mailbox().respond("Sorry, but this player cannot be killed again once they are dead!")
+    else:
+        db_set(user_id,'role','Dead')
+        return Mailbox().respond("<@{}> has been killed.".format(user_id))
+
