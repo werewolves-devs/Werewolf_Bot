@@ -3,11 +3,11 @@ from config import dynamic_config
 import json
 
 def jget(variable):
-    """Return what value the given variable is set to. Note that the parameter variable need to a string.
+    """Return what value the given variable is set to. Note that the parameter variable needs to be a string.
     
     Keyword arguments:
     variable -> the variable in dynamic.json that should be changed."""
-
+    
     jdict = json.loads(open(dynamic_config).read())
     return jdict[variable]
 
