@@ -177,7 +177,8 @@ async def on_message(message):
 
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
-                    await botspam_channel.send("Oi, Game Masters! Please check the console, I got a problem concerning channel creation for ya to fix.")
+                    await botspam_channel.send("Oi, Game Masters! I got a problem concerning channel creation for ya to fix.")
+                    botspam_channel.send(e)
                     raise e # Send the full log to Buddy1913 and his sketchy VM.
 
                 # Give the settlers their own happy little residence
