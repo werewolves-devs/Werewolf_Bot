@@ -33,7 +33,8 @@ def kill_queue_test():
 # Check the database
 def test_database():
   reset.reset(True)
-  #assert db.get_category() == None #TODO: Randium should fix his tests
+  assert db.count_categories() == 0
+  assert db.get_category() == None
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
@@ -47,6 +48,7 @@ def test_database():
   assert db.poll_list() == [(u'1',u':smirk:',1,0)]
 
   db.add_category('24')
+  assert db.count_categories() == 1
   assert db.get_category() == 24
   assert db.get_columns() == [(u'1',)]
   assert db.channel_get('1234555') == None
@@ -71,6 +73,7 @@ def test_database():
   for i in range(48):
     assert db.get_category() == 24
     db.add_channel(10*i,608435446804+7864467*i)
+  assert db.count_categories() == 1
   assert db.get_category() == None
   reset.reset(True)
 
@@ -78,7 +81,7 @@ def test_database():
 # Make sure the check module is working as intended
 def check_check():
   class message:
-      content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier. Zoiets zou een Hooker zoals jij nooit opmerken."
+    content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier. Zoiets zou een Hooker zoals jij nooit opmerken."
 
   x = message()
   assert check.numbers(x) == [4,1999,8,1]
@@ -88,3 +91,5 @@ def check_check():
   assert check.roles(x) == ['Hooker']
   assert check.roles(x,1) == ['Hooker']
   assert check.roles(x,2) == False
+
+test_database()
