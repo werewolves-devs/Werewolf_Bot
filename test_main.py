@@ -91,5 +91,3 @@ def check_check():
   assert check.roles(x) == ['Hooker']
   assert check.roles(x,1) == ['Hooker']
   assert check.roles(x,2) == False
-
-test_database()
