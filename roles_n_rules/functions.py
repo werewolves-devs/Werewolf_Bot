@@ -19,10 +19,9 @@ def syntax_signup():
     pass
 
 def suicide():
-    if player.role.name in ["Spectator", "Dead"] or me.dead == True:
+    if player.role.name in ["Spectator", "Dead"]:
         return mail = Mailbox().respond("Sorry, but you cannot kill yourself once you are dead!",me.channel)
     else:
-        me.dead = True
-        player.role.name in ["Dead"]
-        return mail = Mailbox().respond("You have committed suicide, upon closer investigate, it has been found out that " + player.name + " was a " + player.role.name + ".")
+        db_set(user_id,'role','Dead')
+        return mail = Mailbox().respond("Seeing that you cannot do or acheive anymore, clearly life was not worth living anymore and you have committed suicide. The town, upon closer investigation, has found out that " + player.name + " was a " + db_get(user_id,'role') + ".")
 
