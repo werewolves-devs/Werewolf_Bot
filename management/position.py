@@ -54,6 +54,8 @@ def positionof(column):
         return 21
     if column == "abducted":
         return 22
+    if column == "ccs":
+        return 23
     
     raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
 
