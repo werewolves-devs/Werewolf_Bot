@@ -18,10 +18,10 @@ def signup(user_id,emoji,channel):
 def syntax_signup():
     pass
 
-def suicide():
-    if player.role.name in ["Spectator", "Dead"]:
-        return mail = Mailbox().respond("Sorry, but you cannot kill yourself once you are dead!",me.channel)
+def suicide(user_id):
+    if db.db_get(user_id,'role') in ["Spectator", "Dead"]:
+        return Mailbox().respond("Sorry, but this player cannot be killed again once they are dead!")
     else:
         db_set(user_id,'role','Dead')
-        return mail = Mailbox().respond("Seeing that you cannot do or acheive anymore, clearly life was not worth living anymore and you have committed suicide. The town, upon closer investigation, has found out that " + player.name + " was a " + db_get(user_id,'role') + ".")
+        return Mailbox().respond("<@{}> has been killed.".format(user_id))
 
