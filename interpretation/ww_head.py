@@ -15,6 +15,17 @@ def process(message, isGameMaster = False):
     message_channel = message.channel.id
     user_role = db_get(user_id,'role')
 
+    '''testcc'''
+    # This function is merely a temporary one, to test if the cc creation command is working properly.
+    if is_command(message,['cc','testcc','test_cc']):
+        members = check.users(message)
+        name = message.content.split(' ')[1]
+        return Mailbox().create_cc(name,user_id,members)
+    if is_command(message,['cc','testcc','test_cc'],True):
+        msg = "**Usage:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
+        msg += "\n\nThe bot understands both mentions and emojis linked to players."
+        return [Mailbox().respond(msg)]
+
     # =============================================================
     #
     #                         GAME MASTERS
@@ -500,4 +511,7 @@ def process(message, isGameMaster = False):
         # TODO
         return todo()
 
-    return [Mailbox().msg("Sorry bud, couldn't find what you were looking for.",message_channel,True).msg("But hey, at least SOME response!",message_channel,True)]
+    if message.content[0] == prefix:
+        return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.",True)]
+
+    return []
