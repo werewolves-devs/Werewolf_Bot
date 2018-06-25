@@ -1,6 +1,6 @@
 import sqlite3
 from config import database, max_channels_per_category
-from management.position import positionof
+from management.position import positionof, check_for_int
 
 conn = sqlite3.connect(database)
 c = conn.cursor()
@@ -218,12 +218,13 @@ def channel_change_all(user_id,old,new):
 # If the channel does not exist, it returns None
 # When given a specific user_id or the argument owner, it returns that specific bit of data
 def channel_get(channel_id,user_id = ''):
-    """Gain the information of a channel.
+    """Gain the information of a channel. Returns None if the channel doesn't exist, or if the user isn't found.
 
     Keyword arguments:
     channel_id -> the channel's id
     user_id -> (optional) the specific value. Returns all info if blank and returns the owner's id when set to 'owner'
     """
+
     if user_id == '':
         c.execute("SELECT * FROM 'channels' WHERE channel_id =?",(channel_id,))
     elif user_id == 'owner':
@@ -235,6 +236,10 @@ def channel_get(channel_id,user_id = ''):
         else:
             return None
     else:
+        c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
+        if c.fetchone() == None:
+            return None
+
         column = 'id' + str(user_id)
         c.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(column),(channel_id,))
     return c.fetchone()
@@ -305,6 +310,30 @@ def add_category(id):
     c.execute("UPDATE categories SET current = 0;")
     c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
     conn.commit()
+
+def is_owner(id,channel):
+    """This function returns True is the given user is the owner of a given cc.
+    Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
+    
+    Keyword arguments:
+    id -> the id of the user
+    channel -> the id of the channel"""
+
+    # Check if the user exists
+    c.execute("SELECT * FROM channel_rows WHERE id =?",(id,))
+    if c.fetchone() == None or check_for_int(id) == False:
+        return False
+    
+    owner = channel_get(channel,id)
+    if int(owner) == int(id):
+        return True
+    
+    return False
+
+def count_categories():
+    """This function counts how many categories are currently registered, and returns the value as an integer."""
+    c.execute("SELECT COUNT(*) FROM 'categories';")
+    return c.fetchone()[0]
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):

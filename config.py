@@ -2,8 +2,10 @@
 TOKEN = "CENSORED"
 
 # Rules 'n' settings
-game_stage = 0
+dynamic_config = "dynamic.json"
 max_participants = 40
+max_cc_per_user = 8
+season = "1"
 
 prefix = '!'
 universal_prefix = "#!003-88-6521"

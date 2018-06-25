@@ -18,10 +18,12 @@ import random
 import asyncio
 
 # Import config data
+import story_time.cc_creation as creation_messages
 from config import prefix, welcome_channel
-from management.db import db_set
+from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
+import management.db as db
 
 
 client = discord.Client()
@@ -64,6 +66,11 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        for element in mailbox.answer:
+            msg = await message.channel.send(element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
         for element in mailbox.channel:
             msg = await client.get_channel(element.destination).send(element.content)
             if element.temporary == True:
@@ -101,14 +108,66 @@ async def on_message(message):
             # The other members are given access through another Mailbox.
             # You could make the work easier if you also posted a cc channel message already over here.
 
-            if element.owner not in element.members:
-                element.members.append(element.owner)
-            for buddy in element.settlers:
-                if buddy not in element.members:
-                    print("Warning: I'm adding settlers to a channel!")
+            if ' ' not in element.name:
 
-            for buddy in element.settlers:
-                db_set(buddy,"channel",'''id of the channel you just created''')
+                if element.owner not in element.members:
+                    element.members.append(element.owner)
+                for buddy in element.settlers:
+                    if buddy not in element.members:
+                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem, \
+                        but it does at least indicate a flaw in the bot's code. Please, report this to the Game Masters!"""
+                        await client.get_channel(message.channel).send(msg)
+                        element.members.append(buddy)
+
+                intro_msg = creation_messages.cc_intro(element.members)
+
+                # Role objects (based on ID)
+                main_guild = botspam_channel.guild # Find the guild we're in
+                roles = main_guild.roles # Roles from the guild
+                game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
+                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+                default_permissions = {
+                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
+                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                    game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True) for member in element.members if db_get(member,'abducted') == 0
+                    },
+                }
+
+                # Create a new category if needed
+                if db.get_category() == None:
+                    category = await main_guild.create_category('CC part {}'.format(db.count_categories(), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.)
+                    db.add_category(category)
+                else:
+                    category = db.get_category()
+
+                try:
+                    channel = await main_guild.create_text_channel( # Create a text channel
+                        name="s{}_".format(config.season) + element.name,
+                        category=category,
+                        overwrites=default_permissions,
+                        reason='CC requested by ' + message.author.mention)
+                    db.add_channel(channel.id,element.owner)
+                    await channel.send(intro_msg)
+                except Exception as e: # Catch any thrown exceptions and send an error to the user.
+                    await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
+                    await botspam_channel.send("Oi, Game Masters! Please check the console, I got a problem concerning channel creation for ya to fix.")
+                    raise e # Send the full log to Buddy1913 and his sketchy VM.
+
+                for buddy in element.settlers:
+                    db_set(buddy,"channel",'''id of the channel you just created''')
+            
+            else:
+                """This should not happen, but we'll use it, to prevent the bot from purposely causing an error
+                everytime someone attempts to create a channel that contains spaces. 'cause believe me,
+                that happens ALL the time."""
+                msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
+                temp_msg.append(msg)
+
 
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(5)
