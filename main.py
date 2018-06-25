@@ -132,25 +132,9 @@ async def on_message(message):
                     frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
                     dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
                     game_master_role: discord.PermissionOverwrite(read_messages=True),
-                    client.user: discord.PermissionOverwrite(read_messages=True),
+                    client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
-                        # I don't know how ya code works, don't blame me if it doesn't work.
-                        # Is this valid syntax inside curly brackets?
-                        # If not, you better fix that!
-                        for member in element.members:
-                            if db.isParticipant(member) == True:
-                                if db_get(member,'abducted') == 1:
-                                    member: discord.PermissionOverwrite(read_messages=False,send_messages=True)
-                                elif db_get(member,'frozen') == 1:
-                                    member: discord.PermissionOverwrite(read_messages=True,send_messages=False)
-                                else:
-                                    member: discord.PermissionOverwrite(read_messages=True,send_messages=True)
-                            elif db.isParticipant(member,True,True):
-                                member: discord.PermissionOverwrite(read_messages=True,send_messages=False)
-                            else:
-                                # Do we want to allow outsiders to join when explicitly invited?
-                                # They can't talk, obviously, but still.
-                                member: discord.PermissionOverwrite(read_messages=True,send_messages=False)
+                        member: discord.PermissionOverwrite(read_messages=True) for member in element.members if db_get(member,'abducted') == 0
                     },
                 }
 
