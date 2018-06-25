@@ -180,8 +180,9 @@ async def on_message(message):
                     await botspam_channel.send("Oi, Game Masters! Please check the console, I got a problem concerning channel creation for ya to fix.")
                     raise e # Send the full log to Buddy1913 and his sketchy VM.
 
+                # Give the settlers their own happy little residence
                 for buddy in element.settlers:
-                    db_set(buddy,"channel",'''id of the channel you just created''')
+                    db_set(buddy,"channel",channel.id)
             
             else:
                 """This should not happen, but we'll use it, to prevent the bot from purposely causing an error
