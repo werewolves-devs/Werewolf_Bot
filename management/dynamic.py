@@ -8,7 +8,7 @@ def jget(variable):
     Keyword arguments:
     variable -> the variable in dynamic.json that should be changed."""
 
-    jdict = json.loads(open('/dynamic.json').read())
+    jdict = json.loads(open(dynamic_config).read())
     return jdict[variable]
 
 def jset(variable,value):
