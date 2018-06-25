@@ -2,6 +2,7 @@
 TOKEN = "CENSORED"
 
 # Rules 'n' settings
+season = "1"
 game_stage = 0
 max_participants = 40
 
