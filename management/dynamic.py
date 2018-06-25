@@ -2,13 +2,13 @@
 from config import dynamic_config
 import json
 
-def jget(variable, directory):
-    """Return what value the given variable is set to. Note that both parameters need to be strings.
+def jget(variable):
+    """Return what value the given variable is set to. Note that the parameter variable need to a string.
     
     Keyword arguments:
     variable -> the variable in dynamic.json that should be changed."""
 
-    jdict = json.loads(open(directory).read())
+    jdict = json.loads(open('/dynamic.json').read())
     return jdict[variable]
 
 def jset(variable,value):
