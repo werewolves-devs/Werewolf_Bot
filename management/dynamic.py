@@ -18,8 +18,11 @@ def jset(variable,value):
     variable -> the variable that should be changed.  
     value -> the value the variable should be set to."""
     
-    jdict1 = json.loads(open(dynamic_config).read())
-    jdict1[variable] = value
+    with open(dynamic_config, 'r') as f:
+        jdict1 = json.load(f)
+        jdict1[variable] = value
+    with open(dynamic_config, 'w') as f:
+        json.dump(jdict1, f)
     
 def get_stage():
     """Return what stage the game is currently in"""
@@ -33,8 +36,11 @@ def set_stage(value):
     
     Valid arguments are 'Day', 'Night' and 'NA'."""
     
-    jdict1 = json.loads(open(dynamic_config).read())
-    jdict1[stage] = value
+    with open(dynamic_config, 'r') as f:
+        jdict2 = json.load(f)
+        jdict2["stage"] = value
+    with open(dynamic_config, 'w') as f:
+        json.dump(jdict2, f)
 
     # Day - daytime
     # Night - nighttime
