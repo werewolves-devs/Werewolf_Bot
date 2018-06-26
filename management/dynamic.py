@@ -1,16 +1,15 @@
 # This file's meaning is to open the dynamic config, and distribute it to whomever needs its information
 from config import dynamic_config
+import json
 
 def jget(variable):
-    """Return what value the given variable is set to.
+    """Return what value the given variable is set to. Note that the parameter variable needs to be a string.
     
     Keyword arguments:
     variable -> the variable in dynamic.json that should be changed."""
-
-    # TODO
-    # The variable dynamic_config contains the name of the dynamic JSON-formatted config.
-
-    return #TODO
+    
+    jdict = json.loads(open(dynamic_config).read())
+    return jdict[variable]
 
 def jset(variable,value):
     """Change the variable in the dynamic config to the given value.
