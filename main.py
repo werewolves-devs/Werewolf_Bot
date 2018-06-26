@@ -1,12 +1,29 @@
+'''
+
+888       888                                                  888  .d888       888888b.            888
+888   o   888                                                  888 d88P"        888  "88b           888
+888  d8b  888                                                  888 888          888  .88P           888
+888 d888b 888  .d88b.  888d888  .d88b.  888  888  888  .d88b.  888 888888       8888888K.   .d88b.  888888
+888d88888b888 d8P  Y8b 888P"   d8P  Y8b 888  888  888 d88""88b 888 888          888  "Y88b d88""88b 888
+88888P Y88888 88888888 888     88888888 888  888  888 888  888 888 888          888    888 888  888 888
+8888P   Y8888 Y8b.     888     Y8b.     Y88b 888 d88P Y88..88P 888 888          888   d88P Y88..88P Y88b.
+888P     Y888  "Y8888  888      "Y8888   "Y8888888P"   "Y88P"  888 888          8888888P"   "Y88P"   "Y888
+
+                         - = https://github.com/werewolves-devs/werewolf_bot = -
+
+'''
+
 import discord
 import random
 import asyncio
 
 # Import config data
+import story_time.cc_creation as creation_messages
 from config import prefix, welcome_channel
-from management.db import db_set
+from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
+import management.db as db
 
 
 client = discord.Client()
@@ -49,6 +66,11 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        for element in mailbox.answer:
+            msg = await message.channel.send(element.content)
+            if element.temporary == True:
+                temp_msg.append(msg)
+
         for element in mailbox.channel:
             msg = await client.get_channel(element.destination).send(element.content)
             if element.temporary == True:
@@ -75,6 +97,8 @@ async def on_message(message):
         for element in mailbox.newchannels:
             # element.name - name of the channel;
             # element.owner - owner of the channel;
+            # element.members - members of the channel
+            # element.settlers - members for whom this shall become their home channel
             #
             # @Participant      - no view + type
             # @dead Participant - view + no type
@@ -84,15 +108,103 @@ async def on_message(message):
             # The other members are given access through another Mailbox.
             # You could make the work easier if you also posted a cc channel message already over here.
 
-            # TODO
+            if ' ' not in element.name:
 
-            for buddy in element.settlers:
-                db_set(buddy,"channel",'''id of the channel you just created''')
+                main_guild = botspam_channel.guild # Find the guild we're in
+
+                if element.owner not in element.members:
+                    element.members.append(element.owner)
+                for buddy in element.settlers:
+                    if buddy not in element.members:
+                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem, \
+                        but it does at least indicate a flaw in the bot's code. Please, report this to the Game Masters!"""
+                        await client.get_channel(message.channel).send(msg)
+                        element.members.append(buddy)
+
+                viewers = []
+                abductees = []
+                for member in db.player_list():
+                    if db_get(member,'abducted') == 1:
+                        abductees.append(member)
+                    elif member in element.members or db_get(member,'role') in ['Dead','Spectator'] or str(member) == str(element.owner):
+                        if main_guild.get_member(int(member)) != None:
+                            viewers.append(main_guild.get_member(int(member)))
+                        else:
+                            sorry = await message.channel.send("It doesn't seem like <@{}> is part of this server! I am sorry, I can't add them to your channel.".format(member))
+                            temp_msg.append(sorry)
+
+                intro_msg = creation_messages.cc_intro([v.id for v in viewers])
+
+                await message.channel.send(viewers)
+                intro_msg = creation_messages.cc_intro(viewers)
+
+                # Role objects (based on ID)
+                roles = main_guild.roles # Roles from the guild
+                #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                #dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
+                #frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+                default_permissions = {
+                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                    #frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
+                    #dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                    #game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True) for member in viewers
+                    },
+                }
+
+                # Create a new category if needed
+                if db.get_category() == None:
+                    category = await main_guild.create_category('CC part {}'.format(db.count_categories()), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
+                    db.add_category(category.id)
+                else:
+                    category = main_guild.get_channel(db.get_category())
+
+                try:
+                    # Create the text channel
+                    reason_msg = 'CC requested by ' + message.author.name
+                    channel = await main_guild.create_text_channel(
+                        name="s{}_{}".format(config.season,element.name),
+                        category=category,
+                        overwrites=default_permissions,
+                        reason=reason_msg)
+                    db.add_channel(channel.id,element.owner)
+                    await channel.send(intro_msg)
+
+                    # Set all access rules in the database
+                    for victim in abductees:
+                        db.set_user_in_channel(channel.id,victim,3)
+                    for user in viewers:
+                        if db_get(user.id,'role') in ['Dead','Spectator']:
+                            db.set_user_in_channel(channel.id,user.id,4)
+                        elif db_get(user.id,'frozen') == 1:
+                            db.set_user_in_channel(channel.id,user.id,2)
+                        else:
+                            db.set_user_in_channel(channel.id,user.id,1)
+
+                except Exception as e: # Catch any thrown exceptions and send an error to the user.
+                    await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
+                    await botspam_channel.send("Oi, Game Masters! I got a problem concerning channel creation for ya to fix.")
+                    await botspam_channel.send(e)
+                    raise e # Send the full log to Buddy1913 and his sketchy VM.
+
+                # Give the settlers their own happy little residence
+                for buddy in element.settlers:
+                    db_set(buddy,"channel",channel.id)
+
+            else:
+                """This should not happen, but we'll use it, to prevent the bot from purposely causing an error
+                everytime someone attempts to create a channel that contains spaces. 'cause believe me,
+                that happens ALL the time."""
+                msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
+                temp_msg.append(msg)
+
 
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(5)
     for msg in temp_msg:
-        await client.delete_message(msg)
+        await msg.delete()
 
 
 # Whenever the bot regains his connection with the Discord API.
@@ -103,6 +215,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-    await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
+    await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 client.run(config.TOKEN)

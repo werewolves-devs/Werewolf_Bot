@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player
 from interpretation.check import is_command
 import roles_n_rules.functions as func
 from main_classes import Mailbox, Message
@@ -14,6 +14,21 @@ def process(message, isGameMaster = False):
     user_id = message.author.id
     message_channel = message.channel.id
     user_role = db_get(user_id,'role')
+
+    '''testcc'''
+    # This function is merely a temporary one, to test if the cc creation command is working properly.
+    if is_command(message,['cc','testcc','test_cc']):
+        members = check.users(message)
+        if len(message.content.split(' ')) == 1 or members == False:
+            msg = "**Incorrect syntax:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
+            msg += "\n\nThe bot understands both mentions and emojis linked to players."
+            return [Mailbox().respond(msg,True)]
+        name = message.content.split(' ')[1]
+        return [Mailbox().create_cc(name,user_id,members)]
+    if is_command(message,['cc','testcc','test_cc'],True):
+        msg = "**Usage:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
+        msg += "\n\nThe bot understands both mentions and emojis linked to players."
+        return [Mailbox().respond(msg,True)]
 
     # =============================================================
     #
@@ -494,10 +509,38 @@ def process(message, isGameMaster = False):
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
     if is_command(message,['signup']):
-        # TODO
-        return todo()
-    if is_command(message,['signup'],True):
-        # TODO
-        return todo()
+        emojis = check.emojis(message)
+        choice_emoji = ""
 
-    return [Mailbox().msg("Sorry bud, couldn't find what you were looking for.",message_channel,True).msg("But hey, at least SOME response!",message_channel,True)]
+        if emojis == False:
+            msg = "**Incorrect syntax:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
+            return [Mailbox().respond(msg,True)]
+
+        for emoji in emojis:
+            if emoji_to_player(emoji) == None:
+                choice_emoji = emoji
+                break
+
+        if isParticipant(user_id,True,True):
+            if choice_emoji == "":
+               return [Mailbox().respond("You are already signed up with the {} emoji! Also, your emoji was occupied.".format(db_get(user_id,'emoji')),True)]
+            db_set(user_id,'emoji',choice_emoji)
+            reaction = Mailbox().respond("You have successfully changed your emoji to the {} emoji!".format(choice_emoji))
+            return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
+
+        if emoji == "":
+            if len(choice_emojis) == 1:
+                return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
+            return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]
+        signup(user_id,message.author.name,choice_emoji)
+        reaction = Mailbox().respond("You have successfully signed up with the {} emoji!".format(choice_emoji))
+        return [reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id,choice_emoji))]
+    # Help command
+    if is_command(message,['signup'],True):
+        msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
+        return [Mailbox().respond(msg,True)]
+
+    if message.content[0] == prefix:
+        return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.",True)]
+
+    return []

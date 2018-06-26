@@ -52,8 +52,20 @@ def positionof(column):
         return 20
     if column == "zombies":
         return 21
+    if column == "abducted":
+        return 22
+    if column == "ccs":
+        return 23
     
     raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
+
+def check_for_int(s):
+    """Returns True if the value s is or can be converted to an integer. Returns False otherwise."""
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 # This piece is only run when this is the main file in the terminal.
 # It will not run if the file is being imported by another file.
