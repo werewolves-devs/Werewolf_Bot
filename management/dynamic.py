@@ -17,7 +17,13 @@ def jset(variable,value):
     Keyword arguments:
     variable -> the variable that should be changed.  
     value -> the value the variable should be set to."""
-
+    
+    with open(dynamic_config, 'r') as f:
+        jdict1 = json.load(f)
+        jdict1[variable] = value
+    with open(dynamic_config, 'w') as f:
+        json.dump(jdict1, f)
+    
 def get_stage():
     """Return what stage the game is currently in"""
     return jget("stage")
@@ -29,6 +35,11 @@ def set_stage(value):
     value -> the value the game stage should be changed into.  
     
     Valid arguments are 'Day', 'Night' and 'NA'."""
+    
+    if value in ['Day','Night','NA']:
+        return jset("stage",value)
+
+    raise ValueError("Attempt made to set stage to invalid value: {}".format(value))
 
     # Day - daytime
     # Night - nighttime
