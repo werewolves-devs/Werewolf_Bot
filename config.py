@@ -1,5 +1,5 @@
 # Discord API / Login settings
-TOKEN = "CENSORED"
+TOKEN = "yo_momma's_sized_token_Boi"
 
 # Rules 'n' settings
 dynamic_config = "dynamic.json"
@@ -12,7 +12,7 @@ universal_prefix = "#!003-88-6521"
 
 # Database settings
 database = 'database.db'
-max_channels_per_category = 50
+max_channels_per_category = 5
 
 # List of specific channels
 welcome_channel = 456880220486631424
@@ -23,6 +23,6 @@ story_time = 446205631159074818
 # List of specific roles
 game_master = 456884637638328332
 participant = 456881451745411089
-dead_participant = 457498358077063170  # TODO
-frozen_participant = 457498631344357387  # TODO
-suspended = "55"  # TODO
+dead_participant = 457498358077063170
+frozen_participant = 457498631344357387
+suspended = 0 # TODO
