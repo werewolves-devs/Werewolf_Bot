@@ -1,16 +1,16 @@
 '''
 
-888       888                                                  888  .d888       888888b.            888    
-888   o   888                                                  888 d88P"        888  "88b           888    
-888  d8b  888                                                  888 888          888  .88P           888    
-888 d888b 888  .d88b.  888d888  .d88b.  888  888  888  .d88b.  888 888888       8888888K.   .d88b.  888888 
-888d88888b888 d8P  Y8b 888P"   d8P  Y8b 888  888  888 d88""88b 888 888          888  "Y88b d88""88b 888    
-88888P Y88888 88888888 888     88888888 888  888  888 888  888 888 888          888    888 888  888 888    
-8888P   Y8888 Y8b.     888     Y8b.     Y88b 888 d88P Y88..88P 888 888          888   d88P Y88..88P Y88b.  
-888P     Y888  "Y8888  888      "Y8888   "Y8888888P"   "Y88P"  888 888          8888888P"   "Y88P"   "Y888 
-                                                                                                           
+888       888                                                  888  .d888       888888b.            888
+888   o   888                                                  888 d88P"        888  "88b           888
+888  d8b  888                                                  888 888          888  .88P           888
+888 d888b 888  .d88b.  888d888  .d88b.  888  888  888  .d88b.  888 888888       8888888K.   .d88b.  888888
+888d88888b888 d8P  Y8b 888P"   d8P  Y8b 888  888  888 d88""88b 888 888          888  "Y88b d88""88b 888
+88888P Y88888 88888888 888     88888888 888  888  888 888  888 888 888          888    888 888  888 888
+8888P   Y8888 Y8b.     888     Y8b.     Y88b 888 d88P Y88..88P 888 888          888   d88P Y88..88P Y88b.
+888P     Y888  "Y8888  888      "Y8888   "Y8888888P"   "Y88P"  888 888          8888888P"   "Y88P"   "Y888
+
                          - = https://github.com/werewolves-devs/werewolf_bot = -
-                                                                                                           
+
 '''
 
 import discord
@@ -119,8 +119,6 @@ async def on_message(message):
                         await client.get_channel(message.channel).send(msg)
                         element.members.append(buddy)
 
-                intro_msg = creation_messages.cc_intro(element.members)
-
                 viewers = []
                 abductees = []
                 for member in db.player_list():
@@ -130,17 +128,20 @@ async def on_message(message):
                         if member in element.members or db_get(member,'role') in ['Dead','Spectator']:
                             viewers.append(member)
 
+                await message.channel.send(viewers)
+                intro_msg = creation_messages.cc_intro(viewers)
+
                 # Role objects (based on ID)
                 main_guild = botspam_channel.guild # Find the guild we're in
                 roles = main_guild.roles # Roles from the guild
-                game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+                #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                #dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
+                #frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    #frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
+                    #dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                    #game_master_role: discord.PermissionOverwrite(read_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
                         member: discord.PermissionOverwrite(read_messages=True) for member in viewers
@@ -149,10 +150,10 @@ async def on_message(message):
 
                 # Create a new category if needed
                 if db.get_category() == None:
-                    category = await main_guild.create_category('CC part {}'.format(db.count_categories(), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
-                    db.add_category(category)
+                    category = await main_guild.create_category('CC part {}'.format(db.count_categories()), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
+                    db.add_category(category.id)
                 else:
-                    category = db.get_category()
+                    category = main_guild.get_channel(db.get_category())
 
                 try:
                     # Create the text channel
@@ -178,13 +179,13 @@ async def on_message(message):
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
                     await botspam_channel.send("Oi, Game Masters! I got a problem concerning channel creation for ya to fix.")
-                    botspam_channel.send(e)
+                    await botspam_channel.send(e)
                     raise e # Send the full log to Buddy1913 and his sketchy VM.
 
                 # Give the settlers their own happy little residence
                 for buddy in element.settlers:
                     db_set(buddy,"channel",channel.id)
-            
+
             else:
                 """This should not happen, but we'll use it, to prevent the bot from purposely causing an error
                 everytime someone attempts to create a channel that contains spaces. 'cause believe me,
@@ -196,7 +197,7 @@ async def on_message(message):
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(5)
     for msg in temp_msg:
-        await client.delete_message(msg)
+        await msg.delete()
 
 
 # Whenever the bot regains his connection with the Discord API.
@@ -207,6 +208,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-    await client.send_message(client.get_channel(welcome_channel),'Beep boop! I just went online!')
+    await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 client.run(config.TOKEN)
