@@ -36,11 +36,10 @@ def set_stage(value):
     
     Valid arguments are 'Day', 'Night' and 'NA'."""
     
-    with open(dynamic_config, 'r') as f:
-        jdict2 = json.load(f)
-        jdict2["stage"] = value
-    with open(dynamic_config, 'w') as f:
-        json.dump(jdict2, f)
+    if value in ['Day','Night','NA']:
+        return jset("stage",value)
+
+    raise ValueError("Attempt made to set stage to invalid value: {}".format(value))
 
     # Day - daytime
     # Night - nighttime
