@@ -27,6 +27,10 @@ def poll_list():
 
     return c.fetchall()
 
+def player_list():
+    """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
+    return [item[0] for item in poll_list()]
+
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
 def emoji_to_player(emoji):
@@ -170,6 +174,8 @@ def add_channel(channel_id,owner):
     channel_id -> the channel's id
     owner -> the owner's id
     """
+    c.execute("SELECT * FROM categories")
+
     # Tell the categories database the given category has yet received another channel
     c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
 
@@ -179,17 +185,17 @@ def add_channel(channel_id,owner):
 # Change a user's value in a specific channel
 def set_user_in_channel(channel_id,user_id,number):
 
-    """Set a specific user's value in a given channel.  
-    0 - no access  
-    1 - access  
-    2 - frozen  
-    3 - abducted  
-    4 - dead  
+    """Set a specific user's value in a given channel.
+    0 - no access
+    1 - access
+    2 - frozen
+    3 - abducted
+    4 - dead
 
-    Keyword arguments:  
-    channel_id -> the channel's id  
-    user_id -> the user's id  
-    number -> the value to set  
+    Keyword arguments:
+    channel_id -> the channel's id
+    user_id -> the user's id
+    number -> the value to set
     """
     data = [number,channel_id]
     c.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id),data)
@@ -290,21 +296,21 @@ def kill(user_id):
     return [channel_change_all(user_id,i,4) for i in range(4)]
 
 def get_category():
-    """Receives the category that the current cc should be created in. If it cannot find a category, 
+    """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
     c.execute("SELECT * FROM categories WHERE current = 1")
     category = c.fetchone()
-    
+
     if category == None:
         return None
     if category[2] >= max_channels_per_category:
         return None
-    
+
     return int(category[1])
 
 def add_category(id):
     """Let the datbase know a new category has been appointed for the cc's, which has the given id.
-    
+
     Keyword arguments:
     id -> the id of the category"""
     c.execute("UPDATE categories SET current = 0;")
@@ -314,7 +320,7 @@ def add_category(id):
 def is_owner(id,channel):
     """This function returns True is the given user is the owner of a given cc.
     Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
-    
+
     Keyword arguments:
     id -> the id of the user
     channel -> the id of the channel"""
@@ -323,11 +329,11 @@ def is_owner(id,channel):
     c.execute("SELECT * FROM channel_rows WHERE id =?",(id,))
     if c.fetchone() == None or check_for_int(id) == False:
         return False
-    
+
     owner = channel_get(channel,id)
     if int(owner) == int(id):
         return True
-    
+
     return False
 
 def count_categories():
