@@ -135,6 +135,9 @@ async def on_message(message):
 
                 intro_msg = creation_messages.cc_intro([v.id for v in viewers])
 
+                await message.channel.send(viewers)
+                intro_msg = creation_messages.cc_intro(viewers)
+
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
