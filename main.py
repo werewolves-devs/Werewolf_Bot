@@ -110,6 +110,8 @@ async def on_message(message):
 
             if ' ' not in element.name:
 
+                main_guild = botspam_channel.guild # Find the guild we're in
+
                 if element.owner not in element.members:
                     element.members.append(element.owner)
                 for buddy in element.settlers:
@@ -124,15 +126,19 @@ async def on_message(message):
                 for member in db.player_list():
                     if db_get(member,'abducted') == 1:
                         abductees.append(member)
-                    else:
-                        if member in element.members or db_get(member,'role') in ['Dead','Spectator']:
-                            viewers.append(member)
+                    elif member in element.members or db_get(member,'role') in ['Dead','Spectator'] or str(member) == str(element.owner):
+                        if main_guild.get_member(int(member)) != None:
+                            viewers.append(main_guild.get_member(int(member)))
+                        else:
+                            sorry = await message.channel.send("It doesn't seem like <@{}> is part of this server! I am sorry, I can't add them to your channel.".format(member))
+                            temp_msg.append(sorry)
+
+                intro_msg = creation_messages.cc_intro([v.id for v in viewers])
 
                 await message.channel.send(viewers)
                 intro_msg = creation_messages.cc_intro(viewers)
 
                 # Role objects (based on ID)
-                main_guild = botspam_channel.guild # Find the guild we're in
                 roles = main_guild.roles # Roles from the guild
                 #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
                 #dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
@@ -157,11 +163,12 @@ async def on_message(message):
 
                 try:
                     # Create the text channel
+                    reason_msg = 'CC requested by ' + message.author.name
                     channel = await main_guild.create_text_channel(
-                        name="s{}_".format(config.season) + element.name,
+                        name="s{}_{}".format(config.season,element.name),
                         category=category,
                         overwrites=default_permissions,
-                        reason='CC requested by ' + message.author.mention)
+                        reason=reason_msg)
                     db.add_channel(channel.id,element.owner)
                     await channel.send(intro_msg)
 
@@ -169,12 +176,12 @@ async def on_message(message):
                     for victim in abductees:
                         db.set_user_in_channel(channel.id,victim,3)
                     for user in viewers:
-                        if db_get(user,'role') in ['Dead','Spectator']:
-                            db.set_user_in_channel(channel.id,user,4)
-                        elif db_get(user,'frozen') == 1:
-                            db.set_user_in_channel(channel.id,user,2)
+                        if db_get(user.id,'role') in ['Dead','Spectator']:
+                            db.set_user_in_channel(channel.id,user.id,4)
+                        elif db_get(user.id,'frozen') == 1:
+                            db.set_user_in_channel(channel.id,user.id,2)
                         else:
-                            db.set_user_in_channel(channel.id,user,1)
+                            db.set_user_in_channel(channel.id,user.id,1)
 
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')

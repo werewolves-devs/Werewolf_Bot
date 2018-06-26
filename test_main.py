@@ -1,5 +1,6 @@
 # This file runs CI on Travis
 # It will be better soon
+from config import max_channels_per_category
 from management.position import positionof
 import interpretation.check as check
 import management.db as db
@@ -70,7 +71,7 @@ def test_database():
   assert db.freeze('1') == [u'1234555',u'12211']
   assert db.abduct('420') == []
 
-  for i in range(48):
+  for i in range(max_channels_per_category - 2):
     assert db.get_category() == 24
     db.add_channel(10*i,608435446804+7864467*i)
   assert db.count_categories() == 1
