@@ -11,6 +11,9 @@ syntax_signup()
 import management.db as db
 from main_classes import Mailbox
 
+def myrole():
+    return db.db_get(message.author.id,'role')
+
 def signup(user_id,emoji,channel):
     if db.emoji_to_player(emoji) != None:
         mail = Mailbox().respond("I am terribly sorry! That emoji has already been taken!",channel)
