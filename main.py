@@ -35,12 +35,13 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-    
-    author = ctx.message.author
+     
     # Check if the message author has the Game Master role
+    author = ctx.message.author
+    
     if game_master in [y.id for y in author.roles]:
         isGameMaster = True
-    else
+    else:
         isGameMaster = False
 
     result = process(message,isGameMaster)
