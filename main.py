@@ -37,9 +37,8 @@ async def on_message(message):
         return
      
     # Check if the message author has the Game Master role
-    author = ctx.message.author
     
-    if game_master in [y.id for y in author.roles]:
+    if game_master in [y.id for y in message.author.roles]:
         isGameMaster = True
     else:
         isGameMaster = False
