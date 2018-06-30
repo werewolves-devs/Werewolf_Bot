@@ -113,7 +113,7 @@ def process(message, isGameMaster = False):
         if is_command(message,['whois'],True):
             msg = "**Usage:** `" + prefix + "whois <user1> <user2> ...`\n\n"
             msg += "Example: `" + prefix + "whois @Randium#6521`\nGame Master only command"
-            return [Mailbox().respond(msg,True)
+            return [Mailbox().respond(msg,True)]
 
     # =============================================================
     #
