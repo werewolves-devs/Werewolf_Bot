@@ -76,11 +76,6 @@ class Mailbox:
         self.channel[-1].react(emoji)
         return self
 
-    def embed(self, embed, destination, temporary = False, reactions=[]):
-        """Send a message to a given channel"""
-        self.channel.append(Message(embed,temporary,destination,reactions,True))
-        return self
-
     def dm(self,content,user_id,temporary = False,reactions = []):
         """Send a DM to a given user"""
         self.player.append(Message(content,temporary,user_id))
@@ -93,7 +88,7 @@ class Mailbox:
         """Add a reaction to the last DM"""
         self.player[-1].react(emoji)
         return self
-
+  
     def create_cc(self,channel_name,channel_owner,members = [],settlers=[]):
         """Send an order to create a channel"""
         self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers))
@@ -105,12 +100,11 @@ class Mailbox:
 
 # Class used to send messages through the mailbox
 class Message:
-    def __init__(self,content,temporary = False,destination = '',reactions=[],embed = False):
+    def __init__(self,content,temporary = False,destination = '',reactions=[]):
         self.content = content
         self.temporary = temporary
         self.destination = destination
         self.reactions = reactions
-        self.embed = embed
     def add(self,moar_content):
         self.content += str(moar_content)
         return self
@@ -125,11 +119,11 @@ class ChannelCreate:
         self.owner = owner
         self.members = []
         self.settlers = []
-
+        
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
-    # can be executed easily. However, this isn't the case when
+    # can be executed easily. However, this isn't the case when 
     def __init__(self,channel,victim,number):
         self.channel = channel
         self.victim = victim
