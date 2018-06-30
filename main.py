@@ -19,7 +19,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import prefix, welcome_channel
+from config import prefix, welcome_channel, game_master
 from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
@@ -35,11 +35,13 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-
+     
     # Check if the message author has the Game Master role
-    isGameMaster = False
-    if False: # somebody fix this
+    
+    if game_master in [y.id for y in message.author.roles]:
         isGameMaster = True
+    else:
+        isGameMaster = False
 
     result = process(message,isGameMaster)
 
