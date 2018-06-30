@@ -74,9 +74,14 @@ async def on_message(message):
                 temp_msg.append(msg)
 
         for element in mailbox.channel:
-            msg = await client.get_channel(element.destination).send(element.content)
-            if element.temporary == True:
-                temp_msg.append(msg)
+            if element.embed:
+                msg = await client.get_channel(element.destination).send(embed=element.content)
+                if element.temporary == True:
+                    temp_msg.append(msg)
+            else:
+                msg = await client.get_channel(element.destination).send(element.content)
+                if element.temporary == True:
+                    temp_msg.append(msg)
 
         for element in mailbox.player:
             msg = await client.get_channel('''How did we do this again?''').send(element.content)

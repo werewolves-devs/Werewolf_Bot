@@ -105,9 +105,10 @@ def roles(message,amount= -1,delete_duplicates = False):
 
     role_table = []
 
-    for argument in message.content.split(' '):
-        if argument in roles_list:
-            role_table.append(argument)
+    for i in range(len(message.content)):
+        for role in roles_list:
+            if message.content[i:].startswith(role):
+                role_table.append(role)
 
     if delete_duplicates == True:
         role_table = list(set(role_table))
