@@ -4,7 +4,8 @@ from interpretation.check import is_command
 import roles_n_rules.functions as func
 from main_classes import Mailbox, Message
 import interpretation.check as check
-from config import prefix
+from config import prefix, max_cc_per_user
+import discord
 
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!",True)]
@@ -113,18 +114,38 @@ def process(message, isGameMaster = False):
         '''add'''
         # This command allows users to add users to a conspiracy.
         # This command will not trigger if the user doesn't own the conspiracy channel.
-        if is_command(message,['add']):
-            # TODO
-            return todo()
+        if is_command(message,['add'], members_to_add=[], channel_id):
+            id = message.author.id
+            members_to_add = check.users(message)
+            if is_owner(id,channel_id) == False:
+                return Mailbox().dm("Only the owner of the CC is allowed to use this command!", id)
+            elif is_owner(id,channel_id) == True:
+                return #TODO
+                
         if is_command(message,['add'],True):
             # TODO
             return todo()
 
         '''cc'''
-        # This command allows users to create a conspirachy channel.
-        if is_command(message,['cc']):
-            # TODO
-            return todo()
+        # This command allows users to create a conspiracy channel.
+        if is_command(message, ['cc'], channel_name, channel_members=[]):
+            id = message.author.id
+            channel_members = check.users(message)
+            channel_members.append(id)
+            if isinstance(s, channel_name) == False:
+                return Mailbox().dm("The channel name must be a string!", id)
+            elif isinstance(s, channel_name) == True:
+                num_cc_owned = int(db_get(id,'ccs'))
+                if num_cc_owned >= max_cc_per_user:
+                    return Mailbox().dm("You have already reached the limit of CCs!", id)
+                elif num_cc_owned < max_cc_per_user:
+                    db_set(id,'ccs',number_cc_owned + 1)
+                    Mailbox.create_cc(channel_name, id, channel_members)
+                    return Mailbox().dm("A new conspiracy channel has been created!", id)
+                else:
+                    return Mailbox().dm("Something unexpected has happened :p", id)
+             else:
+                return Mailbox().dm("Something unexpected has happened :p", id)
         if is_command(message,['cc'],True):
             # TODO
             return todo()
