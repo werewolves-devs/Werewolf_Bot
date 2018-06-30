@@ -5,6 +5,7 @@ import roles_n_rules.functions as func
 from main_classes import Mailbox, Message
 import interpretation.check as check
 from config import prefix
+from discord import Embed
 
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!",True)]
@@ -133,8 +134,13 @@ def process(message, isGameMaster = False):
         # This command allows users to view information about a conspiracy channel.
         # Says the user must be in a cc if they're not.
         if is_command(message,['info']):
-            # TODO
-            return todo()
+            embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
+            embed.add_field(name='Channel Owner', value='[Placeholder]')
+            embed.add_field(name='Channel Name', value='[Some Awesome CC Name]')
+            embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
+            embed.set_footer(text='Conspiracy Channel Information requested by [Placeholder]')
+            embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/456880220486631424/462621050811973634/0_CultMember.png')
+            return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
             # TODO
             return todo()
