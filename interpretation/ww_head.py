@@ -57,6 +57,11 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)[0]
             user = check.users(message,1)[0]
 
+            if role == False:
+                return [Mailbox().respond("No role provided! Please provide us with a role!")]
+            if user == False:
+                return [Mailbox().respond("No user found! Please provide us with a user!")]
+            
             db_set(user,'role',role)
             return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user,role))]
 
@@ -91,17 +96,24 @@ def process(message, isGameMaster = False):
             user_table = check.users(message)
             identities = Mailbox()
 
+            if user_table == False:
+                return [Mailbox().respond("**ERROR:** No user provided!")]
+            
             for user in user_table:
                 emoji = db_get(user,'emoji')
                 role = db_get(user,'role')
-                msg = "{} - <@{}> has the role of the `{}`!".format(emoji,user,role)
-                identities.spam(msg)
+                if emoji == None or role == None:
+                    identities.spam("**ERROR:** Could not find user <@{}> in database.".format(user))
+                else:
+                    msg = "{} - <@{}> has the role of the `{}`!".format(emoji,user,role)
+                    identities.spam(msg)
 
             return [identities]
 
         if is_command(message,['whois'],True):
             msg = "**Usage:** `" + prefix + "whois <user1> <user2> ...`\n\n"
             msg += "Example: `" + prefix + "whois @Randium#6521`\nGame Master only command"
+            return [Mailbox().respond(msg,True)
 
     # =============================================================
     #
@@ -114,13 +126,12 @@ def process(message, isGameMaster = False):
         '''add'''
         # This command allows users to add users to a conspiracy.
         # This command will not trigger if the user doesn't own the conspiracy channel.
-        if is_command(message,['add'], members_to_add=[], channel_id):
-            id = message.author.id
+        if is_command(message,['add']):
             members_to_add = check.users(message)
-            if is_owner(id,channel_id) == False:
-                return Mailbox().dm("Only the owner of the CC is allowed to use this command!", id)
-            elif is_owner(id,channel_id) == True:
-                return #TODO
+            if is_owner(user_id,channel_id) == False:
+                return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
+            
+            return #TODO
                 
         if is_command(message,['add'],True):
             # TODO
@@ -128,24 +139,24 @@ def process(message, isGameMaster = False):
 
         '''cc'''
         # This command allows users to create a conspiracy channel.
-        if is_command(message, ['cc'], channel_name, channel_members=[]):
-            id = message.author.id
+        if is_command(message, ['cc']):
+            if len(message.content.split(' ')) < 2:
+                    return [Mailbox().respond("**Invalid syntax:**\n\n`" + prefix + "cc <name> <user1> <user2> <user3> ...`\n\n**Example:** `" + prefix + "cc the_cool_guys @Randium#6521`")]
+                    
             channel_members = check.users(message)
-            channel_members.append(id)
-            if isinstance(s, channel_name) == False:
-                return Mailbox().dm("The channel name must be a string!", id)
-            elif isinstance(s, channel_name) == True:
-                num_cc_owned = int(db_get(id,'ccs'))
-                if num_cc_owned >= max_cc_per_user:
-                    return Mailbox().dm("You have already reached the limit of CCs!", id)
-                elif num_cc_owned < max_cc_per_user:
-                    db_set(id,'ccs',number_cc_owned + 1)
-                    Mailbox.create_cc(channel_name, id, channel_members)
-                    return Mailbox().dm("A new conspiracy channel has been created!", id)
-                else:
-                    return Mailbox().dm("Something unexpected has happened :p", id)
-             else:
-                return Mailbox().dm("Something unexpected has happened :p", id)
+            if channel_members == False:
+                channel_members = []
+            if user_id not in channel_members:
+                channel_members.append(user_id)
+                    
+            num_cc_owned = int(db_get(user_id,'ccs'))
+                    
+            if num_cc_owned >= max_cc_per_user:
+                answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
+                return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
+
+            db_set(id,'ccs',number_cc_owned + 1)
+            return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members)
         if is_command(message,['cc'],True):
             # TODO
             return todo()
@@ -561,7 +572,7 @@ def process(message, isGameMaster = False):
         msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
         return [Mailbox().respond(msg,True)]
 
-    if message.content[0] == prefix:
+    if message.content.startswith(prefix):
         return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.",True)]
 
     return []
