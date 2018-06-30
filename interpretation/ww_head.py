@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get
 from interpretation.check import is_command
 import roles_n_rules.functions as func
 from main_classes import Mailbox, Message
@@ -134,11 +134,13 @@ def process(message, isGameMaster = False):
         # This command allows users to view information about a conspiracy channel.
         # Says the user must be in a cc if they're not.
         if is_command(message,['info']):
+            guild = message.channel.guild
+            owner_object = channel_get(message.channel.id,'owner')
             embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
-            embed.add_field(name='Channel Owner', value='[Placeholder]')
-            embed.add_field(name='Channel Name', value='[Some Awesome CC Name]')
+            embed.add_field(name='Channel Owner', value='<@' + owner_object + '>')
+            embed.add_field(name='Channel Name', value=message.channel.name)
             embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
-            embed.set_footer(text='Conspiracy Channel Information requested by [Placeholder]')
+            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
             embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/456880220486631424/462621050811973634/0_CultMember.png')
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
