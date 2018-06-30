@@ -155,7 +155,7 @@ def process(message, isGameMaster = False):
                 answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
                 return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
 
-            db_set(id,'ccs',number_cc_owned + 1)
+            db_set(user_id,'ccs',number_cc_owned + 1)
             return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members)
         if is_command(message,['cc'],True):
             # TODO
