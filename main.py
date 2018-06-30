@@ -229,13 +229,13 @@ async def on_message(message):
 # Whenever the bot regains his connection with the Discord API.
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+    print(' --> Logged in as')
+    print('   | > ' + client.user.name)
+    print('   | > ' + str(client.user.id))
 
     await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 print(ascii)
-print('\x1B[3m' + random.choice(splashes) + '\x1B[23m')
+print(' --> "' + random.choice(splashes) + '"')
+print(' --> Please wait whilst we connect to the Discord API...')
 client.run(config.TOKEN)
