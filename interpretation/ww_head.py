@@ -135,13 +135,14 @@ def process(message, isGameMaster = False):
         # Says the user must be in a cc if they're not.
         if is_command(message,['info']):
             guild = message.channel.guild
-            owner_object = channel_get(message.channel.id,'owner')
+            owner_id = channel_get(message.channel.id,'owner')
+            owner_object = guild.get_member(int(owner_id))
             embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
-            embed.add_field(name='Channel Owner', value='<@' + owner_object + '>')
+            embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
             embed.add_field(name='Channel Name', value=message.channel.name)
             embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
-            embed.set_thumbnail(url='https://cdn.discordapp.com/attachments/456880220486631424/462621050811973634/0_CultMember.png')
+            embed.set_thumbnail(url=owner_object.avatar_url)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
             # TODO
