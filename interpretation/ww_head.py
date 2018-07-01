@@ -159,6 +159,7 @@ def process(message, isGameMaster = False):
 
             db_set(user_id,'ccs',number_cc_owned + 1)
             return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members)
+        
         if is_command(message,['cc'],True):
             # TODO
             return todo()
@@ -176,8 +177,7 @@ def process(message, isGameMaster = False):
         '''myrole'''
         # This command sends the user's role back to them in a DM.
         if is_command(message,['myrole']):
-            # TODO
-            return todo()
+            return myrole(user_id,message)
         if is_command(message,['myrole'],True):
             # TODO
             return todo()
@@ -186,8 +186,16 @@ def process(message, isGameMaster = False):
         # This command removes a given user from a conspiracy channel.
         # A user should not get removed if they're the channel owner.
         if is_command(message,['remove']):
-            # TODO
-            return todo()
+            members_to_remove = check.users(message)
+            if is_owner(user_id,channel_id) == False:
+                return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
+            command = Mailbox()
+            for x in members_to_remove:
+                if is_owner(x,channel_id) == True:
+                    return [Mailbox().respond("The owner of a CC cannot be removed! Please try again.")]
+                command.edit_cc(x,channel_id,0)
+            return command.respond("Insert Randium's comment here")]
+        
         if is_command(message,['remove'],True):
             # TODO
             return todo()
