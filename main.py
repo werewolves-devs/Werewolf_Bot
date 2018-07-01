@@ -33,7 +33,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import prefix, welcome_channel, game_master
+from config import prefix, welcome_channel, game_master, dead_participant, game_master, frozen_participant
 from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
@@ -179,14 +179,14 @@ async def on_message(message):
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
-                #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-                #dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-                #frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+                game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
+                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    #frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-                    #dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    #game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
+                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                    game_master_role: discord.PermissionOverwrite(read_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
                         member: discord.PermissionOverwrite(read_messages=True) for member in viewers
