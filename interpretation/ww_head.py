@@ -135,14 +135,31 @@ def process(message, isGameMaster = False):
         # Says the user must be in a cc if they're not.
         if is_command(message,['info']):
             guild = message.channel.guild
-            owner_id = channel_get(message.channel.id,'owner')
-            owner_object = guild.get_member(int(owner_id))
+            try:
+                owner_id = channel_get(message.channel.id,'owner')
+            except:
+                return[Mailbox().respond('Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            if owner_id != None:
+                owner_object = guild.get_member(int(owner_id))
             embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
-            embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
+            if owner_object != None and owner_id != None:
+                embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
+                embed.set_thumbnail(url=owner_object.avatar_url)
+            elif owner_id == None:
+                return [Mailbox().respond('Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            else:
+                try:
+                    owner_name = db_get(owner_id,'name')
+                    if str(owner_name) == 'None':
+                        owner_name = 'Sorry, an error was encountered. Please alert a Game Master.'
+                except:
+                    owner_name == 'Sorry, an error was encountered. Please alert a Game Master.'
+
+                embed.add_field(name='Channel Owner', value=owner_name)
+
             embed.add_field(name='Channel Name', value=message.channel.name)
             embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
-            embed.set_thumbnail(url=owner_object.avatar_url)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
             # TODO
