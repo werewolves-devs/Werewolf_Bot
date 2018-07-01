@@ -133,7 +133,7 @@ def process(message, isGameMaster = False):
             command = Mailbox()
             for x in members_to_add:
                 command.edit_cc(x,channel_id,1)
-            return Mailbox().respond("Insert Randium's comment here")]
+            return command.respond("Insert Randium's comment here")]
                 
         if is_command(message,['add'],True):
             # TODO
