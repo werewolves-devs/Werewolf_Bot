@@ -69,36 +69,50 @@ async def on_message(message):
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.channel:
             if element.embed:
                 msg = await client.get_channel(element.destination).send(embed=element.content)
+                for emoji in element.reactions:
+                    # add reaction called 'emoji' to message called 'msg'
                 if element.temporary == True:
                     temp_msg.append(msg)
             else:
                 msg = await client.get_channel(element.destination).send(element.content)
+                for emoji in element.reactions:
+                    # add reaction called 'emoji' to message called 'msg'
                 if element.temporary == True:
                     temp_msg.append(msg)
 
         for element in mailbox.player:
             msg = await client.get_channel('''How did we do this again?''').send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
