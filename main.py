@@ -97,13 +97,13 @@ async def on_message(message):
 
         for element in mailbox.channel:
             if element.embed:
-                msg = await client.get_channel(element.destination).send(embed=element.content)
+                msg = await client.get_channel(int(element.destination)).send(embed=element.content)
                 for emoji in element.reactions:
                     # add reaction called 'emoji' to message called 'msg'
                 if element.temporary == True:
                     temp_msg.append(msg)
             else:
-                msg = await client.get_channel(element.destination).send(element.content)
+                msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
                     # add reaction called 'emoji' to message called 'msg'
                 if element.temporary == True:
