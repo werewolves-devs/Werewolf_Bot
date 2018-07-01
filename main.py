@@ -1,4 +1,4 @@
-'''
+ascii = '''
 
 888       888                                                  888  .d888       888888b.            888
 888   o   888                                                  888 d88P"        888  "88b           888
@@ -13,13 +13,27 @@
 
 '''
 
+splashes = [
+'Now with 100% less JavaScript',
+'I made it, we *HAVE* to use it',
+'Standards? What are they?',
+'Nah, we don\'t use libraries here.',
+'The mailbox system is a \'good idea\'',
+'Leaking tokens is fun!',
+'Let\'s just shove everything into main.py, who still does organization in 2018',
+'Works on my machine',
+'Always use a database. What\'s a JSON?',
+'Powered by Electricity',
+'Who still writes docs in 2018?'
+]
+
 import discord
 import random
 import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import prefix, welcome_channel
+from config import prefix, welcome_channel, game_master
 from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
@@ -35,11 +49,13 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-
+     
     # Check if the message author has the Game Master role
-    isGameMaster = False
-    if False: # somebody fix this
+    
+    if game_master in [y.id for y in message.author.roles]:
         isGameMaster = True
+    else:
+        isGameMaster = False
 
     result = process(message,isGameMaster)
 
@@ -53,31 +69,50 @@ async def on_message(message):
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.channel:
-            msg = await client.get_channel(element.destination).send(element.content)
-            if element.temporary == True:
-                temp_msg.append(msg)
+            if element.embed:
+                msg = await client.get_channel(int(element.destination)).send(embed=element.content)
+                for emoji in element.reactions:
+                    # add reaction called 'emoji' to message called 'msg'
+                if element.temporary == True:
+                    temp_msg.append(msg)
+            else:
+                msg = await client.get_channel(int(element.destination)).send(element.content)
+                for emoji in element.reactions:
+                    # add reaction called 'emoji' to message called 'msg'
+                if element.temporary == True:
+                    temp_msg.append(msg)
 
         for element in mailbox.player:
             msg = await client.get_channel('''How did we do this again?''').send(element.content)
+            for emoji in element.reactions:
+                # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
                 temp_msg.append(msg)
 
@@ -210,11 +245,13 @@ async def on_message(message):
 # Whenever the bot regains his connection with the Discord API.
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+    print(' --> Logged in as')
+    print('   | > ' + client.user.name)
+    print('   | > ' + str(client.user.id))
 
     await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
+print(ascii)
+print(' --> "' + random.choice(splashes) + '"')
+print(' --> Please wait whilst we connect to the Discord API...')
 client.run(config.TOKEN)

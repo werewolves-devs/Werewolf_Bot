@@ -236,7 +236,7 @@ def channel_get(channel_id,user_id = ''):
     elif user_id == 'owner':
         c.execute("SELECT owner FROM 'channels' WHERE channel_id =?",(channel_id,))
         try:
-            return c.fetchone()[1]
+            return c.fetchone()[0]
         except ValueError:
             return None
         else:
@@ -317,7 +317,7 @@ def add_category(id):
     c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
     conn.commit()
 
-def is_owner(id,channel):
+def is_owner(user_id,channel_id):
     """This function returns True is the given user is the owner of a given cc.
     Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
 
@@ -326,12 +326,12 @@ def is_owner(id,channel):
     channel -> the id of the channel"""
 
     # Check if the user exists
-    c.execute("SELECT * FROM channel_rows WHERE id =?",(id,))
-    if c.fetchone() == None or check_for_int(id) == False:
+    c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
+    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id):
         return False
 
-    owner = channel_get(channel,id)
-    if int(owner) == int(id):
+    owner = channel_get(channel_id,'owner')
+    if int(owner) == int(user_id):
         return True
 
     return False
