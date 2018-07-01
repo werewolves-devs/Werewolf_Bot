@@ -236,7 +236,7 @@ def channel_get(channel_id,user_id = ''):
     elif user_id == 'owner':
         c.execute("SELECT owner FROM 'channels' WHERE channel_id =?",(channel_id,))
         try:
-            return c.fetchone()[1]
+            return c.fetchone()[0]
         except ValueError:
             return None
         else:

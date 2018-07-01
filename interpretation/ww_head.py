@@ -1,10 +1,11 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get
 from interpretation.check import is_command
-import roles_n_rules.functions as func
-from main_classes import Mailbox, Message
-import interpretation.check as check
 from config import prefix, max_cc_per_user
+from main_classes import Mailbox, Message
+from discord import Embed
+import roles_n_rules.functions as func
+import interpretation.check as check
 import discord
 
 def todo():
@@ -168,8 +169,33 @@ def process(message, isGameMaster = False):
         # This command allows users to view information about a conspiracy channel.
         # Says the user must be in a cc if they're not.
         if is_command(message,['info']):
-            # TODO
-            return todo()
+            guild = message.channel.guild
+            try:
+                owner_id = channel_get(message.channel.id,'owner')
+            except:
+                return[Mailbox().respond('Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            if owner_id != None:
+                owner_object = guild.get_member(int(owner_id))
+            embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
+            if owner_object != None and owner_id != None:
+                embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
+                embed.set_thumbnail(url=owner_object.avatar_url)
+            elif owner_id == None:
+                return [Mailbox().respond('Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            else:
+                try:
+                    owner_name = db_get(owner_id,'name')
+                    if str(owner_name) == 'None':
+                        owner_name = 'Sorry, an error was encountered. Please alert a Game Master.'
+                except:
+                    owner_name == 'Sorry, an error was encountered. Please alert a Game Master.'
+
+                embed.add_field(name='Channel Owner', value=owner_name)
+
+            embed.add_field(name='Channel Name', value=message.channel.name)
+            embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
+            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
+            return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
             # TODO
             return todo()
