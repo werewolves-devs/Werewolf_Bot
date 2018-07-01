@@ -110,7 +110,8 @@ async def on_message(message):
                     temp_msg.append(msg)
 
         for element in mailbox.player:
-            msg = await client.get_channel('''How did we do this again?''').send(element.content)
+            user = client.get_user(element.user_id)
+            msg = await client.get_channel(user).send(element.content)
             for emoji in element.reactions:
                 # add reaction called 'emoji' to message called 'msg'
             if element.temporary == True:
