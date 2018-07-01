@@ -71,6 +71,7 @@ async def on_message(message):
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
                 # add reaction called 'emoji' to message called 'msg'
+                pass
             if element.temporary == True:
                 temp_msg.append(msg)
 
