@@ -49,49 +49,48 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-     
-    # Check if the message author has the Game Master role
-    
-    if game_master in [y.id for y in message.author.roles]:
-        isGameMaster = True
-    else:
-        isGameMaster = False
-
-    result = process(message,isGameMaster)
-
-    temp_msg = []
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
+
+    # Check if the message author has the Game Master role
+    isGameMaster = False
+    if message.guild == gamelog_channel.guild:
+        if game_master in [y.id for y in message.author.roles]:
+            isGameMaster = True
+
+    result = process(message,isGameMaster)
+
+    temp_msg = []
 
     for mailbox in result:
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
@@ -99,23 +98,27 @@ async def on_message(message):
             if element.embed:
                 msg = await client.get_channel(int(element.destination)).send(embed=element.content)
                 for emoji in element.reactions:
-                    # add reaction called 'emoji' to message called 'msg'
+                    await msg.add_reaction(emoji)
                 if element.temporary == True:
                     temp_msg.append(msg)
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
-                    # add reaction called 'emoji' to message called 'msg'
+                    await msg.add_reaction(emoji)
                 if element.temporary == True:
                     temp_msg.append(msg)
 
         for element in mailbox.player:
-            user = client.get_user(element.user_id)
-            msg = await client.get_channel(user).send(element.content)
-            for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-            if element.temporary == True:
-                temp_msg.append(msg)
+            member = client.get_user(element.destination)
+            if member == None:
+                await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
+                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed.".format(message.author.id,element.destination))
+            else:
+                msg = await member.send(element.content)
+                for emoji in element.reactions:
+                    await msg.add_reaction(emoji)
+                if element.temporary == True:
+                    temp_msg.append(msg)
 
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
