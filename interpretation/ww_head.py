@@ -177,7 +177,7 @@ def process(message, isGameMaster = False):
         '''myrole'''
         # This command sends the user's role back to them in a DM.
         if is_command(message,['myrole']):
-            return myrole(user_id,message)
+            return Mailbox().dm("Your role is **{}**.".format(db.db_get(message.author.id,'role')), message.author.id)
         if is_command(message,['myrole'],True):
             # TODO
             return todo()
@@ -192,7 +192,7 @@ def process(message, isGameMaster = False):
             command = Mailbox()
             for x in members_to_remove:
                 if is_owner(x,channel_id) == True:
-                    return [Mailbox().respond("The owner of a CC cannot be removed! Please try again.")]
+                    return [Mailbox().respond("The owner of a CC can\'t be removed! Please try again.")]
                 command.edit_cc(x,channel_id,0)
             return command.respond("Insert Randium's comment here")]
         
