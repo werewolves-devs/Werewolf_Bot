@@ -1,4 +1,4 @@
-'''
+ascii = '''
 
 888       888                                                  888  .d888       888888b.            888
 888   o   888                                                  888 d88P"        888  "88b           888
@@ -12,6 +12,20 @@
                          - = https://github.com/werewolves-devs/werewolf_bot = -
 
 '''
+
+splashes = [
+'Now with 100% less JavaScript',
+'I made it, we *HAVE* to use it',
+'Standards? What are they?',
+'Nah, we don\'t use libraries here.',
+'The mailbox system is a \'good idea\'',
+'Leaking tokens is fun!',
+'Let\'s just shove everything into main.py, who still does organization in 2018',
+'Works on my machine',
+'Always use a database. What\'s a JSON?',
+'Powered by Electricity',
+'Who still writes docs in 2018?'
+]
 
 import discord
 import random
@@ -217,11 +231,13 @@ async def on_message(message):
 # Whenever the bot regains his connection with the Discord API.
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+    print(' --> Logged in as')
+    print('   | > ' + client.user.name)
+    print('   | > ' + str(client.user.id))
 
     await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
+print(ascii)
+print(' --> "' + random.choice(splashes) + '"')
+print(' --> Please wait whilst we connect to the Discord API...')
 client.run(config.TOKEN)
