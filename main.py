@@ -49,9 +49,9 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-     
+
     # Check if the message author has the Game Master role
-    
+
     if game_master in [y.id for y in message.author.roles]:
         isGameMaster = True
     else:
@@ -86,6 +86,7 @@ async def on_message(message):
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
                 # add reaction called 'emoji' to message called 'msg'
+                pass
             if element.temporary == True:
                 temp_msg.append(msg)
 
@@ -93,6 +94,7 @@ async def on_message(message):
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
                 # add reaction called 'emoji' to message called 'msg'
+                pass
             if element.temporary == True:
                 temp_msg.append(msg)
 
@@ -101,12 +103,14 @@ async def on_message(message):
                 msg = await client.get_channel(int(element.destination)).send(embed=element.content)
                 for emoji in element.reactions:
                     # add reaction called 'emoji' to message called 'msg'
+                    pass
                 if element.temporary == True:
                     temp_msg.append(msg)
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
                     # add reaction called 'emoji' to message called 'msg'
+                    pass
                 if element.temporary == True:
                     temp_msg.append(msg)
 
@@ -115,6 +119,7 @@ async def on_message(message):
             msg = await client.get_channel(user).send(element.content)
             for emoji in element.reactions:
                 # add reaction called 'emoji' to message called 'msg'
+                pass
             if element.temporary == True:
                 temp_msg.append(msg)
 
