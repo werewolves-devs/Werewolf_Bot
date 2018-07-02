@@ -112,7 +112,7 @@ async def on_message(message):
             member = client.get_user(element.destination)
             if member == None:
                 await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
-                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed.".format(message.author.id,element.destination))
+                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(message.author.id,element.destination))
             else:
                 msg = await member.send(element.content)
                 for emoji in element.reactions:
