@@ -129,6 +129,8 @@ def process(message, isGameMaster = False):
         # This command will not trigger if the user doesn't own the conspiracy channel.
         if is_command(message,['add']):
             members_to_add = check.users(message)
+            if members_to_add == False:
+                return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
             if is_owner(user_id,channel_id) == False:
                 return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
             command = Mailbox()
@@ -203,7 +205,7 @@ def process(message, isGameMaster = False):
         '''myrole'''
         # This command sends the user's role back to them in a DM.
         if is_command(message,['myrole']):
-            return [Mailbox().dm("Your role is **{}**.".format(db.db_get(message.author.id,'role')), message.author.id)]
+            return [Mailbox().dm("Your role is **{}**.".format(db_get(message.author.id,'role')), message.author.id,False,[db_get(message.author.id,'emoji')])]
         if is_command(message,['myrole'],True):
             # TODO
             return todo()

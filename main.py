@@ -33,7 +33,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import prefix, welcome_channel, game_master
+from config import prefix, welcome_channel, game_master, dead_participant, game_master, frozen_participant
 from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
@@ -50,52 +50,47 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    # Check if the message author has the Game Master role
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
 
-    if game_master in [y.id for y in message.author.roles]:
-        isGameMaster = True
-    else:
-        isGameMaster = False
+    # Check if the message author has the Game Master role
+    isGameMaster = False
+    if message.guild == gamelog_channel.guild:
+        if game_master in [y.id for y in message.author.roles]:
+            isGameMaster = True
 
     result = process(message,isGameMaster)
 
     temp_msg = []
-
-    gamelog_channel = client.get_channel(int(config.game_log))
-    botspam_channel = client.get_channel(int(config.bot_spam))
-    storytime_channel = client.get_channel(int(config.story_time))
 
     for mailbox in result:
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-                pass
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-                pass
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-                pass
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-                pass
+                await msg.add_reaction(emoji)
             if element.temporary == True:
                 temp_msg.append(msg)
 
@@ -103,26 +98,27 @@ async def on_message(message):
             if element.embed:
                 msg = await client.get_channel(int(element.destination)).send(embed=element.content)
                 for emoji in element.reactions:
-                    # add reaction called 'emoji' to message called 'msg'
-                    pass
+                    await msg.add_reaction(emoji)
                 if element.temporary == True:
                     temp_msg.append(msg)
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
-                    # add reaction called 'emoji' to message called 'msg'
-                    pass
+                    await msg.add_reaction(emoji)
                 if element.temporary == True:
                     temp_msg.append(msg)
 
         for element in mailbox.player:
-            user = client.get_user(element.user_id)
-            msg = await client.get_channel(user).send(element.content)
-            for emoji in element.reactions:
-                # add reaction called 'emoji' to message called 'msg'
-                pass
-            if element.temporary == True:
-                temp_msg.append(msg)
+            member = client.get_user(element.destination)
+            if member == None:
+                await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
+                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(message.author.id,element.destination))
+            else:
+                msg = await member.send(element.content)
+                for emoji in element.reactions:
+                    await msg.add_reaction(emoji)
+                if element.temporary == True:
+                    temp_msg.append(msg)
 
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
@@ -183,14 +179,14 @@ async def on_message(message):
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
-                #game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-                #dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-                #frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
+                game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
+                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    #frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-                    #dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    #game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
+                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                    game_master_role: discord.PermissionOverwrite(read_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
                         member: discord.PermissionOverwrite(read_messages=True) for member in viewers

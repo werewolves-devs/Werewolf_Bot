@@ -83,7 +83,7 @@ class Mailbox:
 
     def dm(self,content,user_id,temporary = False,reactions = []):
         """Send a DM to a given user"""
-        self.player.append(Message(content,temporary,user_id))
+        self.player.append(Message(content,temporary,user_id,reactions))
         return self
     def dm_add(self,moar_content):
         """Add some text to the last DM"""
