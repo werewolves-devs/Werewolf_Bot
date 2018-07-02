@@ -206,7 +206,6 @@ def process(message, isGameMaster = False):
         # This command sends the user's role back to them in a DM.
         if is_command(message,['myrole']):
             return [Mailbox().dm("Your role is **{}**.".format(db_get(message.author.id,'role')), message.author.id,False,[db_get(message.author.id,'emoji')])]
-            print("This should not execute!")
         if is_command(message,['myrole'],True):
             # TODO
             return todo()
