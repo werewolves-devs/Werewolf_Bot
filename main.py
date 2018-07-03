@@ -24,7 +24,9 @@ splashes = [
 'Works on my machine',
 'Always use a database. What\'s a JSON?',
 'Powered by Electricity',
-'Who still writes docs in 2018?'
+'Who still writes docs in 2018?',
+"First normal form? What does that mean?",
+"By using a relational database but with nonrelational practices we get the worst of both worlds!"
 ]
 
 import discord
