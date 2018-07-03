@@ -63,7 +63,7 @@ def test_database():
   assert db.channel_get('12211') == (u'12211',u'1',u'1')
   db.set_user_in_channel('1234555',1,2)
   assert db.channel_get('1234555') == (u'1234555',u'1',u'2')
-  assert db.channel_get('1234555',1) == (u'2',)
+  assert db.channel_get('1234555',1) == '2'
   assert db.channel_change_all(1,2,3) == [u'1234555']
   assert db.unabduct(1) == [u'1234555']
   db.signup(420,"BenTechy66",":poop:")
