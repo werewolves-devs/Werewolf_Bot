@@ -131,8 +131,8 @@ def process(message, isGameMaster = False):
             members_to_add = check.users(message)
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
-            if is_owner(user_id,channel_id) == False:
-                return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
+            if is_owner(user_id,message.channel.id) == False:
+                return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
             command = Mailbox()
             for x in members_to_add:
                 command.edit_cc(x,channel_id,1)
