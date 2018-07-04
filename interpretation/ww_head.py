@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
 from interpretation.check import is_command
 from config import prefix, max_cc_per_user
 from main_classes import Mailbox, Message
