@@ -29,7 +29,7 @@ def poll_list():
 
 def player_list():
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
-    return [item[0] for item in poll_list()]
+    return [int(item[0]) for item in poll_list()]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.

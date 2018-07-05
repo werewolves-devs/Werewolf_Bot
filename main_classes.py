@@ -123,8 +123,8 @@ class ChannelCreate:
     def __init__(self,name,owner,members=[],settlers=[]):
         self.name = name
         self.owner = owner
-        self.members = []
-        self.settlers = []
+        self.members = members
+        self.settlers = settlers
 
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.

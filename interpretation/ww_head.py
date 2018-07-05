@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
 from interpretation.check import is_command
 from config import prefix, max_cc_per_user
 from main_classes import Mailbox, Message
@@ -131,8 +131,8 @@ def process(message, isGameMaster = False):
             members_to_add = check.users(message)
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
-            if is_owner(user_id,channel_id) == False:
-                return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
+            if is_owner(user_id,message.channel.id) == False:
+                return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
             command = Mailbox()
             for x in members_to_add:
                 command.edit_cc(x,channel_id,1)
