@@ -1,7 +1,7 @@
 # Werewolf Bot
 > Performs heavy-lifting on the discord _Werewolves_ server
 
-[![Build Status](https://travis-ci.org/werewolves-devs/Werewolf_Bot.svg?branch=master)](https://travis-ci.org/werewolves-devs/Werewolf_Bot) [![Known Vulnerabilities](https://snyk.io/test/github/werewolves-devs/werewolf_bot/badge.svg)](https://snyk.io/test/github/werewolves-devs/werewolf_bot)
+[![Build Status](https://travis-ci.org/werewolves-devs/Werewolf_Bot.svg?branch=master)](https://travis-ci.org/werewolves-devs/Werewolf_Bot) [![Known Vulnerabilities](https://snyk.io/test/github/werewolves-devs/werewolf_bot/badge.svg)](https://snyk.io/test/github/werewolves-devs/werewolf_bot)[![Discord](https://discordapp.com/api/guilds/375597071094382603/embed.png)](https://discord.io/werewolves)
 
 A bot for the werewolves server.
 
