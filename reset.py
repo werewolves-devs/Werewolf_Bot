@@ -32,7 +32,7 @@ def reset(skip = False):
         number += 1
     number = int(number)
 
-    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL, 'type' TEXT NOT NULL, 'role' TEXT NOT NULL, 'part1' TEXT NOT NULL,"
+    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL, 'purpose' TEXT NOT NULL, 'role' TEXT NOT NULL, 'part1' TEXT NOT NULL,"
     for i in range(number - 1):
         poll_str += " 'part{}' TEXT,".format(i+2)
     poll_str += " PRIMARY KEY ('id', 'part1'))"
