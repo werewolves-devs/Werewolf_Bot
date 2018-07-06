@@ -1,5 +1,6 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
+from roles_n_rules.commands import cc_goodbye
 from interpretation.check import is_command
 from config import prefix, max_cc_per_user
 from main_classes import Mailbox, Message
@@ -131,12 +132,20 @@ def process(message, isGameMaster = False):
             members_to_add = check.users(message)
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
-            if is_owner(user_id,message.channel.id) == False:
+            if is_owner(user_id,message_channel) == False:
                 return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
+
             command = Mailbox()
-            for x in members_to_add:
-                command.edit_cc(x,channel_id,1)
-            return [command.respond("Insert Randium's comment here")]
+            for member in members_to_add:
+                if int(db_get(member,'abducted')) == 1:
+                    command.edit_cc(message_channel,member,3)
+                elif int(db_get(member,'frozen')) == 1:
+                    command.edit_cc(message_channel,member,2)
+                elif isParticipant(member):
+                    command.edit_cc(message_channel,member,1)
+                else:
+                    command.edit_cc(message_channel,member,4)
+            return [command.respond("Changes saved! I will execute these now.")]
 
         if is_command(message,['add'],True):
             # TODO
@@ -160,7 +169,7 @@ def process(message, isGameMaster = False):
                 answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
                 return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
 
-            db_set(user_id,'ccs',number_cc_owned + 1)
+            db_set(user_id,'ccs',num_cc_owned + 1)
             return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members)
 
         if is_command(message,['cc'],True):
@@ -215,14 +224,16 @@ def process(message, isGameMaster = False):
         # A user should not get removed if they're the channel owner.
         if is_command(message,['remove']):
             members_to_remove = check.users(message)
-            if is_owner(user_id,channel_id) == False:
+            if is_owner(user_id,message_channel) == False:
                 return [Mailbox().respond("I\'m sorry, but you cannot use this command over here!")]
-            command = Mailbox()
-            for x in members_to_remove:
-                if is_owner(x,channel_id) == True:
-                    return [Mailbox().respond("The owner of a CC can\'t be removed! Please try again.")]
-                command.edit_cc(x,channel_id,0)
-            return [command.respond("Insert Randium's comment here")]
+            command = Mailbox().respond("Looks like we\'ll have to say goodbye!")
+            for member in members_to_remove:
+                if is_owner(member,message_channel) == True:
+                    command.respond("Sorry bud, ya can\'t remove the cc's owner! Blame the people who used to do this on purpose.")
+                else:
+                    command.edit_cc(member,message_channel,0)
+                    command.respond(cc_goodbye(member))
+            return [command]
 
         if is_command(message,['remove'],True):
             # TODO
@@ -247,11 +258,13 @@ def process(message, isGameMaster = False):
             '''assassinate'''
             # Assassin's command; kill a victim
             if is_command(message,['assassinate','kill']) and user_role == "Assassin":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if target == False:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.nightly_kill(user_id,target[0])]
+
             if is_command(message,['assassinate','kill'],True) and user_role == "Assassin":
-                # TODO
-                return todo()
+                return [Mailbox().respond("")]
 
             '''aura'''
             # The command for aura tellers
