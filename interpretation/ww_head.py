@@ -612,7 +612,7 @@ def process(message, isGameMaster = False):
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
 
         if emoji == "":
-            if len(choice_emojis) == 1:
+            if len(choice_emoji) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]
         signup(user_id,message.author.name,choice_emoji)
