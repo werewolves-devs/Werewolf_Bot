@@ -8,12 +8,14 @@ max_participants = 40
 max_cc_per_user = 8
 season = "1"
 
-prefix = '!'
+ww_prefix = '!'
+act_prefix = '-'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
 dynamic_config = "dynamic.json"
-database = 'database.db'
+general_database = 'general.db'
+database = 'game.db'
 max_channels_per_category = 50
 
 # List of specific channels
