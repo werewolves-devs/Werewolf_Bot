@@ -4,44 +4,53 @@ def story_time(victims):
     amount = len(victims)
     msg_table = []
 
-    if amount == 0:
-        msg = '''This can be any story! Funny no-one died!'''
-        msg_table.append(msg)
-
-    if amount == 0:
-        msg = '''Another story! Yay'''
-        msg_table.append(msg)
-    
-    if amount == 0:
-        msg = '''You can just add an enter to the story!
-There! That works just fine! Don\'t worry about how ugly it looks. ;)
-
-Oh, also, if the line\'s getting too thick and you want to write on a \
-new line without actually having the story start on a new line, put a \
-slash at the end of the line.
-
-You don\'t HAVE to do that, though. I\'d suggest writing this story elsewhere, where you are comfortable writing stuff. Then you could just copypaste it here, and it\'s totally fine if you make the lines unbearably long. If some programmers start complaining, that\'s their problem, not yours.
-Also, as you probably have noticed, if you want the apostrophe, type a backslash in front; don\'t forget!'''
-        msg_table.append(msg)
-    
+    # Story written by TROPICALCYCLONEALERT
     if amount == 1:
-        msg = '''Oh no! A story where <@{0}> died!'''.format(victims[0])
+    msg = '''A wispy wind billowed throughout the night. '\
+Dawn was quickly approaching, and only the slightest amount of townsfolk were coming around. \
+As the sun rose over the distant horizon, the first villagers ventured out of the safety of their homes.  
+Soon enough, a dog began to bark. Its owner quickly came over to calm it down. The dog did not stop, \
+and walked towards a corner. The tall animal came to a halt, and beckoned its owner to come. \
+The owner was appalled by the sight. The brick walls were imbued with the dark stain of blood, \
+and a decapitated head was at the base.  
+A few paces away, a foot was found. Forty feet later, another foot and a hand was found. \
+The man who had discovered the dismembered corpse acknowledged the presence of a particular smell, \
+much like that of a wolf that occasionally prowled along the edges of the forests. \
+An autopsy done by the town surgeon revealed a wolf tooth ingrained within the skull. \
+The corpse was revealed to be of one {0}.'''.format(victims[0])
+    msg_table.append(msg)
+    
+    # Story written by Kudels
+    if amount == 3:
+    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
+adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
+A corpse was leaning towards the doorframe. \
+It was <@{0}> with their eyes being completely pecked by crows! A short time after the corpses of \
+<@{1}> and <@{2}> were discovered strewn across the town square. \
+Will this just be the appetiser?'''.format(victims[0],victims[1],victims[2])
         msg_table.append(msg)
     
-    if amount == 2:
-        msg = '''Two more people died this morning! Their ids were {0} and {1}, \
-but please ping them by typing <@ in front and > behind. \
-You can use the number in-between the semi-colons to decide whom you want to mention. This means\
- you can also decide to ping <@{0}> multiple times, if you want. Would <@{0}> enjoy that?'''.format(victims[0],victims[1])
-        msg_table.append(msg)
-    
+    # Story written by Kudels
     if amount == 4:
-        msg = '''Other than that, just copy any code you see, like <@{2}>, <@{0}> \'n\' <@{1}> did.\
-Also, don\'t be afraid to ask, but the most important thing is; don\'t be afraid to make mistakes.
-
-The reason we need someone to do it, is because writing the stories takes time; \
-fixing any bugs you make will take up WAYYYY less than actually writing it. \
-So don\'t worry! We\'re looking forward to your stories, just like <@{3}>. ;)'''.format(victims[0],victims[1],victims[2],victims[3])
+    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
+adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
+A corpse was leaning towards the doorframe. \
+It was <@{0}> with their eyes being completely pecked by crows! A short time after the corpses of <@{1}>, \
+<@{2}> and <@{3}> were discovered strewn across the town square. \
+Will this just be the appetiser?'''.format(victims[0],victims[1],victims[2],victims[3])
         msg_table.append(msg)
 
+    # Story written by Kudels
+    if amount == 5:
+    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
+adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
+A corpse was leaning towards the doorframe. \
+It was <@{0}> with their eyes being completely pecked by crows! A short time after the corpses of <@{1}>, \
+<@{2}>, <@{3}> and even <@{4}> were discovered strewn across the town square. \
+Will this just be the appetiser?'''.format(victims[0],victims[1],victims[2],victims[3],victims[4])
+        msg_table.append(msg)
+    
     return msg_table[random.randint(0,len(msg_table)-1)]
