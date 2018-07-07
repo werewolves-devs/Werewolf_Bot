@@ -1,12 +1,12 @@
 from config import prefix
 from emoji import UNICODE_EMOJI
-from management.db import emoji_to_player
+from management.db import emoji_to_player, isParticipant
 from management.position import roles_list
 
 # Makes sure the message has at least the needed amount of users.
 # If the message contains emojis, they should be converted to ids as well. Mentions have priority, however.
 # The command should return the given amount of user ids, or, if equal to -1, should return them all.
-def users(message,amount = -1, delete_duplicates = True):
+def users(message,amount = -1, delete_duplicates = True, must_be_participant = False):
     """Return the requested amount of user ids in a list. If the amount is -1, all users are given.
 
     Keyword arguments:
@@ -16,11 +16,16 @@ def users(message,amount = -1, delete_duplicates = True):
     """
     user_table = [person.id for person in message.mentions]
 
+    if must_be_participant == True:
+        for user in user_table:
+            if not isParticipant(user):
+                user_table.remove(user)
+
     for argument in message.content.split(' '):
         response = emoji_to_player(argument)
 
         if response != None:
-            user_table.append(response)
+            user_table.append(int(response))
 
     if delete_duplicates == True:
         user_table = list(set(user_table))
