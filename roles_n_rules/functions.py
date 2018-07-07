@@ -21,9 +21,19 @@ def see(user_id,victim_id):
     victim_emoji = db_get(victim_id,"emoji")
     victim_fakerole = db_get(victim_id,"fakerole")
     victim_role = db_get(victim_id,"role")
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(user_id,'abducted'))
 
     user_channel = int(db_get(user_id,"channel"))
+    user_undead = int(db_get(user_id,'undead'))
     user_role = db_get(victim_id,"role")
+
+    if user_undead == 1:
+        return Mailbox().dm("You are undead! This means that you can no longer inspect players. I\'m sorry!",user_id)
+    if victim_frozen == 1:
+        return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t reach them through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
+    if victim_abducted == 1:
+        return Mailbox().msg("You tried to see <@{}>... but you couldn\'t find them! Almost as if they had disappeared in thin air!\nWhat happened?",user_channel,True)
 
     # Follow this procedure if the user has been enchanted.
     if int(db_get(user_id,"echanted")) == 1 and random.random() < 0.6:
@@ -60,7 +70,18 @@ def disguise(user_id,victim_id,role):
 
     user_channel = int(db_get(user_id,'channel'))
     user_role = db_get(user_id,'role')
-    victim_role = db_get(user_id,'role')
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_role = db_get(victim_id,'role')
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+
+    if user_undead == 1:
+        return Mailbox().dm("I am sorry! You are undead, meaning you can no longer disguise people!",user_id)
+    if victim_frozen == 1:
+        return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel)
+    if victim_abducted == 1:
+        return Mailbox().msg("After having finished your great disguise, it seems like you couldn\'t find your target! Where have they gone off to?",user_channel)
 
     db_set(victim_id,'fakerole',role)
     answer = Mailbox().msg("You have successfully disguised <@{}> as the **{}**!".format(victim_id,role),user_channel)
@@ -74,7 +95,8 @@ def disguise(user_id,victim_id,role):
 
 def nightly_kill(user_id,victim_id):
     """This function adds a kill to the kill queue based on the user's role.
-    This function is applicable for roles like the assassin, the lone wolf, the priest, the thing and the white werewolf.
+    This function is applicable for roles like the assassin, the lone wolf, the priest, the thing and the white werewolf.  
+    NOTICE: This function is meant for people who kill solo! Teams should receive a poll.  
     Evaluating whether the kill should actually be applied isn't needed, as this is evaluated at the start of the day.  
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.  
     The function returns a Mailbox.  
@@ -89,9 +111,47 @@ def nightly_kill(user_id,victim_id):
 
     user_role = db_get(user_id,'role')
     user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+
+    if user_undead == 1:
+        return Mailbox().dm("I am sorry! An undead cannot use this power!",user_id)
 
     # Add kill to the kill queue
     db.add_kill(victim_id,user_role,user_id)
 
     answer = Mailbox().msg(ctory.kill_acceptance(victim_id),user_channel)
     return answer.log("The **{}** <@{}> has chosen to pay a visit to <@{}> tonight.".format(user_role,user_id,victim_id))
+
+def powder(user_id,victim_id):
+    """This function powders a player if they are alive and not a pyromancer.  
+    The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.  
+    The function returns a Mailbox.
+    
+    user_id -> the player who powders the victim  
+    victim_id -> the player who is powdered"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently cannot powder anyone!",True)
+    db_set(user_id,'uses',uses - 1)
+
+    user_role = db_get(user_id,'role')
+    user_channel = db_get(user_id,'channel')
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_role = db_get(victim_id,'role')
+    victim_powdered = int(db_get(victim_id,'powdered'))
+
+    if victim_role == 'Pyromaner':
+        return Mailbox().msg("I am sorry, <@{}>, but you cannot powder a pyromancer!".format(user_id),user_channel,True)
+    if victim_powdered == 1:
+        return Mailbox().msg("I am terribly sorry, but <@{}> has already been powdered! Please choose another victim.".format(victim_id),user_channel,True)
+    
+    # Powder the player
+    answer = Mailbox().msg("You have successfully powdered <@{}>!".format(victim_id),user_channel)
+    if user_undead == 1:
+        answer.log("<@{}>, an undead, has pretended to powder <@{}>.".format(user_id,victim_id))
+        return answer.dm("Hey, you are undead, so your powers no longer work... but here\'s a little help to keep up your cover!",user_id)
+
+    db_set(victim_id,'powdered',1)
+    return answer.log("The **{}** <@{}> has powdered the **{}** <@{}>!".format(user_role,user_id,victim_role,victim_id))
