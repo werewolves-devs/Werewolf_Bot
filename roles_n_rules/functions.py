@@ -4,6 +4,7 @@ import random
 from management.db import db_get, db_set
 from main_classes import Mailbox
 from config import game_master
+from config import ww_prefix as prefix
 
 def see(user_id,victim_id):
     """This function allows the user to see a given player of their choice.
@@ -155,3 +156,67 @@ def powder(user_id,victim_id):
 
     db_set(victim_id,'powdered',1)
     return answer.log("The **{}** <@{}> has powdered the **{}** <@{}>!".format(user_role,user_id,victim_role,victim_id))
+
+def ignite(user_id):
+    """This function ignites all powdered players that aren't pyromancer.  
+    The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.  
+    The function returns a Mailbox.
+    
+    user_id -> the player who ignites all powdered players"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently cannot ignite anyone!",True)
+    db_set(user_id,'uses',uses - 1)
+
+    user_role = db_get(user_id,'role')
+    user_channel = db_get(user_id,'channel')
+    user_undead = int(db_get(user_id,'undead'))
+
+    if user_undead == 1:
+        answer = Mailbox().log("<@{}>, an undead **{}**, has pretended to ignite all powdered players.".format(user_id,user_role))
+        answer.dm("Hey, you are undead, so your power won\'t work. But at least this won\'t blow your cover!",user_id)
+        return answer.msg("Okay! All powdered players will die tomorrow.",user_channel)
+    
+    # Ignite all living players.
+    for user in db.player_list():
+        if db.isParticipant(user):
+            db.add_kill(int(user),'Pyromancer',user_id)
+    
+    answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
+    return answer.msg("Okay! All powdered players will die tomorrow.",user_channel)
+
+def freeze(user_id,victim_id,role = ''):
+    """This function allows the ice king to guess a player's role. As the roles are evaluated once all guesses
+    have been submitted, it is not yet determined whether the guess was correct or incorrect.  
+    The function will remove the given user from the list of guesses if no role has been given.  
+    
+    user_id -> the ice king's id
+    victim_id -> the id of the user that is being guessed
+    role -> the role that is being guessed"""
+
+    answer = Mailbox()
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return answer.respond("I am sorry! You currently cannot guess anyone\'s role!",True)
+
+    user_channel = db_get(user_id,'channel')
+    user_undead = int(db_get(user_id,'undead'))
+
+    if role != '':
+        change = db.add_freezer(user_id,victim_id,role)
+        if change == None:
+            answer.msg("<@{}> has been added to your freeze list as a **{}**!".format(victim_id,role),user_channel,True)
+        else:
+            answer.msg("You originally guessed <@{}> to be a **{}**, but I now changed it to the **{}**!".format(victim_id,change,role),user_channel,True)
+    else:
+        if db.delete_freezer(user_id,victim_id) == True:
+            answer.msg("You have removed <@{}> from your freeze list.".format(victim_id),user_channel,True)
+        else:
+            return answer.msg("**Invalid syntax:**\n\n`" + prefix + "freeze <user> <role>`\n\n**Example:** `" + prefix + "freeze @Randium#6521 Pyromancer`",user_channel,True)
+
+    if user_undead == 1:
+        answer.dm("Hey, you are undead, so you can\'t really freeze anyone. But at least this won\'t blow your cover!",user_id,True)
+    
+    return answer
