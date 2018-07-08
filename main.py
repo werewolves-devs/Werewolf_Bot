@@ -35,7 +35,8 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import prefix, welcome_channel, game_master, dead_participant, game_master, frozen_participant
+from config import welcome_channel, game_master, dead_participant, game_master, frozen_participant
+from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
 import config
@@ -237,6 +238,41 @@ async def on_message(message):
                 that happens ALL the time."""
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
+        
+        for element in mailbox.polls:
+            # element.channel
+            # element.purpose
+            # element.description
+
+            msg = element.description + '\n'
+            emoji_table = []
+            id_table = []
+            i = 0
+
+            for user in db.poll_list():
+                if db.isParticipant(user[0]):
+                    i += 1
+                    msg += user[1] + " - <@" + str(user[0]) + "> "
+
+                    if int(user[2]) + int(user[3]) == 0:
+                        if int(user[2]) == 1:
+                            msg += "**[FROZEN]** "
+                        if int(user[3]) == 1:
+                            msg += "**[ABDUCTED] **" 
+                    else:
+                        emoji_table.append(user[1])
+                    
+                    if i % 20 == 19:
+                        msg = await client.get_channel(element.channel).send(msg)
+                        for emoji in emoji_table:
+                            await msg.add_reaction(emoji)
+                        id_table.append(msg.id)
+                        msg = ''
+                    else:
+                        msg += '\n'
+                    
+            # TODO: Insert id_table + purpose into the database
+
 
 
     # Delete all temporary messages after "five" seconds.
