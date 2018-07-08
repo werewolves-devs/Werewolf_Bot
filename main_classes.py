@@ -11,6 +11,7 @@ class Mailbox:
         self.player = []        # Send message to user
         self.newchannels = []   # Create new channel
         self.oldchannels = []   # Edit existing channel
+        self.polls = []
 
     def log(self,content,temporary = False,reactions = []):
         """Send a message to the gamelog channel."""
@@ -102,6 +103,10 @@ class Mailbox:
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
+    
+    def new_poll(self,channel_id,purpose,description = ''):
+        """Send a request to make a poll in the given channel"""
+        self.polls.append(PollRequest(channel_id,purpose,description))
 
 # Class used to send messages through the mailbox
 class Message:
@@ -129,8 +134,18 @@ class ChannelCreate:
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
-    # can be executed easily. However, this isn't the case when
+    # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
     def __init__(self,channel,victim,number):
         self.channel = channel
         self.victim = victim
         self.number = number
+
+class PollRequest:
+    def __init__(self,channel_id,purpose,description):
+        self.channel = channel_id
+        self.purpose = purpose
+        
+        if len(description) > 512:
+            self.description = description[0:512]
+        else:
+            self.description = description
