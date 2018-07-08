@@ -366,3 +366,41 @@ def signup(user_id,name,emoji):
     c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
     c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
     conn.commit()
+
+    
+def add_freezer(user_id,victim_id,role):
+    """This function saves an ice king's guess in the database. If a guess about that player already exists,
+    it is overwritten, and the old role is returned.  
+    
+    user_id -> the role of the ice king casting the guess  
+    victim_id -> the player whose role is guessed  
+    role -> the role that victim_id is guessed to be  """
+    c.execute("SELECT role FROM 'freezers' WHERE victim =?",(victim_id,))
+    answer = c.fetchone()
+    if answer == None:
+        c.execute("INSERT INTO 'freezers' (king,victim,role) VALUES (?,?,?)",(user_id,victim_id,role))
+        conn.commit()
+        return None
+    c.execute("UPDATE 'freezers' SET 'role' =? WHERE king =? AND victim =?",(role,user_id,victim_id))
+    conn.commit()
+    return answer[0]
+
+def get_freezers(user_id):
+    """Get a list of all the guesses an ice king has made so far, including their roles.  
+    
+    user_id -> the id of the ice king"""
+    c.execute("SELECT victim, role FROM freezers WHERE king =?",(user_id,))
+    return c.fetchall()
+
+def delete_freezer(user_id,victim_id):
+    """Remove a guessed user from the database. If the user wasn\'t in the database, return False.
+    Else, return True when removed successfully.  
+    
+    user_id -> the player removing the guess  
+    victim_id -> the player being guessed"""
+    c.execute("SELECT * FROM freezers WHERE king =? AND victim =?",(user_id,victim_id))
+    if c.fetchone() == None:
+        return False
+    c.execute("DELETE FROM freezers WHERE king =? AND victim =?",(user_id,victim_id))
+    conn.commit()
+    return True

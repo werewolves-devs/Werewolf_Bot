@@ -92,3 +92,17 @@ def check_check():
   assert check.roles(x) == ['Hooker']
   assert check.roles(x,1) == ['Hooker']
   assert check.roles(x,2) == False
+
+def control_freezers():
+  reset.reset(True)
+  assert db.add_freezer(1,3,'Pyromancer') == None
+  assert db.add_freezer(1,3,'The Thing') == 'Pyromancer'
+  assert db.add_freezer(1,4,'Assassin') == None
+  assert db.add_freezer(1,3,'Booh') == 'The Thing'
+  assert db.add_freezer(1,5,'Hooker') == None
+  assert db.add_freezer(2,9,'Fortune Teller')
+  assert db.get_freezers(1) == [(3, 'Booh'), (4, 'Assassin'), (5, 'Hooker')]
+  assert db.delete_freezer(1,7) == False
+  assert db.delete_freezer(1,4) == True
+  assert db.get_freezers(1) == [(3, 'Booh'), (5, 'Hooker')]
+  reset.reset(True)

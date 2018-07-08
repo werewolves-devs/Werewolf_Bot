@@ -19,6 +19,7 @@ def reset(skip = False):
     c.execute("DROP TABLE IF EXISTS 'channels'")
     c.execute("DROP TABLE IF EXISTS 'channel_rows'")
     c.execute("DROP TABLE IF EXISTS 'categories'")
+    c.execute("DROP TABLE IF EXISTS 'freezers'")
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new game....')
@@ -27,6 +28,7 @@ def reset(skip = False):
     c.execute("CREATE TABLE 'categories' ('current' INTEGER NOT NULL DEFAULT 1, 'id' TEXT NOT NULL, 'channels' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'channels' ('channel_id' TEXT PRIMARY KEY NOT NULL, 'owner' TEXT NOT NULL)")
     c.execute("CREATE TABLE 'channel_rows' ('id' TEXT PRIMARY KEY NOT NULL)")
+    c.execute("CREATE TABLE 'freezers' ('king' INTEGER NOT NULL, 'victim' INTEGER NOT NULL, 'role' TEXT NOT NULL)")
     number = float(config.max_participants)/20
     if number > int(number):
         number += 1
