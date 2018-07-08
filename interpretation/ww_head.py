@@ -2,7 +2,8 @@
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
 from roles_n_rules.commands import cc_goodbye
 from interpretation.check import is_command
-from config import prefix, max_cc_per_user
+from config import max_cc_per_user
+from config import ww_prefix as prefix
 from main_classes import Mailbox, Message
 from discord import Embed
 import roles_n_rules.functions as func
@@ -612,7 +613,7 @@ def process(message, isGameMaster = False):
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
 
         if emoji == "":
-            if len(choice_emojis) == 1:
+            if len(choice_emoji) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]
         signup(user_id,message.author.name,choice_emoji)
