@@ -1,4 +1,4 @@
-from config import prefix
+from config import ww_prefix as prefix
 from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player, isParticipant
 from management.position import roles_list
