@@ -1,6 +1,7 @@
 import sqlite3
-from config import database, max_channels_per_category
+from config import database, max_channels_per_category, max_participants
 from management.position import positionof, check_for_int
+from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
 c = conn.cursor()
@@ -366,3 +367,37 @@ def signup(user_id,name,emoji):
     c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
     c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
     conn.commit()
+
+def add_poll(msg_table,purpose,user_id = 0):
+    """Add a new poll to the database. The poll is saved so it can be evaluated later on.  
+    
+    msg_table -> the list of messages that contain the poll  
+    purpose -> the reason the poll is made for. Examples are 'wolf', 'mayor', 'lynch' or 'cult'  
+    user_id -> the user who is \"responsible\" for the lynch. Leave blank if daily poll."""
+    amount = int(max_participants/20)+1
+    if msg_table == []:
+        raise ValueError("Cannot insert empty poll into database.")
+    if len(msg_table) > amount:
+        raise IndexError("Poll needed more space in database than expected!")
+    
+    request_msg = "INSERT INTO 'polls' ('purpose','user_id'"
+    request2_msg = ") VALUES ('{}',{}".format(purpose,user_id)
+
+    for i in range(len(msg_table)):
+
+        request_msg += ",'part{}'".format(i+1)
+        request2_msg += ",{}".format(msg_table[i].id)
+    
+    query = request_msg + request2_msg + ");"
+    c.execute(query)
+    conn.commit()
+
+def get_all_polls():
+    """Gain the polls registered the database. As all polls are always evaluated simultaneously,
+    the polls are deleted from the database. If they really need to be kept, they can always be saved again."""
+    c.execute("SELECT * FROM 'polls'")
+    answer_table = c.fetchall()
+    c.execute("DELETE FROM 'polls'")
+    conn.commit()
+
+    return [PollToEvaluate(item) for item in answer_table]
