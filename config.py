@@ -8,7 +8,7 @@ max_participants = 40
 max_cc_per_user = 8
 season = "1"
 
-prefix = '!'
+ww_prefix = '!'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
