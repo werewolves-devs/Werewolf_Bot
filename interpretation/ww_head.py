@@ -247,7 +247,7 @@ def process(message, isGameMaster = False):
                 embed.add_field(name='Channel Owner', value=owner_name)
             member_text = ""
             for member in get_channel_members(message.channel.id):
-                member_text += "<@" + member + "> "
+                member_text += "<@" + str(member) + "> "
             embed.add_field(name='Channel Name', value=message.channel.name)
             embed.add_field(name='Participants', value=member_text)
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
