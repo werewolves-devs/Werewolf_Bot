@@ -147,21 +147,25 @@ async def on_message(message):
             # 4 -> give dead role + remove participant role
 
             channel = client.get_channel(element.channel)
-            user = client.get_user(element.user)
-            if number == 0:
-                overwrite = {user:discord.PermissionOverwrite(read_messages=False)}
-            elif number == 1:
-                overwrite = {user:discord.PermissionOverwrite(read_messages=True)}
-            elif number == 2:
-                overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+            user = client.get_user(element.victim)
+            if element.number == 0:
+                #overwrite = {user:discord.PermissionOverwrite(read_messages=False)}
+                await channel.set_permissions(user, read_messages=False)
+            elif element.number == 1:
+                #overwrite = {user:discord.PermissionOverwrite(read_messages=True)}
+                await channel.set_permissions(user, read_messages=True)
+            elif element.number == 2:
+                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif number == 3:
-                overwrite = {user:discord.PermissionOverwrite(read_messages=False, send_messages=False)}
+                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=False, send_messages=False)}
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif number == 4:
-                overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
-            await channel.set_permissions(overwrite=overwrite)
             await msg.channel.send(':white_check_mark: Changes saved.')
 
         for element in mailbox.newchannels:
