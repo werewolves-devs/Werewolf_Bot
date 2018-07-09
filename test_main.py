@@ -18,7 +18,7 @@ def test_positionof():
   assert positionof("frozen") == 13
   assert positionof("fakerole") == 6
   assert positionof("votes") == 8
-  assert positionof("sleepers") == 19
+  assert positionof("sleepingover") == 19
   assert positionof("bitten") == 16
   assert positionof("id") == 0
 
