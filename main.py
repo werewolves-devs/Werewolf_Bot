@@ -149,19 +149,14 @@ async def on_message(message):
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
             if element.number == 0:
-                #overwrite = {user:discord.PermissionOverwrite(read_messages=False)}
                 await channel.set_permissions(user, read_messages=False)
             elif element.number == 1:
-                #overwrite = {user:discord.PermissionOverwrite(read_messages=True)}
                 await channel.set_permissions(user, read_messages=True)
             elif element.number == 2:
-                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif number == 3:
-                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=False, send_messages=False)}
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif number == 4:
-                #element.overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
