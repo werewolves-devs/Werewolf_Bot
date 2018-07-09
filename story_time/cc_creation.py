@@ -5,8 +5,9 @@ def cc_intro(list):
     amount = len(list)
     msgtable = []
 
-    msg = '''Once upon a time there was a duck. The duck pooped out an entire conspiracy channel.'''
-    msg_table.append(msg)
+    if randium.random() < 0.01:
+        msg = '''Once upon a time there was a duck. The duck pooped out an entire conspiracy channel.'''
+        msg_table.append(msg)
     
     if amount == 0:
         return "That is strange... a channel with zero members?"
