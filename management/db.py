@@ -362,7 +362,7 @@ def get_channel_members(channel_id, number = 1):
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):
-    c.execute("INSERT INTO game (id,name,emoji,channel,role,fakerole,lovers,sleepers,amulets,zombies) VALUES (?,?,?,'#gamelog','Spectator','Spectator','','','','')", (user_id,name,emoji))
+    c.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id,name,emoji))
     c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
     c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
     conn.commit()
