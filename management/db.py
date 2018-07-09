@@ -365,9 +365,9 @@ def get_channel_members(channel_id, number = 1):
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id,name,emoji))
     c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-    if c.fetchall() == None:
-        c.execute("ALTER TABLE channels ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
-        c.execute("INSERT INTO channel_rows ('id') VALUES (?)",(user_id,))
+    if c.fetchall() == []:
+        c.execute("ALTER TABLE 'channels' ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
+        c.execute("INSERT INTO 'channel_rows' ('id') VALUES (?)",(user_id,))
     conn.commit()
 
 def add_poll(msg_table,purpose,user_id = 0):
