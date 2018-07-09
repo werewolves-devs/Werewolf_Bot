@@ -68,6 +68,9 @@ async def on_message(message):
     temp_msg = []
 
     for mailbox in result:
+      
+        if mailbox.evaluate_polls == True:
+            # EVALUATE ALL POLLS
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
