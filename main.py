@@ -99,11 +99,18 @@ async def on_message(message):
 
         for element in mailbox.channel:
             if element.embed:
-                msg = await client.get_channel(int(element.destination)).send(embed=element.content)
-                for emoji in element.reactions:
-                    await msg.add_reaction(emoji)
-                if element.temporary == True:
-                    temp_msg.append(msg)
+                if element.destination == "spam":
+                    msg = await botspam_channel.send(embed=element.content)
+                    for emoji in element.reactions:
+                        await msg.add_reaction(emoji)
+                    if element.temporary == True:
+                        temp_msg.append(msg)
+                else:
+                    msg = await client.get_channel(int(element.destination)).send(embed=element.content)
+                    for emoji in element.reactions:
+                        await msg.add_reaction(emoji)
+                    if element.temporary == True:
+                        temp_msg.append(msg)
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
@@ -280,7 +287,7 @@ async def on_message(message):
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
     # Delete all temporary messages after "five" seconds.
-    await asyncio.sleep(5)
+    await asyncio.sleep(120)
     for msg in temp_msg:
         await msg.delete()
 

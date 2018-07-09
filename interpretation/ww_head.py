@@ -2,7 +2,8 @@
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
 from roles_n_rules.commands import cc_goodbye
 from interpretation.check import is_command
-from config import prefix, max_cc_per_user
+from config import max_cc_per_user
+from config import ww_prefix as prefix
 from main_classes import Mailbox, Message
 from discord import Embed
 import roles_n_rules.functions as func
@@ -30,7 +31,7 @@ def process(message, isGameMaster = False):
         return [Mailbox().create_cc(name,user_id,members)]
     if is_command(message,['cc','testcc','test_cc'],True):
         msg = "**Usage:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
-        msg += "\n\nThe bot understands both mentions and emojis linked to players."
+        msg += "\nThe bot understands both mentions and emojis linked to players."
         return [Mailbox().respond(msg,True)]
 
     # =============================================================
@@ -49,27 +50,30 @@ def process(message, isGameMaster = False):
             # TODO
             return todo()
         if is_command(message,['addrole'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Add a role to the game pool\n\n`" + prefix + "addrole <role>`\n\n**Example:** `" + prefix + "addrole Innocent`"
+            msg += "\nThe command accepts multiple roles. This command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
 
         '''assign'''
         # This command is used at the start of the game to assign all roles.
         # This will actually set their "fakerole" value, which will be transferred to their actual role once the game starts.
         if is_command(message,['assign']):
-            role = check.roles(message,1)[0]
-            user = check.users(message,1)[0]
+            role = check.roles(message,1)
+            user = check.users(message,1)
 
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
 
-            db_set(user,'role',role)
-            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user,role))]
+            db_set(user[0],'role',role[0])
+            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
 
         if is_command(message,['assign'],True):
-            msg = "**Usage:** `" + prefix + "assign <user> <role>`\n\nExample: `" + prefix
-            msg += "assign @Randium#6521 Innocent`\nGame Master only command"
+            msg = "**Usage:** Give a player a specific role\n\n`" + prefix + "assign <user> <role>`\n\nExample: `" + prefix
+            msg += "assign @Randium#6521 Innocent`\nThis command can only be used by Game Masters."
             return [Mailbox().spam(msg)]
 
         '''day'''
@@ -78,8 +82,19 @@ def process(message, isGameMaster = False):
             # TODO
             return todo()
         if is_command(message,['day'],True):
+            msg = "**Usage:** Initiate the day if this does not happen automatically.\n\n"
+            msg += "`" + prefix + "day`\n\nThis command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
+
+        '''night'''
+        # This command is used to initialize the day.
+        if is_command(message,['night']):
             # TODO
             return todo()
+        if is_command(message,['night'],True):
+            msg = "**Usage:** Initiate the night if this does not happen automatically.\n\n"
+            msg += "`" + prefix + "night`\n\nThis command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
 
         '''open_signup'''
         # This command is started when a new game can be started.
@@ -88,8 +103,9 @@ def process(message, isGameMaster = False):
             # TODO
             return todo()
         if is_command(message,['open_signup'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Allow users to sign up for a new game.\n\n`" + prefix + "open_signup`\n\n"
+            msg += "This command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
 
         '''whois'''
         # This command reveals the role of a player.
@@ -99,22 +115,55 @@ def process(message, isGameMaster = False):
             identities = Mailbox()
 
             if user_table == False:
-                return [Mailbox().respond("**ERROR:** No user provided!")]
+                return [Mailbox().respond("**ERROR:** No user provided!",True)]
 
             for user in user_table:
                 emoji = db_get(user,'emoji')
                 role = db_get(user,'role')
+                member = message.channel.guild.get_member(int(user))
                 if emoji == None or role == None:
                     identities.spam("**ERROR:** Could not find user <@{}> in database.".format(user))
+                elif member == None:
+                    identities.spam("I am sorry, but I couldn\'t find <@{}> on this server! Try again, please!".format(user))
                 else:
-                    msg = "{} - <@{}> has the role of the `{}`!".format(emoji,user,role)
-                    identities.spam(msg)
+                    special_tags = ""
+                    if int(db_get(user,'abducted')) == 1:
+                        special_tags += '[Abducted] '
+                    if int(db_get(user,'bites')) > 0:
+                        special_tags += '[Bitten] '
+                    if int(db_get(user,'demonized')) == 1:
+                        special_tags += '[Demonized] '
+                    if db_get(user,'fakerole') != role:
+                        special_tags += "[Disguised as {}] ".format(db_get(user,'fakerole'))
+                    if int(db_get(user,'enchanted')) == 1:
+                        special_tags += "[Enchanted] "
+                    if int(db_get(user,'frozen')) == 1:
+                        special_tags += '[Frozen] '
+                    if int(db_get(user,'powdered')) == 1:
+                        special_tags += '[Powdered] '
+                    if int(db_get(user,'souls')) > -1:
+                        special_tags += '[Soulless One] '
+                    if int(db_get(user,'threatened')) > 0:
+                        special_tags += "[Threatened] "
+                    if int(db_get(user,'undead')) == 1:
+                        special_tags += '[Undead] '
+                    if special_tags == "":
+                        special_tags += "None"
+                    embed = Embed(color=0xcd9e00, title='User Info')
+                    embed.set_thumbnail(url=member.avatar_url)
+                    embed.add_field(name = "Name", value = message.author.name + "\n(" + message.author.nick + ")")
+                    embed.add_field(name = "Emoji", value = emoji)
+                    embed.add_field(name = "Role", value = role)
+                    embed.add_field(name = "Attributes", value = special_tags)
+                    embed.set_footer(text='Participant Information requested by ' + message.author.name)
+                    identities.embed(embed,'spam')
 
             return [identities]
 
         if is_command(message,['whois'],True):
-            msg = "**Usage:** `" + prefix + "whois <user1> <user2> ...`\n\n"
-            msg += "Example: `" + prefix + "whois @Randium#6521`\nGame Master only command"
+            msg = "**Usage:** Gain all the wanted info about a player.\n\n`" + prefix + "whois <user1> <user2> ...`\n\n"
+            msg += "**Example:** `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
+            msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg,True)]
 
     # =============================================================
@@ -148,8 +197,10 @@ def process(message, isGameMaster = False):
             return [command.respond("Changes saved! I will execute these now.")]
 
         if is_command(message,['add'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Add a user to the existing conspiracy channel.\n\n`" + prefix + "add <user>`\n\n"
+            msg += "**Example:** `" + prefix + "add @Randium#6521`\nThis command can only be used by the owner of "
+            msg += "the conspiracy channel. To see who owns a given conspiracy channel, type `" + prefix + "info`."
+            return [Mailbox().respond(msg,True)]
 
         '''cc'''
         # This command allows users to create a conspiracy channel.
@@ -170,11 +221,13 @@ def process(message, isGameMaster = False):
                 return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
 
             db_set(user_id,'ccs',num_cc_owned + 1)
-            return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members)
+            return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))
 
         if is_command(message,['cc'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** create a *conspiracy channel*, a private channel where one can talk with a selected group of players.\n\n"
+            msg += "`" + prefix + "cc <name> <user1> <user2> <user3> ...`\n\n**Example:** `" + prefix + "cc the_cool_guys @Randium#6521`\n"
+            msg += "Please do not abuse this command to create empty channels without a purpose. Abuse will be noticed and dealt with accordingly."
+            return [Mailbox().respond(msg,True)]
 
         '''info'''
         # This command allows users to view information about a conspiracy channel.
@@ -208,16 +261,21 @@ def process(message, isGameMaster = False):
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Gain information about a conspiracy channel.\n\n`" + prefix + "info`\n\n"
+            msg += "Try it! You\'ll see what it does."
+            return [Mailbox().respond(msg,True)]
 
         '''myrole'''
         # This command sends the user's role back to them in a DM.
         if is_command(message,['myrole']):
-            return [Mailbox().dm("Your role is **{}**.".format(db_get(message.author.id,'role')), message.author.id,False,[db_get(message.author.id,'emoji')])]
+            if int(db_get(message.author.id,'undead')) == 0:
+                return [Mailbox().dm("Your role is **{}**.".format(db_get(message.author.id,'role')), message.author.id,False,[db_get(message.author.id,'emoji')])]
+            return [Mailbox().dm("You pretend to be a **{}**, while you are secretly an **Undead**!".format(db_get(message.author.id,'role')),message.author.id)]
         if is_command(message,['myrole'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Get a DM of what your role is.\n\n`" + prefix + "myrole`\n\n"
+            msg += "This command may sound silly, but it could be useful if the player is confused about whether certain "
+            msg += "scenarios have changed their role or not."
+            return [Mailbox().respond(msg,True)]
 
         '''remove'''
         # This command removes a given user from a conspiracy channel.
@@ -236,8 +294,9 @@ def process(message, isGameMaster = False):
             return [command]
 
         if is_command(message,['remove'],True):
-            # TODO
-            return todo()
+            msg = "**Usage:** Remove a user from a conspiracy channel.\n\n`" + prefix + "remove <user>`\n\n"
+            msg += "**Example:** `" + prefix + "remove @Randium#6521`\nThis command can only be used by the conspiracy channel owner."
+            return [Mailbox().respond(msg,True)]
 
         # =======================================================
         #                ROLE SPECIFIC COMMANDS
@@ -612,7 +671,7 @@ def process(message, isGameMaster = False):
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
 
         if emoji == "":
-            if len(choice_emojis) == 1:
+            if len(choice_emoji) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]
         signup(user_id,message.author.name,choice_emoji)

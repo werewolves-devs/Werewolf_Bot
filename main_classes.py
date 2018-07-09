@@ -132,6 +132,8 @@ class ChannelCreate:
         self.owner = owner
         self.members = members
         self.settlers = settlers
+        if owner not in members:
+            self.members.append((owner))
 
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
