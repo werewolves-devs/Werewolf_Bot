@@ -46,7 +46,7 @@ def test_database():
   assert db.isParticipant(2) == False
   assert db.isParticipant(2,True) == False
   db.db_set(1,'frozen',1)
-  assert db.poll_list() == [(u'1',u':smirk:',1,0)]
+  assert db.poll_list() == [(1,u':smirk:',1,0)]
 
   db.add_category('24')
   assert db.count_categories() == 1
