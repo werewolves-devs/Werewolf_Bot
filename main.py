@@ -311,6 +311,6 @@ print(ascii)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-client.run(config.TOKEN)
+    client.run(config.TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')
