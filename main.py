@@ -246,7 +246,7 @@ async def on_message(message):
 
             msg = element.description + '\n'
             emoji_table = []
-            id_table = []
+            msg_table = []
             i = 0
 
             for user in db.poll_list():
@@ -266,14 +266,18 @@ async def on_message(message):
                         msg = await client.get_channel(element.channel).send(msg)
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
-                        id_table.append(msg.id)
+                        msg_table.append(msg)
                         msg = ''
                     else:
                         msg += '\n'
-                    
-            # TODO: Insert id_table + purpose into the database
 
-
+            if msg != '':
+                msg = await client.get_channel(element.channel).send(msg)
+                for emoji in emoji_table:
+                    await msg.add_reaction(emoji)
+                msg_table.append(msg)
+            db.add_poll(msg_table,element.purpose,element.user_id)
+            await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(5)
