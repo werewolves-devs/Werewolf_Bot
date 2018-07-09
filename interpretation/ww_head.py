@@ -185,7 +185,7 @@ def process(message, isGameMaster = False):
                     command.edit_cc(message_channel,member,1)
                 else:
                     command.edit_cc(message_channel,member,4)
-            return [command.respond("Changes saved! I will execute these now.")]
+            return [command.respond("Please wait whilst I save your changes...")]
 
         if is_command(message,['add'],True):
             msg = "**Usage:** Add a user to the existing conspiracy channel.\n\n`" + prefix + "add <user>`\n\n"
