@@ -61,13 +61,15 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)
             user = check.users(message,1)
 
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
 
             db_set(user[0],'role',role[0])
-            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user,role))]
+            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
 
         if is_command(message,['assign'],True):
             msg = "**Usage:** Give a player a specific role\n\n`" + prefix + "assign <user> <role>`\n\nExample: `" + prefix
@@ -149,7 +151,7 @@ def process(message, isGameMaster = False):
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
                     embed.set_thumbnail(url=member.avatar_url)
-                    embed.add_field(name = "Name", value = message.author.name + "(" + message.author.nick + ")")
+                    embed.add_field(name = "Name", value = message.author.name + "\n(" + message.author.nick + ")")
                     embed.add_field(name = "Emoji", value = emoji)
                     embed.add_field(name = "Role", value = role)
                     embed.add_field(name = "Attributes", value = special_tags)
@@ -160,7 +162,7 @@ def process(message, isGameMaster = False):
 
         if is_command(message,['whois'],True):
             msg = "**Usage:** Gain all the wanted info about a player.\n\n`" + prefix + "whois <user1> <user2> ...`\n\n"
-            msg += "Example: `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
+            msg += "**Example:** `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg,True)]
 
