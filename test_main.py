@@ -1,6 +1,6 @@
 # This file runs CI on Travis
 # It will be better soon
-from config import max_channels_per_category
+from config import max_channels_per_category, game_log
 from management.position import positionof
 import interpretation.check as check
 import management.db as db
@@ -18,7 +18,7 @@ def test_positionof():
   assert positionof("frozen") == 13
   assert positionof("fakerole") == 6
   assert positionof("votes") == 8
-  assert positionof("sleepingover") == 19
+  assert positionof("sleepingover") == 18
   assert positionof("bitten") == 16
   assert positionof("id") == 0
 
@@ -39,8 +39,8 @@ def test_database():
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
-  assert db.get_user(1) == (u'1', u'Randium003', u':smirk:', 0, u'#gamelog', u'Spectator', u'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, u'', u'', u'', u'',0,0)
-  assert db.db_get(1,'channel') == '#gamelog'
+  assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0)
+  assert db.db_get(1,'channel') == game_log
   assert db.isParticipant(1) == False
   assert db.isParticipant(1,True) == True
   assert db.isParticipant(2) == False
