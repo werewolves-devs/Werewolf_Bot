@@ -19,20 +19,6 @@ def process(message, isGameMaster = False):
     message_channel = message.channel.id
     user_role = db_get(user_id,'role')
 
-    '''testcc'''
-    # This function is merely a temporary one, to test if the cc creation command is working properly.
-    if is_command(message,['cc','testcc','test_cc']):
-        members = check.users(message)
-        if len(message.content.split(' ')) == 1 or members == False:
-            msg = "**Incorrect syntax:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
-            msg += "\n\nThe bot understands both mentions and emojis linked to players."
-            return [Mailbox().respond(msg,True)]
-        name = message.content.split(' ')[1]
-        return [Mailbox().create_cc(name,user_id,members)]
-    if is_command(message,['cc','testcc','test_cc'],True):
-        msg = "**Usage:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
-        msg += "\nThe bot understands both mentions and emojis linked to players."
-        return [Mailbox().respond(msg,True)]
 
     # =============================================================
     #
