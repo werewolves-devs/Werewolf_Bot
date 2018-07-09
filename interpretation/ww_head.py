@@ -34,6 +34,10 @@ def process(message, isGameMaster = False):
         msg += "\nThe bot understands both mentions and emojis linked to players."
         return [Mailbox().respond(msg,True)]
 
+    '''testpoll'''
+    if is_command(message,['poll','testpoll']):
+        return [Mailbox().new_poll(message.channel.id,'kill',message.author.id,message.content.split(' ',1)[1])]
+
     # =============================================================
     #
     #                         GAME MASTERS
@@ -151,7 +155,7 @@ def process(message, isGameMaster = False):
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
                     embed.set_thumbnail(url=member.avatar_url)
-                    embed.add_field(name = "Name", value = message.author.name + "\n(" + message.author.nick + ")")
+                    embed.add_field(name = "Name", value = "<@{}>".format(user))
                     embed.add_field(name = "Emoji", value = emoji)
                     embed.add_field(name = "Role", value = role)
                     embed.add_field(name = "Attributes", value = special_tags)
@@ -670,7 +674,7 @@ def process(message, isGameMaster = False):
             reaction = Mailbox().respond("You have successfully changed your emoji to the {} emoji!".format(choice_emoji))
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
 
-        if emoji == "":
+        if choice_emoji == "":
             if len(choice_emoji) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]
