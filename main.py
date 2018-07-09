@@ -60,7 +60,7 @@ async def on_message(message):
     # Check if the message author has the Game Master role
     isGameMaster = False
     if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.author.roles]:
+        if game_master in [y.id for y in message.author.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
     result = process(message,isGameMaster)
@@ -245,7 +245,7 @@ async def on_message(message):
                 that happens ALL the time."""
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
-        
+
         for element in mailbox.polls:
             # element.channel
             # element.purpose
@@ -257,18 +257,18 @@ async def on_message(message):
             i = 0
 
             for user in db.poll_list():
-                if db.isParticipant(user[0]):
+                if db.isParticipant(int(user[0])):
                     i += 1
                     msg += user[1] + " - <@" + str(user[0]) + "> "
 
-                    if int(user[2]) + int(user[3]) == 0:
+                    if int(user[2]) + int(user[3]) > 0:
                         if int(user[2]) == 1:
                             msg += "**[FROZEN]** "
                         if int(user[3]) == 1:
-                            msg += "**[ABDUCTED] **" 
+                            msg += "**[ABDUCTED] **"
                     else:
                         emoji_table.append(user[1])
-                    
+
                     if i % 20 == 19:
                         msg = await client.get_channel(element.channel).send(msg)
                         for emoji in emoji_table:

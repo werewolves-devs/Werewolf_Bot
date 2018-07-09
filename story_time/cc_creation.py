@@ -121,7 +121,7 @@ Even though the town did not know the concept of a gun, they could still have a 
 *"You better start talking,"* <@{1}> said, sweat dripping from their head.
 *"You first,"* <@{3}> responded, watching <@{0}> in the corner of their left eye.
 *"Both of you shut up,"* said <@{2}> with a calm but dominant voice.
-*"You watch your attitude, or it\'ll be your last." <@{0}> moved their bow slowly towards <@{2}>.
+*"You watch your attitude, or it\'ll be your last."* <@{0}> moved their bow slowly towards <@{2}>.
 
 They were slowly forcing each other to share information, and the spectators guessed that three of them would not survive \
 the standoff. Was it all faked, however? Did they all trust each other, and were the bows merely a decoy to make sure \

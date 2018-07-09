@@ -12,7 +12,7 @@ class Mailbox:
         self.newchannels = []   # Create new channel
         self.oldchannels = []   # Edit existing channel
         self.polls = []         # Create new polls
-        
+
         self.evaluate_polls = evaluate_polls
 
     def log(self,content,temporary = False,reactions = []):
@@ -105,10 +105,11 @@ class Mailbox:
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
-    
+
     def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
         """Send a request to make a poll in the given channel"""
         self.polls.append(PollRequest(channel_id,purpose,user_id,description))
+        return self
 
 # Class used to send messages through the mailbox
 class Message:
@@ -149,7 +150,7 @@ class PollRequest:
         self.channel = channel_id
         self.purpose = purpose
         self.user_id = user_id
-        
+
         if len(description) > 512:
             self.description = description[0:512]
         else:
@@ -159,5 +160,5 @@ class PollToEvaluate:
     def __init__(self,database_tuple):
         self.msg_table = database_tuple[1]
         self.blamed = database_tuple[2]
-        
+
         self.msg_table = [int(database_tuple[i+3]) for i in range(len(database_tuple) - 3) if int(database_tuple[i+3]) != 0]
