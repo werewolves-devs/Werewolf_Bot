@@ -5,6 +5,10 @@ def cc_intro(list):
     amount = len(list)
     msgtable = []
 
+    if randium.random() < 0.01:
+        msg = '''Once upon a time there was a duck. The duck pooped out an entire conspiracy channel.'''
+        msg_table.append(msg)
+    
     if amount == 0:
         return "That is strange... a channel with zero members?"
 
@@ -121,7 +125,7 @@ Even though the town did not know the concept of a gun, they could still have a 
 *"You better start talking,"* <@{1}> said, sweat dripping from their head.
 *"You first,"* <@{3}> responded, watching <@{0}> in the corner of their left eye.
 *"Both of you shut up,"* said <@{2}> with a calm but dominant voice.
-*"You watch your attitude, or it\'ll be your last." <@{0}> moved their bow slowly towards <@{2}>.
+*"You watch your attitude, or it\'ll be your last."* <@{0}> moved their bow slowly towards <@{2}>.
 
 They were slowly forcing each other to share information, and the spectators guessed that three of them would not survive \
 the standoff. Was it all faked, however? Did they all trust each other, and were the bows merely a decoy to make sure \
