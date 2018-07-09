@@ -2,7 +2,7 @@ from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
-    def __init__(self):
+    def __init__(self,evaluate_polls = False):
         self.gamelog = []       # Send message to gamelog channel
         self.botspam = []       # Send message to botspam channel
         self.storytime = []     # Send message to storytime channel
@@ -11,7 +11,9 @@ class Mailbox:
         self.player = []        # Send message to user
         self.newchannels = []   # Create new channel
         self.oldchannels = []   # Edit existing channel
-        self.polls = []
+        self.polls = []         # Create new polls
+        
+        self.evaluate_polls = evaluate_polls
 
     def log(self,content,temporary = False,reactions = []):
         """Send a message to the gamelog channel."""
@@ -149,3 +151,10 @@ class PollRequest:
             self.description = description[0:512]
         else:
             self.description = description
+
+class PollToEvaluate:
+    def __init__(self,database_tuple):
+        self.msg_table = database_tuple[1]
+        self.blamed = database_tuple[2]
+        
+        self.msg_table = [int(database_tuple[i+3]) for i in range(len(database_tuple) - 3) if int(database_tuple[i+3]) != 0]
