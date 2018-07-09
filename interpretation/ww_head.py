@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner, get_channel_members
 from roles_n_rules.commands import cc_goodbye
 from interpretation.check import is_command
 from config import max_cc_per_user
@@ -19,6 +19,10 @@ def process(message, isGameMaster = False):
     message_channel = message.channel.id
     user_role = db_get(user_id,'role')
 
+
+    '''testpoll'''
+    if is_command(message,['poll','testpoll']):
+        return [Mailbox().new_poll(message.channel.id,'kill',message.author.id,message.content.split(' ',1)[1])]
 
     # =============================================================
     #
@@ -47,13 +51,15 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)
             user = check.users(message,1)
 
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
 
             db_set(user[0],'role',role[0])
-            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user,role))]
+            return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
 
         if is_command(message,['assign'],True):
             msg = "**Usage:** Give a player a specific role\n\n`" + prefix + "assign <user> <role>`\n\nExample: `" + prefix
@@ -135,7 +141,7 @@ def process(message, isGameMaster = False):
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
                     embed.set_thumbnail(url=member.avatar_url)
-                    embed.add_field(name = "Name", value = message.author.name + "(" + message.author.nick + ")")
+                    embed.add_field(name = "Name", value = "<@{}>".format(user))
                     embed.add_field(name = "Emoji", value = emoji)
                     embed.add_field(name = "Role", value = role)
                     embed.add_field(name = "Attributes", value = special_tags)
@@ -146,7 +152,7 @@ def process(message, isGameMaster = False):
 
         if is_command(message,['whois'],True):
             msg = "**Usage:** Gain all the wanted info about a player.\n\n`" + prefix + "whois <user1> <user2> ...`\n\n"
-            msg += "Example: `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
+            msg += "**Example:** `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg,True)]
 
@@ -239,9 +245,11 @@ def process(message, isGameMaster = False):
                     owner_name == 'Sorry, an error was encountered. Please alert a Game Master.'
 
                 embed.add_field(name='Channel Owner', value=owner_name)
-
+            member_text = ""
+            for member in get_channel_members(message.channel.id):
+                member_text += "<@" + member + "> "
             embed.add_field(name='Channel Name', value=message.channel.name)
-            embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
+            embed.add_field(name='Participants', value=member_text)
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
@@ -654,7 +662,7 @@ def process(message, isGameMaster = False):
             reaction = Mailbox().respond("You have successfully changed your emoji to the {} emoji!".format(choice_emoji))
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id,choice_emoji))]
 
-        if emoji == "":
+        if choice_emoji == "":
             if len(choice_emoji) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.",True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",True)]

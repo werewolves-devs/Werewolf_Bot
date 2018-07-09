@@ -36,10 +36,10 @@ def reset(skip = False):
         number += 1
     number = int(number)
 
-    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL, 'purpose' TEXT NOT NULL, 'role' TEXT NOT NULL, 'part1' TEXT NOT NULL,"
+    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'purpose' TEXT NOT NULL, 'user_id' INTEGER NOT NULL, 'part1' INTEGER NOT NULL DEFAULT 0"
     for i in range(number - 1):
-        poll_str += " 'part{}' TEXT,".format(i+2)
-    poll_str += " PRIMARY KEY ('id', 'part1'))"
+        poll_str += ", 'part{}' INTEGER NOT NULL DEFAULT 0".format(i+2)
+    poll_str += ")"
     c.execute(poll_str)
     print('Formatting completed! The bot is now ready for a new game!\n')
 
