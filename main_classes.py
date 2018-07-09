@@ -106,9 +106,9 @@ class Mailbox:
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
     
-    def new_poll(self,channel_id,purpose,description = ''):
+    def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
         """Send a request to make a poll in the given channel"""
-        self.polls.append(PollRequest(channel_id,purpose,description))
+        self.polls.append(PollRequest(channel_id,purpose,user_id,description))
 
 # Class used to send messages through the mailbox
 class Message:
@@ -143,9 +143,10 @@ class ChannelChange:
         self.number = number
 
 class PollRequest:
-    def __init__(self,channel_id,purpose,description):
+    def __init__(self,channel_id,purpose,user_id,description):
         self.channel = channel_id
         self.purpose = purpose
+        self.user_id = user_id
         
         if len(description) > 512:
             self.description = description[0:512]
