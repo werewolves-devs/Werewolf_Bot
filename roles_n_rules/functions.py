@@ -143,7 +143,7 @@ def powder(user_id,victim_id):
     victim_role = db_get(victim_id,'role')
     victim_powdered = int(db_get(victim_id,'powdered'))
 
-    if victim_role == 'Pyromaner':
+    if victim_role == 'Pyromancer':
         return Mailbox().msg("I am sorry, <@{}>, but you cannot powder a pyromancer!".format(user_id),user_channel,True)
     if victim_powdered == 1:
         return Mailbox().msg("I am terribly sorry, but <@{}> has already been powdered! Please choose another victim.".format(victim_id),user_channel,True)
