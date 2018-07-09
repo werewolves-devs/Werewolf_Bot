@@ -404,3 +404,8 @@ def delete_freezer(user_id,victim_id):
     c.execute("DELETE FROM freezers WHERE king =? AND victim =?",(user_id,victim_id))
     conn.commit()
     return True
+
+def add_standoff():
+    """Add a new kill condition to the database."""
+    pass
+    # TODO
