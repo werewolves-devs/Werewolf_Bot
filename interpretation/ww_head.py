@@ -171,8 +171,9 @@ def process(message, isGameMaster = False):
             members_to_add = check.users(message)
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
-            if is_owner(user_id,message_channel) == False:
-                return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
+            #TODO: Re-enable this
+            #if is_owner(user_id,message_channel) == False:
+            #    return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
 
             command = Mailbox()
             for member in members_to_add:
