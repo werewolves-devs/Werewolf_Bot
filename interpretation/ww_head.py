@@ -1,5 +1,5 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner
+from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, is_owner, get_channel_members
 from roles_n_rules.commands import cc_goodbye
 from interpretation.check import is_command
 from config import max_cc_per_user
@@ -259,9 +259,11 @@ def process(message, isGameMaster = False):
                     owner_name == 'Sorry, an error was encountered. Please alert a Game Master.'
 
                 embed.add_field(name='Channel Owner', value=owner_name)
-
+            member_text = ""
+            for member in get_channel_members(message.channel.id):
+                member_text += "<@" + member + "> "
             embed.add_field(name='Channel Name', value=message.channel.name)
-            embed.add_field(name='Participants', value='[Bob Roberts], [Dummy], [Randium], [BenTechy66], [Ed588]')
+            embed.add_field(name='Participants', value=member_text)
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message,['info'],True):
