@@ -112,7 +112,7 @@ def roles(message,amount= -1,delete_duplicates = False):
 
     for i in range(len(message.content)):
         for role in roles_list:
-            if message.content[i:].startswith(role):
+            if message.content[i:].lower().startswith(role.lower()):
                 role_table.append(role)
 
     if delete_duplicates == True:
