@@ -211,7 +211,7 @@ def process(message, isGameMaster = False):
                 return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
 
             db_set(user_id,'ccs',num_cc_owned + 1)
-            return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))
+            return [Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))]
 
         if is_command(message,['cc'],True):
             msg = "**Usage:** create a *conspiracy channel*, a private channel where one can talk with a selected group of players.\n\n"

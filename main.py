@@ -145,9 +145,24 @@ async def on_message(message):
             # 2 -> give frozen (if they don't have it yet)
             # 3 -> read = False
             # 4 -> give dead role + remove participant role
-                
-            # TODO
-            pass
+
+            channel = client.get_channel(element.channel)
+            user = client.get_user(element.user)
+            if number == 0:
+                overwrite = {user:discord.PermissionOverwrite(read_messages=False)}
+            elif number == 1:
+                overwrite = {user:discord.PermissionOverwrite(read_messages=True)}
+            elif number == 2:
+                overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+            elif number == 3:
+                overwrite = {user:discord.PermissionOverwrite(read_messages=False, send_messages=False)}
+            elif number == 4:
+                overwrite = {user:discord.PermissionOverwrite(read_messages=True, send_messages=False)}
+            else:
+                await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                return
+            await channel.set_permissions(overwrite=overwrite)
+            await msg.channel.send(':white_check_mark: Changes saved.')
 
         for element in mailbox.newchannels:
             # element.name - name of the channel;
@@ -311,6 +326,6 @@ print(ascii)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-client.run(config.TOKEN)
+    client.run(config.TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')
