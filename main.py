@@ -140,6 +140,12 @@ async def on_message(message):
                 # 3 - abducted      (no view, no type)
                 # 4 - dead          (dead role?)
 
+            # 0 -> read = False
+            # 1 -> read = True
+            # 2 -> give frozen (if they don't have it yet)
+            # 3 -> read = False
+            # 4 -> give dead role + remove participant role
+                
             # TODO
             pass
 
