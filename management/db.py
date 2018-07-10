@@ -329,9 +329,6 @@ def is_owner(user_id,channel_id):
     user_id -> the id of the user
     channel_id -> the id of the channel"""
 
-    print(user_id)
-    print(channel_id)
-
     # Check if the user exists
     c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
     if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id) == False:
