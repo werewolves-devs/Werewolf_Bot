@@ -39,6 +39,7 @@ from config import welcome_channel, game_master, dead_participant, game_master, 
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
+from interpretation.polls import count_votes
 import config
 import management.db as db
 
@@ -68,6 +69,28 @@ async def on_message(message):
     temp_msg = []
 
     for mailbox in result:
+
+        if mailbox.evaluate_polls == True:
+            for poll in db.get_all_polls():
+                # poll.msg_table -> list of message ids
+                # poll.blamed -> name of killer
+                # poll.purpose -> the reason of the kill
+                user_table = []
+                for msg in poll.msg_table:
+                    for emoji in gamelog_channel.guild.get_message(msg).reactions:
+                        users = await emoji.users()
+                        print(users) # To confirm I did this right.
+
+                        for person in users:
+                            if db.isParticipant(person.id):
+                                user_table.append([person.id,emoji])
+
+                await botspam_channel.send(user_table)
+
+                log, result = count_votes(user_table,poll.purpose)
+                
+                
+
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
@@ -164,6 +187,7 @@ async def on_message(message):
             await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
+
 
         for element in mailbox.newchannels:
             # element.name - name of the channel;
