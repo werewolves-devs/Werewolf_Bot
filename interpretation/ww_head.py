@@ -51,12 +51,12 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)
             user = check.users(message,1)
 
-            if isParticipant(user[0],True,True) == False:
-                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
 
             db_set(user[0],'role',role[0])
             return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
@@ -172,19 +172,19 @@ def process(message, isGameMaster = False):
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
             #TODO: Re-enable this
-            #if is_owner(user_id,message_channel) == False:
-            #    return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
+            if is_owner(user_id,message_channel) == False:
+                return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
 
             command = Mailbox()
             for member in members_to_add:
-                if int(db_get(member,'abducted')) == 1:
+                if isParticipant(member) == False:
+                    command.edit_cc(message_channel,member,4)
+                elif int(db_get(member,'abducted')) == 1:
                     command.edit_cc(message_channel,member,3)
                 elif int(db_get(member,'frozen')) == 1:
                     command.edit_cc(message_channel,member,2)
-                elif isParticipant(member):
-                    command.edit_cc(message_channel,member,1)
                 else:
-                    command.edit_cc(message_channel,member,4)
+                    command.edit_cc(message_channel,member,1)
             return [command.respond("Please wait whilst I save your changes...")]
 
         if is_command(message,['add'],True):
@@ -209,7 +209,7 @@ def process(message, isGameMaster = False):
 
             if num_cc_owned >= max_cc_per_user:
                 answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
-                return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
+                return [answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)]
 
             db_set(user_id,'ccs',num_cc_owned + 1)
             return [Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))]

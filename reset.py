@@ -28,7 +28,7 @@ def reset(skip = False):
     c.execute("CREATE TABLE 'death-row' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'victim' TEXT NOT NULL, 'role' TEXT NOT NULL, 'murderer' TEXT NOT NULL DEFAULT '')")
     c.execute("CREATE TABLE 'categories' ('current' INTEGER NOT NULL DEFAULT 1, 'id' TEXT NOT NULL, 'channels' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'channels' ('channel_id' TEXT PRIMARY KEY NOT NULL, 'owner' TEXT NOT NULL)")
-    c.execute("CREATE TABLE 'channel_rows' ('id' TEXT PRIMARY KEY NOT NULL)")
+    c.execute("CREATE TABLE 'channel_rows' ('id' INTEGER PRIMARY KEY NOT NULL)")
     c.execute("CREATE TABLE 'freezers' ('king' INTEGER NOT NULL, 'victim' INTEGER NOT NULL, 'role' TEXT NOT NULL)")
     c.execute("CREATE TABLE 'standoff' ('killer' INTEGER NOT NULL, 'victim' INTEGER NOT NULL, 'type' TEXT NOT NULL);")
     number = float(config.max_participants)/20

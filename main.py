@@ -154,14 +154,16 @@ async def on_message(message):
                 await channel.set_permissions(user, read_messages=True)
             elif element.number == 2:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
-            elif number == 3:
+            elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-            elif number == 4:
+            elif element.number == 4:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
-            await msg.channel.send(':white_check_mark: Changes saved.')
+            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
+            if db.isParticipant(element.victim,True,True):
+                db.set_user_in_channel(element.channel,element.victim,element.number)
 
         for element in mailbox.newchannels:
             # element.name - name of the channel;
