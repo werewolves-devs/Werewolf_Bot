@@ -308,6 +308,18 @@ async def on_message(message):
             db.add_poll(msg_table,element.purpose,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
+        for element in mailbox.deletecategories:
+            id = element.channel
+            category = client.get_channel(id)
+            if category != None:
+                await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
+                for channel in category.channels:
+                    await channel.delete()
+                await category.delete()
+                await message.channel.send('\n:thumbsup: Channels and category deleted')
+            else:
+                await message.channel.send('Sorry, I couldn\'t find that category.')
+
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(120)
     for msg in temp_msg:
