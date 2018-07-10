@@ -51,7 +51,7 @@ def test_database():
   db.add_category('24')
   assert db.count_categories() == 1
   assert db.get_category() == 24
-  assert db.get_columns() == [(u'1',)]
+  assert db.get_columns() == [(1,)]
   assert db.channel_get('1234555') == None
   db.add_channel('1234555',1)
   assert db.get_category() == 24
