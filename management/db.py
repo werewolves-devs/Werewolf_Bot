@@ -240,6 +240,8 @@ def channel_get(channel_id,user_id = ''):
             return c.fetchone()[0]
         except ValueError:
             return None
+        except TypeError:
+            return None
         else:
             return None
     else:
@@ -324,15 +326,22 @@ def is_owner(user_id,channel_id):
     Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
 
     Keyword arguments:
-    id -> the id of the user
-    channel -> the id of the channel"""
+    user_id -> the id of the user
+    channel_id -> the id of the channel"""
+
+    print(user_id)
+    print(channel_id)
 
     # Check if the user exists
     c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id):
+    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id) == False:
+        print('Column doesn\'t exist!')
         return False
 
     owner = channel_get(channel_id,'owner')
+    if owner == None:
+        return False
+
     if int(owner) == int(user_id):
         return True
 
