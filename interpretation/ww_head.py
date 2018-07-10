@@ -172,19 +172,19 @@ def process(message, isGameMaster = False):
             if members_to_add == False:
                 return [Mailbox().respond("I am sorry! I couldn't find the user you were looking for!",True)]
             #TODO: Re-enable this
-            #if is_owner(user_id,message_channel) == False:
-            #    return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
+            if is_owner(user_id,message_channel) == False:
+                return [Mailbox().respond("I\'m sorry, you can only use this in conspiracy channels where you are the owner!")]
 
             command = Mailbox()
             for member in members_to_add:
-                if int(db_get(member,'abducted')) == 1:
+                if isParticipant(member) == False:
+                    command.edit_cc(message_channel,member,4)
+                elif int(db_get(member,'abducted')) == 1:
                     command.edit_cc(message_channel,member,3)
                 elif int(db_get(member,'frozen')) == 1:
                     command.edit_cc(message_channel,member,2)
-                elif isParticipant(member):
-                    command.edit_cc(message_channel,member,1)
                 else:
-                    command.edit_cc(message_channel,member,4)
+                    command.edit_cc(message_channel,member,1)
             return [command.respond("Please wait whilst I save your changes...")]
 
         if is_command(message,['add'],True):
