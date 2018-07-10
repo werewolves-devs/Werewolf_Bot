@@ -312,7 +312,7 @@ async def on_message(message):
             id = element.channel
             category = client.get_channel(id)
             if category != None:
-                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channel contained within the specified category. Please use with discretion.')
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
                 await bot_message.add_reaction('👍')
                 def check(reaction, user):
                     return user == message.author and str(reaction.emoji) == '👍'
