@@ -312,11 +312,20 @@ async def on_message(message):
             id = element.channel
             category = client.get_channel(id)
             if category != None:
-                await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
-                for channel in category.channels:
-                    await channel.delete()
-                await category.delete()
-                await message.channel.send('\n:thumbsup: Channels and category deleted')
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channel contained within the specified category. Please use with discretion.')
+                await bot_message.add_reaction('👍')
+                def check(reaction, user):
+                    return user == message.author and str(reaction.emoji) == '👍'
+                try:
+                    reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
+                except asyncio.TimeoutError:
+                    await message.channel.send('Confirmation timed out.')
+                else:
+                    await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    await message.channel.send('\n:thumbsup: Channels and category deleted')
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
