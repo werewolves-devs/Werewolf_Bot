@@ -30,6 +30,16 @@ def process(message, isGameMaster = False):
     #
     # =============================================================
     if isGameMaster == True:
+        '''delete_category'''
+        # This command is used to entirely delete a category and all channels in it
+        # (Note that this will A: take a while due to ratelimits and B: Spam the audit log)
+        # Moderation should be used to ensure this command is not used outside of where it's allowed
+        if is_command(message,['delete_category']):
+            return [Mailbox().delete_category(check.numbers(message)[0])]
+        if is_command(message,['delete_category'],True):
+            msg = "**Usage:** Deletes an entire category and all channels in it.\n\n`" + prefix + "delete_category <id>`\n\n**Example:** `" + prefix + "delete_category 457264810363584513`"
+            msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
 
         '''addrole'''
         # Before the game starts, a list of roles is kept track of.
