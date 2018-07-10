@@ -168,9 +168,26 @@ async def on_message(message):
             # 2 -> give frozen (if they don't have it yet)
             # 3 -> read = False
             # 4 -> give dead role + remove participant role
-                
-            # TODO
-            pass
+
+            channel = client.get_channel(element.channel)
+            user = client.get_user(element.victim)
+            if element.number == 0:
+                await channel.set_permissions(user, read_messages=False)
+            elif element.number == 1:
+                await channel.set_permissions(user, read_messages=True)
+            elif element.number == 2:
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
+            elif element.number == 3:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+            elif element.number == 4:
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
+            else:
+                await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                return
+            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
+            if db.isParticipant(element.victim,True,True):
+                db.set_user_in_channel(element.channel,element.victim,element.number)
+
 
         for element in mailbox.newchannels:
             # element.name - name of the channel;
@@ -314,6 +331,27 @@ async def on_message(message):
                 msg_table.append(msg)
             db.add_poll(msg_table,element.purpose,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
+
+        for element in mailbox.deletecategories:
+            id = element.channel
+            category = client.get_channel(id)
+            if category != None:
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
+                await bot_message.add_reaction('👍')
+                def check(reaction, user):
+                    return user == message.author and str(reaction.emoji) == '👍'
+                try:
+                    reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
+                except asyncio.TimeoutError:
+                    await message.channel.send('Confirmation timed out.')
+                else:
+                    await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    await message.channel.send('\n:thumbsup: Channels and category deleted')
+            else:
+                await message.channel.send('Sorry, I couldn\'t find that category.')
 
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(120)
