@@ -51,12 +51,12 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)
             user = check.users(message,1)
 
-            if isParticipant(user[0],True,True) == False:
-                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
 
             db_set(user[0],'role',role[0])
             return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
@@ -209,7 +209,7 @@ def process(message, isGameMaster = False):
 
             if num_cc_owned >= max_cc_per_user:
                 answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
-                return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
+                return [answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)]
 
             db_set(user_id,'ccs',num_cc_owned + 1)
             return [Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))]
