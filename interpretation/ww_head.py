@@ -13,7 +13,7 @@ import discord
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!",True)]
 
-def process(message, isGameMaster = False):
+def process(message, isGameMaster = False, isAdmin = False):
 
     user_id = message.author.id
     message_channel = message.channel.id
@@ -26,20 +26,34 @@ def process(message, isGameMaster = False):
 
     # =============================================================
     #
-    #                         GAME MASTERS
+    #                         ADMINISTRATOR
     #
     # =============================================================
-    if isGameMaster == True:
+    if isAdmin == True:
+
         '''delete_category'''
         # This command is used to entirely delete a category and all channels in it
         # (Note that this will A: take a while due to ratelimits and B: Spam the audit log)
         # Moderation should be used to ensure this command is not used outside of where it's allowed
         if is_command(message,['delete_category']):
-            return [Mailbox().delete_category(check.numbers(message)[0])]
+            int_table = check.numbers(message)
+            if int_table == False:
+                return [Mailbox().respond("**Invalid syntax:** Missing category id.\n\n`" + prefix + "delete_category <category id>`")]
+            answer = Mailbox()
+            for id in int_table:
+                answer.delete_category(id)
+            return [answer]
         if is_command(message,['delete_category'],True):
             msg = "**Usage:** Deletes an entire category and all channels in it.\n\n`" + prefix + "delete_category <id>`\n\n**Example:** `" + prefix + "delete_category 457264810363584513`"
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg,True)]
+
+    # =============================================================
+    #
+    #                         GAME MASTERS
+    #
+    # =============================================================
+    if isGameMaster == True:
 
         '''addrole'''
         # Before the game starts, a list of roles is kept track of.
