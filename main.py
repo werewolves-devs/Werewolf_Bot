@@ -35,7 +35,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import welcome_channel, game_master, dead_participant, game_master, frozen_participant
+from config import welcome_channel, game_master, dead_participant, game_master, frozen_participant, administrator
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
@@ -64,7 +64,12 @@ async def on_message(message):
         if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
-    result = process(message,isGameMaster)
+    isAdmin = False
+    if message.guild == gamelog_channel.guild:
+        if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+            isAdmin = True
+
+    result = process(message,isGameMaster,isAdmin)
 
     temp_msg = []
 
@@ -172,9 +177,9 @@ async def on_message(message):
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
             if element.number == 0:
-                await channel.set_permissions(user, read_messages=False)
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 1:
-                await channel.set_permissions(user, read_messages=True)
+                await channel.set_permissions(user, read_messages=True, send_messages=True)
             elif element.number == 2:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif element.number == 3:
@@ -184,6 +189,7 @@ async def on_message(message):
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
+            # Reminder: Add some different welcome messages
             await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
@@ -217,33 +223,44 @@ async def on_message(message):
                         element.members.append(buddy)
 
                 viewers = []
+                frozones = []
                 abductees = []
-                for member in db.player_list():
-                    if db_get(member,'abducted') == 1 and member in element.members:
-                        abductees.append(member)
-                    elif member in element.members or db_get(member,'role') in ['Dead','Spectator'] or int(member) == int(element.owner):
-                        if main_guild.get_member(int(member)) != None:
-                            viewers.append(main_guild.get_member(int(member)))
+                deadies = []
+                for user in element.members:
+                    member = main_guild.get_member(user)
+
+                    if member == None:
+                        await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
+                    elif db.isParticipant(user,False,True) == True:
+                        if int(db_get(user,'abducted')) == 1:
+                            abductees.append(member)
+                        elif int(db_get(user,'frozen')) == 1:
+                            frozones.append(member)
+                        elif db.isParticipant(user,False,False) == False:
+                            deadies.append(member)
                         else:
-                            sorry = await message.channel.send("It doesn't seem like <@{}> is part of this server! I am sorry, I can't add them to your channel.".format(member))
-                            temp_msg.append(sorry)
+                            viewers.append(member)
+                    else:
+                        deadies.append(member)
 
                 intro_msg = creation_messages.cc_intro([v.id for v in viewers])
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
                 default_permissions = {
-                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
+                    game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
-                        member: discord.PermissionOverwrite(read_messages=True) for member in viewers
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=True) for member in viewers
                     },
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=False) for member in frozones
+                    },
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=False) for member in deadies
+                    }
                 }
 
                 # Create a new category if needed
@@ -265,15 +282,15 @@ async def on_message(message):
                     await channel.send(intro_msg)
 
                     # Set all access rules in the database
-                    for victim in abductees:
-                        db.set_user_in_channel(channel.id,victim,3)
-                    for user in viewers:
-                        if db_get(user.id,'role') in ['Dead','Spectator']:
-                            db.set_user_in_channel(channel.id,user.id,4)
-                        elif db_get(user.id,'frozen') == 1:
-                            db.set_user_in_channel(channel.id,user.id,2)
-                        else:
-                            db.set_user_in_channel(channel.id,user.id,1)
+                    for member in viewers:
+                        db.set_user_in_channel(channel.id,member.id,1)
+                    for member in frozones:
+                        db.set_user_in_channel(channel.id,member.id,2)
+                    for member in abductees:
+                        db.set_user_in_channel(channel.id,member.id,3)
+                    for member in deadies:
+                        db.set_user_in_channel(channel.id,member.id,4)
+
 
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
