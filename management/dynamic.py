@@ -52,3 +52,17 @@ def day_number():
 def next_day():
     """Set the game's current day one step forward."""
     return jset("day",day_number()+1)
+
+def get_mayor():
+    """Get the id of the town's current mayor"""
+    return jget("Mayor")
+
+def set_mayor(user_id):
+    """Set the mayor to the given id  
+    
+    userid -> the id of the user that is to be set mayor"""
+    return jset("Mayor",user_id)
+
+def kill_mayor():
+    """Remove the mayor from the dynamic config file. The town will now longer have a mayor.  """
+    return set_mayor(0)
