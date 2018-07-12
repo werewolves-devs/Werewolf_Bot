@@ -80,21 +80,21 @@ async def on_message(message):
                 # poll.msg_table -> list of message ids
                 # poll.blamed -> name of killer
                 # poll.purpose -> the reason of the kill
+                poll_channel = client.get_channel(poll.channel)
+
                 user_table = []
                 for msg in poll.msg_table:
-                    for emoji in gamelog_channel.guild.get_message(msg).reactions:
-                        users = await emoji.users()
+                    poll_msg = await poll_channel.get_message(msg)
+                    for emoji in poll_msg.reactions:
+                        users = await emoji.users().flatten()
                         print(users) # To confirm I did this right.
 
                         for person in users:
                             if db.isParticipant(person.id):
-                                user_table.append([person.id,emoji])
-
-                await botspam_channel.send(user_table)
-                poll_channel = gamelog_channel.guild.get_message(poll.msg_table[0]).channel
+                                user_table.append([person.id,emoji.emoji])
 
                 log, result, chosen_emoji = count_votes(user_table,poll.purpose)
-                
+
                 await gamelog_channel.send(log)
                 await poll_channel.send(result)
 
