@@ -36,7 +36,7 @@ def reset(skip = False):
         number += 1
     number = int(number)
 
-    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'purpose' TEXT NOT NULL, 'user_id' INTEGER NOT NULL, 'part1' INTEGER NOT NULL DEFAULT 0"
+    poll_str = "CREATE TABLE 'polls' ('id' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'purpose' TEXT NOT NULL, 'user_id' INTEGER NOT NULL, 'channel' INTEGER NOT NULL, 'part1' INTEGER NOT NULL DEFAULT 0"
     for i in range(number - 1):
         poll_str += ", 'part{}' INTEGER NOT NULL DEFAULT 0".format(i+2)
     poll_str += ")"
