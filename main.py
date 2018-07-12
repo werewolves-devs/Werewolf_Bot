@@ -91,10 +91,31 @@ async def on_message(message):
                                 user_table.append([person.id,emoji])
 
                 await botspam_channel.send(user_table)
+                poll_channel = gamelog_channel.guild.get_message(poll.msg_table[0]).channel
 
-                log, result = count_votes(user_table,poll.purpose)
+                log, result, chosen_emoji = count_votes(user_table,poll.purpose)
                 
-                
+                await gamelog_channel.send(log)
+                await poll_channel.send(result)
+
+                chosen_one = db.emoji_to_player(chosen_emoji)
+
+                if chosen_emoji != '' and chosen_one != None:
+                    if poll.purpose == 'lynch':
+                        db.add_kill(chosen_one,'Innocent')
+                    elif poll.purpose == 'Mayor':
+                        # TODO: give Mayor role and add data to dynamic.json
+                        pass
+                    elif poll.purpose == 'Reporter':
+                        # TODO: give Reporter role and add data to dynamic.json
+                        pass
+                    elif poll.purpose == 'wolf':
+                        db.add_kill(chosen_one,'Werewolf',db.random_wolf())
+                    elif poll.purpose == 'cult':
+                        db.add_kill(chosen_one,'Cult Leader',db.random_cult())
+                    elif poll.purpose == 'thing':
+                        # TODO: kill poor victim
+                        pass
 
 
         for element in mailbox.gamelog:
