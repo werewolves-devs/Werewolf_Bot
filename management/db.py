@@ -1,6 +1,7 @@
 import sqlite3
+import random
 from config import database, max_channels_per_category, max_participants
-from management.position import positionof, check_for_int
+from management.position import positionof, check_for_int, wolf_pack
 from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
@@ -451,3 +452,19 @@ def add_standoff():
     """Add a new kill condition to the database."""
     pass
     # TODO
+
+def random_wolf():
+    """Find and get a random wolf pack member"""
+    wolfies = [user_id for user_id in player_list() if db_get(user_id,'role') in wolf_pack]
+    if wolfies == []:
+        print("This is strange! A random wolf is called, which shouldn't happen if there aren't any wolves around.")
+        return ''
+    return wolfies[random.randint(0,len(wolfies)-1)]
+
+def random_cult():
+    """Find and get a random cult leader/member"""
+    culties = [user_id for user_id in player_list() if db_get(user_id,'role') in ['Cult Leader','Cult Member']]
+    if culties == []:
+        print('How is the random_cult() function called when there isn\'t a cult leader around? Strange!')
+        return ''
+    return culties[random.randint(0,len(culties)-1)]

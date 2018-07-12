@@ -5,6 +5,8 @@ roles_list = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller","B
 "Infected Wolf","Lone Wolf","Sacred Wolf","Tanner","Warlock","White Werewolf","Wolf's Cub","Angel","Despot","Devil","Demon",
 "Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer","The Thing","Undead","Vampire"," Zombie"]
 
+wolf_pack = ["Werewolf","Bloody Butcher","Hell Hound","Infected Wolf","Sacred Wolf","White Werewolf","Wolf's Cub"]
+
 # Converts the required string to its position in the SQLite database.
 # Raises an error if it cannot find the string.
 def positionof(column):

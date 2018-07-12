@@ -44,3 +44,11 @@ def set_stage(value):
     # Day - daytime
     # Night - nighttime
     # NA - out of game/otherwise
+
+def day_number():
+    """Return the game's current day number"""
+    return int(jget("day"))
+
+def next_day():
+    """Set the game's current day one step forward."""
+    return jset("day",day_number()+1)
