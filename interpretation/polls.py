@@ -13,7 +13,7 @@ class Vote:
             self.user = user_id
             self.type = 'generic'
             self.emoji = emoji
-            self.votes = votes
+            self.votes = vote
 
 class Disqualified:
     def __init__(self,user_id,reason = 0):
