@@ -20,9 +20,13 @@ def process(message, isGameMaster = False, isAdmin = False):
     user_role = db_get(user_id,'role')
 
 
+    '''evaluate'''
+    if is_command(message,['eval']):
+        return [Mailbox(True)]
+
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
-        return [Mailbox().new_poll(message.channel.id,'kill',message.author.id,message.content.split(' ',1)[1])]
+        return [Mailbox().new_poll(message.channel.id,'lynch',message.author.id,message.content.split(' ',1)[1])]
 
     # =============================================================
     #
