@@ -1,9 +1,5 @@
-def db_get(user_id,bla):
-    return -10
-def player_list():
-    return []
-def emoji_to_player(emoji):
-    return -4
+from management.db import db_get, emoji_to_player, player_list
+from management.dynamic import day_number
 
 class Vote:
     def __init__(self,user_id, emoji, purpose, reason = ''):
@@ -13,7 +9,7 @@ class Vote:
         self.reason = reason
         if int(db_get(user_id,'undead')) == 1:
             self.votes = 0
-        if purpose == 'lynch':
+        if purpose in ['lynch','Mayor','Reporter']:
             self.votes = db_get(user_id,'votes')
 
 class Disqualified:
@@ -25,6 +21,7 @@ class Disqualified:
         # 1 - self voting
 
 def count_votes(voting_table, purpose = 'lynch', mayor = 0):
+    """Count votes based on reactions given to """
     user_table = []
     blacklist = []
     emoji_table = []
@@ -45,7 +42,6 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
     
     # Evaluate table, filter double votes and continue
     voting_table = [Vote(vote[0],vote[1],purpose) for vote in voting_table if vote[0] in user_table]
-    voting_table.append(Vote(0,':smirk:',2,"**RAVEN THREAT**"))
     blacklist = [Disqualified(user) for user in blacklist]
 
     if purpose == 'lynch':
@@ -54,8 +50,29 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
                 voting_table.append(Vote(0,db_get(user,'emoji'),2,"**RAVEN THREAT**"))
 
     # Create the evaluation messages
-    answer = "**__Poll results:__**\n\n"
-    log = "**__Poll results:__**\n\n"
+    answer = "**__Poll results "
+    log = "**__Poll results "
+
+    if purpose == 'wolf':
+        answer += "from wolf attack:__**\n"
+        log += "from wolf attack:__**\n"
+    elif purpose == 'cult':
+        answer += "from cult attack:__**\n"
+        log += "from cult attack:__**\n"
+    elif purpose == 'thing':
+        answer += "from the swamp:__**\n"
+        log += "from the swamp:__**\n"
+    elif purpose == 'lynch':
+        answer += "from public execution on day {}:__**\n".format(day_number())
+        log += "from public execution on day {}:__**\n".format(day_number)
+    elif purpose == 'Mayor':
+        answer += "from Mayor election:__**\n"
+        log += "from Mayor election:__**\n"
+    elif purpose == 'Reporter':
+        answer += "from Reporter election:__**\n"
+        log += "from Reporter election:__**\n"
+
+
     max_i = 0
     chosen_emoji = ''
 
@@ -63,8 +80,8 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         emoji_votes = [vote for vote in voting_table if vote.emoji == emoji]
 
         if emoji_votes != []:
-            answer += "{}\n".format(emoji)
-            log += "{}\n".format(emoji)
+            answer += "{} - VOTES FOR <@{}>\n".format(emoji,emoji_to_player(emoji))
+            log += "{} - VOTES FOR <@{}>\n".format(emoji,emoji_to_player(emoji))
         i = 0
 
         for vote in emoji_votes:
@@ -99,16 +116,25 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
             chosen_emoji = emoji
             max_i = i
     
+    answer += "\n"
+    log += "\n"
+
     for cheater in blacklist:
         if cheater.reason == 0:
             answer += "<@{}>, you have been disqualified for double voting.\n".format(cheater.user)
+            log += "<@{}> has been disqualified for double voting.\n".format(cheater.user)
         if cheater.reason == 1:
-            answer += "<@{}>, your vote has been disqualified for you may not vote for yourself on this poll.".format(cheater.user)
+            answer += "<@{}>, your vote has been disqualified for you may not vote for yourself on this poll.\n".format(cheater.user)
+            log += "<@{}> has been disqualified for voting on themselves.\n".format(cheater.user)
     
-    return log, answer, chosen_emoji
+    if chosen_emoji != '':
+        answer += "\n__The emoji {} has the most votes, making <@{}> the winner of this poll!__".format(chosen_emoji,emoji_to_player(emoji))
+        log += "\n__The emoji {} has the most votes, effectively making <@{}> the winner of this poll.__".format(chosen_emoji,emoji_to_player(chosen_emoji))
+    elif emoji_table != []:
+        answer += "\n__It seems like we\'ve reached a tie! No-one will win this poll, I\'m sorry!__"
+        log += "\n__The poll has reached a tie and will not choose a winner.__"
+    else:
+        answer += "\n__It seems like no-one has voted! Well, in that case, there won\'t be a winner either.__"
+        log += "\n__No votes have been registered.__"
 
-if __name__ == "__main__":
-    log, answer, chosen_emoji = count_votes([[1,':smirk:'],[2,':smirk:'],[3,':smirk:'],[4,':grin:'],[5,':smirk:'],[3,':grin:'],[8,':grin:']],'wolf',8)
-    print(log)
-    print(chosen_emoji)
-    print(answer)
+    return log, answer, chosen_emoji
