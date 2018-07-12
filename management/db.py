@@ -377,7 +377,7 @@ def signup(user_id,name,emoji):
         c.execute("INSERT INTO 'channel_rows' ('id') VALUES (?)",(user_id,))
     conn.commit()
 
-def add_poll(msg_table,purpose,user_id = 0):
+def add_poll(msg_table,purpose,channel_id,user_id = 0):
     """Add a new poll to the database. The poll is saved so it can be evaluated later on.
 
     msg_table -> the list of messages that contain the poll
@@ -389,8 +389,8 @@ def add_poll(msg_table,purpose,user_id = 0):
     if len(msg_table) > amount:
         raise IndexError("Poll needed more space in database than expected!")
 
-    request_msg = "INSERT INTO 'polls' ('purpose','user_id'"
-    request2_msg = ") VALUES ('{}',{}".format(purpose,user_id)
+    request_msg = "INSERT INTO 'polls' ('purpose','user_id','channel'"
+    request2_msg = ") VALUES ('{}',{},{}".format(purpose,user_id,channel_id)
 
     for i in range(len(msg_table)):
 

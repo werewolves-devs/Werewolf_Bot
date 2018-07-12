@@ -1,20 +1,19 @@
 from management.db import db_get, emoji_to_player, player_list, isParticipant
 from management.dynamic import day_number
+from interpretation.check import check_for_int
 
 class Vote:
-    def __init__(self,user_id, emoji, purpose, reason = ''):
-        self.user = user_id
-        self.emoji = emoji
-        self.votes = 1
-        self.reason = reason
-        if reason == "**RAVEN THREAT**":
-            self.votes == int(db_get(purpose,'threatened'))
-            print(self.votes)
+    def __init__(self,user_id,emoji,votes = 1):
+        if check_for_int(user_id) == True:
+            self.user = user_id
+            self.type = 'user'
+            self.emoji = emoji
+            self.votes = votes
         else:
-            if int(db_get(user_id,'undead')) == 1:
-                self.votes = 0
-            if purpose in ['lynch','Mayor','Reporter']:
-                self.votes = db_get(user_id,'votes')
+            self.user = user_id
+            self.type = 'generic'
+            self.emoji = emoji
+            self.votes = vote
 
 class Disqualified:
     def __init__(self,user_id,reason = 0):
@@ -28,6 +27,7 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
     """Count votes based on reactions given to """
     user_table = []
     blacklist = []
+    blacklist2 = []
     emoji_table = []
 
     for vote in voting_table:
@@ -35,9 +35,13 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         if vote[1] not in emoji_table:
             emoji_table.append(vote[1])
 
-        # Raise alarm if user already voted
-        if vote[0] in blacklist:
+        # Filter self-votes and double votes
+        if vote[0] in blacklist or vote[0] in blacklist2:
             pass
+        elif vote[0] == emoji_to_player(vote[1]) and purpose not in ['Mayor','Reporter']:
+            blacklist2.append(vote[0])
+            if vote[0] in user_table:
+                user_table.remove(vote[0])
         elif vote[0] in user_table:
             blacklist.append(vote[0])
             user_table.remove(vote[0])
@@ -47,36 +51,38 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
     # Evaluate table, filter double votes and continue
     voting_table = [Vote(vote[0],vote[1],purpose) for vote in voting_table if vote[0] in user_table]
     blacklist = [Disqualified(user) for user in blacklist]
+    blacklist2 = [Disqualified(user,1) for user in blacklist2]
+    blacklist.extend(blacklist2)
 
     if purpose == 'lynch':
         for user in player_list():
             if int(db_get(user,'threatened')) > 0:
-                voting_table.append(Vote(0,db_get(user,'emoji'),user,"**RAVEN THREAT**"))
+                voting_table.append(Vote("**RAVEN THREAT**",db_get(user,'emoji'),db_get(user,'threatened')))
 
-    print([[vote.user,vote.emoji,vote.votes] for vote in voting_table])
+    # print([[vote.user,vote.emoji,vote.votes] for vote in voting_table])
 
     # Create the evaluation messages
     answer = "**__Poll results "
     log = "**__Poll results "
 
     if purpose == 'wolf':
-        answer += "from wolf attack:__**\n"
-        log += "from wolf attack:__**\n"
+        answer += "from wolf attack:__**\n\n"
+        log += "from wolf attack:__**\n\n"
     elif purpose == 'cult':
-        answer += "from cult attack:__**\n"
-        log += "from cult attack:__**\n"
+        answer += "from cult attack:__**\n\n"
+        log += "from cult attack:__**\n\n"
     elif purpose == 'thing':
-        answer += "from the swamp:__**\n"
-        log += "from the swamp:__**\n"
+        answer += "from the swamp:__**\n\n"
+        log += "from the swamp:__**\n\n"
     elif purpose == 'lynch':
-        answer += "from public execution on day {}:__**\n".format(day_number())
-        log += "from public execution on day {}:__**\n".format(day_number())
+        answer += "from public execution on day {}:__**\n\n".format(day_number())
+        log += "from public execution on day {}:__**\n\n".format(day_number())
     elif purpose == 'Mayor':
-        answer += "from Mayor election:__**\n"
-        log += "from Mayor election:__**\n"
+        answer += "from Mayor election:__**\n\n"
+        log += "from Mayor election:__**\n\n"
     elif purpose == 'Reporter':
-        answer += "from Reporter election:__**\n"
-        log += "from Reporter election:__**\n"
+        answer += "from Reporter election:__**\n\n"
+        log += "from Reporter election:__**\n\n"
 
 
     max_i = 0
@@ -86,32 +92,36 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         emoji_votes = [vote for vote in voting_table if vote.emoji == emoji]
 
         if emoji_votes != []:
-            answer += "{} - VOTES FOR <@{}>\n".format(emoji,emoji_to_player(emoji))
-            log += "{} - VOTES FOR <@{}>\n".format(emoji,emoji_to_player(emoji))
+            answer += "**{} - VOTES FOR <@{}>:**\n".format(emoji,emoji_to_player(emoji))
+            log += "**{} - VOTES FOR <@{}>:**\n".format(emoji,emoji_to_player(emoji))
         i = 0
 
         for vote in emoji_votes:
-            if vote.user == emoji_to_player(emoji) and purpose not in ["Mayor","Reporter"]:
-                blacklist.append(Disqualified(vote.user,1))
-            elif vote.user == 0 and vote.votes > 0:
-                log += vote.reason
-                if vote.votes > 1:
-                    log += " *({}x)*".format(vote.votes)
-                log += '\n'
-
-                i += vote.votes
-            else:
+            # vote.user
+            # vote.type
+            # vote.emoji
+            # vote.votes
+            if vote.type == 'user':
                 answer += "<@{}> ".format(vote.user)
                 log += "<@{}> ".format(vote.user)
                 if vote.user == mayor:
                     vote.votes += 1
-                    answer += "- @Mayor"
-                    log += "- @Mayor"
+                    answer += "- @Mayor "
+                    log += "- @Mayor "
                 if vote.votes > 1:
-                    log += " *({}x)*".format(vote.votes)
+                    log += "*({}x)* ".format(vote.votes)
                 i += vote.votes
                 log += '\n'
                 answer += '\n'
+            elif vote.type == 'generic':
+                log += "{} ".format(vote.user)
+                if vote.votes > 1:
+                    log += "*({}x)* ".format(vote.votes)
+                i += vote.votes
+                log += '\n'
+            else:
+                answer += "*Oops! An error occured on this line!*\n"
+                log += "*Oops! An error occured on this line! Looks like we\'ve got an undefined voting type!*\n"
 
         if i > 0:
             log += "**TOTAL: {} votes**\n\n".format(i)
@@ -144,3 +154,4 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         log += "\n__No votes have been registered.__"
 
     return log, answer, chosen_emoji
+  
