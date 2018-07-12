@@ -172,5 +172,6 @@ class PollToEvaluate:
     def __init__(self,database_tuple):
         self.purpose = database_tuple[1]
         self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
 
-        self.msg_table = [int(database_tuple[i+3]) for i in range(len(database_tuple) - 3) if int(database_tuple[i+3]) != 0]
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
