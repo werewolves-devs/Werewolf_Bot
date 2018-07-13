@@ -26,7 +26,15 @@ splashes = [
 'Powered by Electricity',
 'Who still writes docs in 2018?',
 "First normal form? What does that mean?",
-"By using a relational database but with nonrelational practices we get the worst of both worlds!"
+"By using a relational database but with nonrelational practices we get the worst of both worlds!",
+"I haven\'t paid attention or read any comments, therefor it\'s impossible to understand!",
+"Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.",
+"I don\'t wanna explain, just Google it.",
+"What are cogs?",
+"This is MY project. You\'re just freeloaders.",
+"You've got three weeks to fix EVERYTHING.",
+"No-one agrees? Too bad! Myy idea it is.",
+"The next version will be written in Java only!"
 ]
 
 import discord
