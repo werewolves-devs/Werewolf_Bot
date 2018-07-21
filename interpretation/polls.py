@@ -8,12 +8,12 @@ class Vote:
             self.user = user_id
             self.type = 'user'
             self.emoji = emoji
-            self.votes = votes
+            self.votes = int(votes)
         else:
             self.user = user_id
             self.type = 'generic'
             self.emoji = emoji
-            self.votes = vote
+            self.votes = int(votes)
 
 class Disqualified:
     def __init__(self,user_id,reason = 0):
@@ -49,15 +49,21 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
             user_table.append(vote[0])
 
     # Evaluate table, filter double votes and continue
-    voting_table = [Vote(vote[0],vote[1],purpose) for vote in voting_table if vote[0] in user_table]
+    voting_table = [Vote(vote[0],vote[1],int(db_get(vote[0],'votes'))) for vote in voting_table if vote[0] in user_table]
     blacklist = [Disqualified(user) for user in blacklist]
     blacklist2 = [Disqualified(user,1) for user in blacklist2]
     blacklist.extend(blacklist2)
 
+    # Add extra (secret) outside lynches, may some special events happen.
     if purpose == 'lynch':
         for user in player_list():
             if int(db_get(user,'threatened')) > 0:
-                voting_table.append(Vote("**RAVEN THREAT**",db_get(user,'emoji'),db_get(user,'threatened')))
+                print('{} has been threatened!'.format(user))
+                voting_table.append(Vote("RAVEN THREAT",db_get(user,'emoji'),int(db_get(user,'threatened'))))
+
+                # Add emoji to table
+                if db_get(user,'emoji') not in emoji_table:
+                    emoji_table.append(db_get(user,'emoji'))
 
     # print([[vote.user,vote.emoji,vote.votes] for vote in voting_table])
 
@@ -92,7 +98,10 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         emoji_votes = [vote for vote in voting_table if vote.emoji == emoji]
 
         if emoji_votes != []:
-            answer += "**{} - VOTES FOR <@{}>:**\n".format(emoji,emoji_to_player(emoji))
+            for vote in emoji_votes:
+                if vote.type == 'user':
+                    answer += "**{} - VOTES FOR <@{}>:**\n".format(emoji,emoji_to_player(emoji))
+                    break
             log += "**{} - VOTES FOR <@{}>:**\n".format(emoji,emoji_to_player(emoji))
         i = 0
 
@@ -108,7 +117,7 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
                     vote.votes += 1
                     answer += "- @Mayor "
                     log += "- @Mayor "
-                if vote.votes > 1:
+                if vote.votes != 1:
                     log += "*({}x)* ".format(vote.votes)
                 i += vote.votes
                 log += '\n'
@@ -144,7 +153,7 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
             log += "<@{}> has been disqualified for voting on themselves.\n".format(cheater.user)
 
     if chosen_emoji != '':
-        answer += "\n__The emoji {} has the most votes, making <@{}> the winner of this poll!__".format(chosen_emoji,emoji_to_player(emoji))
+        answer += "\n__The emoji {} has the most votes, making <@{}> the winner of this poll!__".format(chosen_emoji,emoji_to_player(chosen_emoji))
         log += "\n__The emoji {} has the most votes, effectively making <@{}> the winner of this poll.__".format(chosen_emoji,emoji_to_player(chosen_emoji))
     elif emoji_table != []:
         answer += "\n__It seems like we\'ve reached a tie! No-one will win this poll, I\'m sorry!__"
@@ -154,4 +163,4 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
         log += "\n__No votes have been registered.__"
 
     return log, answer, chosen_emoji
-  
+
