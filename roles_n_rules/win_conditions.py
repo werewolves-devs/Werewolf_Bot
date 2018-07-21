@@ -47,3 +47,10 @@ def devil_victory():
             if db.db_get(user,'souls') < 0:
                 return False
     return True
+
+def ice_victory():
+    """This function returns true if the ice kings have won."""
+    for user in db.player_list():
+        if db.isParticipant(user) and db.db_get(user,'frozen') == 0 and db.db_get(user,'role') != 'Ice King':
+            return False
+    return True
