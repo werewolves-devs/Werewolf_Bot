@@ -88,7 +88,11 @@ async def on_message(message):
                 # poll.msg_table -> list of message ids
                 # poll.blamed -> name of killer
                 # poll.purpose -> the reason of the kill
-                poll_channel = client.get_channel(poll.channel)
+
+                poll_channel = client.get_channel(int(poll.channel))
+                if poll_channel == None:
+                    await botspam_channel.send("We got a problem! Could you send these results to the appropriate channel, please?")
+                    poll_channel = botspam_channel
 
                 user_table = []
                 for msg in poll.msg_table:
@@ -318,7 +322,8 @@ async def on_message(message):
                     for member in abductees:
                         db.set_user_in_channel(channel.id,member.id,3)
                     for member in deadies:
-                        db.set_user_in_channel(channel.id,member.id,4)
+                        if db.isParticipant(member.id,True,True) == True:
+                            db.set_user_in_channel(channel.id,member.id,4)
 
 
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
@@ -341,6 +346,7 @@ async def on_message(message):
         for element in mailbox.polls:
             # element.channel
             # element.purpose
+            # element.user_id
             # element.description
 
             msg = element.description + '\n'
@@ -375,7 +381,7 @@ async def on_message(message):
                 for emoji in emoji_table:
                     await msg.add_reaction(emoji)
                 msg_table.append(msg)
-            db.add_poll(msg_table,element.purpose,element.user_id)
+            db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
         for element in mailbox.deletecategories:
