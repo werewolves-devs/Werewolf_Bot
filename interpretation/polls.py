@@ -58,7 +58,6 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
     if purpose == 'lynch':
         for user in player_list():
             if int(db_get(user,'threatened')) > 0:
-                print('{} has been threatened!'.format(user))
                 voting_table.append(Vote("RAVEN THREAT",db_get(user,'emoji'),int(db_get(user,'threatened'))))
 
                 # Add emoji to table
