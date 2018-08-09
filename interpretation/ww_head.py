@@ -13,30 +13,44 @@ import discord
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!",True)]
 
-def process(message, isGameMaster = False):
+def process(message, isGameMaster = False, isAdmin = False):
 
     user_id = message.author.id
     message_channel = message.channel.id
     user_role = db_get(user_id,'role')
 
-    '''testcc'''
-    # This function is merely a temporary one, to test if the cc creation command is working properly.
-    if is_command(message,['cc','testcc','test_cc']):
-        members = check.users(message)
-        if len(message.content.split(' ')) == 1 or members == False:
-            msg = "**Incorrect syntax:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
-            msg += "\n\nThe bot understands both mentions and emojis linked to players."
-            return [Mailbox().respond(msg,True)]
-        name = message.content.split(' ')[1]
-        return [Mailbox().create_cc(name,user_id,members)]
-    if is_command(message,['cc','testcc','test_cc'],True):
-        msg = "**Usage:** `" + prefix + "cc <name> <user> <user> <user> ...`\n\nExample: `" + prefix + "cc the_cool_ones @Randium#6521`"
-        msg += "\nThe bot understands both mentions and emojis linked to players."
-        return [Mailbox().respond(msg,True)]
+
+    '''evaluate'''
+    if is_command(message,['eval']):
+        return [Mailbox(True)]
 
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
-        return [Mailbox().new_poll(message.channel.id,'kill',message.author.id,message.content.split(' ',1)[1])]
+        return [Mailbox().new_poll(message.channel.id,'lynch',message.author.id,message.content.split(' ',1)[1])]
+
+    # =============================================================
+    #
+    #                         ADMINISTRATOR
+    #
+    # =============================================================
+    if isAdmin == True:
+
+        '''delete_category'''
+        # This command is used to entirely delete a category and all channels in it
+        # (Note that this will A: take a while due to ratelimits and B: Spam the audit log)
+        # Moderation should be used to ensure this command is not used outside of where it's allowed
+        if is_command(message,['delete_category']):
+            int_table = check.numbers(message)
+            if int_table == False:
+                return [Mailbox().respond("**Invalid syntax:** Missing category id.\n\n`" + prefix + "delete_category <category id>`")]
+            answer = Mailbox()
+            for id in int_table:
+                answer.delete_category(id)
+            return [answer]
+        if is_command(message,['delete_category'],True):
+            msg = "**Usage:** Deletes an entire category and all channels in it.\n\n`" + prefix + "delete_category <id>`\n\n**Example:** `" + prefix + "delete_category 457264810363584513`"
+            msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
+            return [Mailbox().respond(msg,True)]
 
     # =============================================================
     #
@@ -65,12 +79,12 @@ def process(message, isGameMaster = False):
             role = check.roles(message,1)
             user = check.users(message,1)
 
-            if isParticipant(user[0],True,True) == False:
-                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
             if role == False:
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
+            if isParticipant(user[0],True,True) == False:
+                return [Mailbox().respond("I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
 
             db_set(user[0],'role',role[0])
             return [Mailbox().spam("You have successfully given <@{}> the role of the `{}`!".format(user[0],role[0]))]
@@ -190,15 +204,15 @@ def process(message, isGameMaster = False):
 
             command = Mailbox()
             for member in members_to_add:
-                if int(db_get(member,'abducted')) == 1:
+                if isParticipant(member) == False:
+                    command.edit_cc(message_channel,member,4)
+                elif int(db_get(member,'abducted')) == 1:
                     command.edit_cc(message_channel,member,3)
                 elif int(db_get(member,'frozen')) == 1:
                     command.edit_cc(message_channel,member,2)
-                elif isParticipant(member):
-                    command.edit_cc(message_channel,member,1)
                 else:
-                    command.edit_cc(message_channel,member,4)
-            return [command.respond("Changes saved! I will execute these now.")]
+                    command.edit_cc(message_channel,member,1)
+            return [command.respond("Please wait whilst I save your changes...")]
 
         if is_command(message,['add'],True):
             msg = "**Usage:** Add a user to the existing conspiracy channel.\n\n`" + prefix + "add <user>`\n\n"
@@ -222,10 +236,10 @@ def process(message, isGameMaster = False):
 
             if num_cc_owned >= max_cc_per_user:
                 answer = Mailbox().dm("You have reached the amount of conspiracy channels one may own!", user_id)
-                return answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)
+                return [answer.dm("If you want more conspiracy channels, please request permission from one of the Game Masters.", user_id)]
 
             db_set(user_id,'ccs',num_cc_owned + 1)
-            return Mailbox.create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))
+            return [Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members).spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id,message.content.split(' ')[1]))]
 
         if is_command(message,['cc'],True):
             msg = "**Usage:** create a *conspiracy channel*, a private channel where one can talk with a selected group of players.\n\n"
@@ -261,7 +275,7 @@ def process(message, isGameMaster = False):
                 embed.add_field(name='Channel Owner', value=owner_name)
             member_text = ""
             for member in get_channel_members(message.channel.id):
-                member_text += "<@" + member + "> "
+                member_text += "<@" + str(member) + "> "
             embed.add_field(name='Channel Name', value=message.channel.name)
             embed.add_field(name='Participants', value=member_text)
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)

@@ -1,6 +1,7 @@
 import sqlite3
+import random
 from config import database, max_channels_per_category, max_participants
-from management.position import positionof, check_for_int
+from management.position import positionof, check_for_int, wolf_pack
 from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
@@ -240,6 +241,8 @@ def channel_get(channel_id,user_id = ''):
             return c.fetchone()[0]
         except ValueError:
             return None
+        except TypeError:
+            return None
         else:
             return None
     else:
@@ -324,15 +327,19 @@ def is_owner(user_id,channel_id):
     Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
 
     Keyword arguments:
-    id -> the id of the user
-    channel -> the id of the channel"""
+    user_id -> the id of the user
+    channel_id -> the id of the channel"""
 
     # Check if the user exists
     c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id):
+    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id) == False:
+        print('Column doesn\'t exist!')
         return False
 
     owner = channel_get(channel_id,'owner')
+    if owner == None:
+        return False
+
     if int(owner) == int(user_id):
         return True
 
@@ -370,7 +377,7 @@ def signup(user_id,name,emoji):
         c.execute("INSERT INTO 'channel_rows' ('id') VALUES (?)",(user_id,))
     conn.commit()
 
-def add_poll(msg_table,purpose,user_id = 0):
+def add_poll(msg_table,purpose,channel_id,user_id = 0):
     """Add a new poll to the database. The poll is saved so it can be evaluated later on.
 
     msg_table -> the list of messages that contain the poll
@@ -382,8 +389,8 @@ def add_poll(msg_table,purpose,user_id = 0):
     if len(msg_table) > amount:
         raise IndexError("Poll needed more space in database than expected!")
 
-    request_msg = "INSERT INTO 'polls' ('purpose','user_id'"
-    request2_msg = ") VALUES ('{}',{}".format(purpose,user_id)
+    request_msg = "INSERT INTO 'polls' ('purpose','user_id','channel'"
+    request2_msg = ") VALUES ('{}',{},{}".format(purpose,user_id,channel_id)
 
     for i in range(len(msg_table)):
 
@@ -445,3 +452,19 @@ def add_standoff():
     """Add a new kill condition to the database."""
     pass
     # TODO
+
+def random_wolf():
+    """Find and get a random wolf pack member"""
+    wolfies = [user_id for user_id in player_list() if db_get(user_id,'role') in wolf_pack]
+    if wolfies == []:
+        print("This is strange! A random wolf is called, which shouldn't happen if there aren't any wolves around.")
+        return ''
+    return wolfies[random.randint(0,len(wolfies)-1)]
+
+def random_cult():
+    """Find and get a random cult leader/member"""
+    culties = [user_id for user_id in player_list() if db_get(user_id,'role') in ['Cult Leader','Cult Member']]
+    if culties == []:
+        print('How is the random_cult() function called when there isn\'t a cult leader around? Strange!')
+        return ''
+    return culties[random.randint(0,len(culties)-1)]

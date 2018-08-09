@@ -26,7 +26,15 @@ splashes = [
 'Powered by Electricity',
 'Who still writes docs in 2018?',
 "First normal form? What does that mean?",
-"By using a relational database but with nonrelational practices we get the worst of both worlds!"
+"By using a relational database but with nonrelational practices we get the worst of both worlds!",
+"I haven\'t paid attention or read any comments, therefor it\'s impossible to understand!",
+"Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.",
+"I don\'t wanna explain, just Google it.",
+"What are cogs?",
+"This is MY project. You\'re just freeloaders.",
+"You've got three weeks to fix EVERYTHING.",
+"No-one agrees? Too bad! Myy idea it is.",
+"The next version will be written in Java only!"
 ]
 
 import discord
@@ -35,10 +43,11 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import welcome_channel, game_master, dead_participant, game_master, frozen_participant
+from config import welcome_channel, game_master, dead_participant, game_master, frozen_participant, administrator
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
+from interpretation.polls import count_votes
 import config
 import management.db as db
 
@@ -63,11 +72,63 @@ async def on_message(message):
         if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
-    result = process(message,isGameMaster)
+    isAdmin = False
+    if message.guild == gamelog_channel.guild:
+        if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+            isAdmin = True
+
+    result = process(message,isGameMaster,isAdmin)
 
     temp_msg = []
 
     for mailbox in result:
+
+        if mailbox.evaluate_polls == True:
+            for poll in db.get_all_polls():
+                # poll.msg_table -> list of message ids
+                # poll.blamed -> name of killer
+                # poll.purpose -> the reason of the kill
+
+                poll_channel = client.get_channel(int(poll.channel))
+                if poll_channel == None:
+                    await botspam_channel.send("We got a problem! Could you send these results to the appropriate channel, please?")
+                    poll_channel = botspam_channel
+
+                user_table = []
+                for msg in poll.msg_table:
+                    poll_msg = await poll_channel.get_message(msg)
+                    for emoji in poll_msg.reactions:
+                        users = await emoji.users().flatten()
+                        print(users) # To confirm I did this right.
+
+                        for person in users:
+                            if db.isParticipant(person.id):
+                                user_table.append([person.id,emoji.emoji])
+
+                log, result, chosen_emoji = count_votes(user_table,poll.purpose)
+
+                await gamelog_channel.send(log)
+                await poll_channel.send(result)
+
+                chosen_one = db.emoji_to_player(chosen_emoji)
+
+                if chosen_emoji != '' and chosen_one != None:
+                    if poll.purpose == 'lynch':
+                        db.add_kill(chosen_one,'Innocent')
+                    elif poll.purpose == 'Mayor':
+                        # TODO: give Mayor role and add data to dynamic.json
+                        pass
+                    elif poll.purpose == 'Reporter':
+                        # TODO: give Reporter role and add data to dynamic.json
+                        pass
+                    elif poll.purpose == 'wolf':
+                        db.add_kill(chosen_one,'Werewolf',db.random_wolf())
+                    elif poll.purpose == 'cult':
+                        db.add_kill(chosen_one,'Cult Leader',db.random_cult())
+                    elif poll.purpose == 'thing':
+                        # TODO: kill poor victim
+                        pass
+
 
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
@@ -140,8 +201,32 @@ async def on_message(message):
                 # 3 - abducted      (no view, no type)
                 # 4 - dead          (dead role?)
 
-            # TODO
-            pass
+            # 0 -> read = False
+            # 1 -> read = True
+            # 2 -> give frozen (if they don't have it yet)
+            # 3 -> read = False
+            # 4 -> give dead role + remove participant role
+
+            channel = client.get_channel(element.channel)
+            user = client.get_user(element.victim)
+            if element.number == 0:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+            elif element.number == 1:
+                await channel.set_permissions(user, read_messages=True, send_messages=True)
+            elif element.number == 2:
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
+            elif element.number == 3:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+            elif element.number == 4:
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
+            else:
+                await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                return
+            # Reminder: Add some different welcome messages
+            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
+            if db.isParticipant(element.victim,True,True):
+                db.set_user_in_channel(element.channel,element.victim,element.number)
+
 
         for element in mailbox.newchannels:
             # element.name - name of the channel;
@@ -171,33 +256,44 @@ async def on_message(message):
                         element.members.append(buddy)
 
                 viewers = []
+                frozones = []
                 abductees = []
-                for member in db.player_list():
-                    if db_get(member,'abducted') == 1 and member in element.members:
-                        abductees.append(member)
-                    elif member in element.members or db_get(member,'role') in ['Dead','Spectator'] or int(member) == int(element.owner):
-                        if main_guild.get_member(int(member)) != None:
-                            viewers.append(main_guild.get_member(int(member)))
+                deadies = []
+                for user in element.members:
+                    member = main_guild.get_member(user)
+
+                    if member == None:
+                        await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
+                    elif db.isParticipant(user,False,True) == True:
+                        if int(db_get(user,'abducted')) == 1:
+                            abductees.append(member)
+                        elif int(db_get(user,'frozen')) == 1:
+                            frozones.append(member)
+                        elif db.isParticipant(user,False,False) == False:
+                            deadies.append(member)
                         else:
-                            sorry = await message.channel.send("It doesn't seem like <@{}> is part of this server! I am sorry, I can't add them to your channel.".format(member))
-                            temp_msg.append(sorry)
+                            viewers.append(member)
+                    else:
+                        deadies.append(member)
 
                 intro_msg = creation_messages.cc_intro([v.id for v in viewers])
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
-                dead_participant_role = discord.utils.find(lambda r: r.id == dead_participant, roles)
-                frozen_participant_role = discord.utils.find(lambda r: r.id == frozen_participant, roles)
                 default_permissions = {
-                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    frozen_participant_role: discord.PermissionOverwrite(send_messages=False),
-                    dead_participant_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                    game_master_role: discord.PermissionOverwrite(read_messages=True),
+                    main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
+                    game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     client.user: discord.PermissionOverwrite(read_messages=True,send_messages=True),
                     **{
-                        member: discord.PermissionOverwrite(read_messages=True) for member in viewers
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=True) for member in viewers
                     },
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=False) for member in frozones
+                    },
+                    **{
+                        member: discord.PermissionOverwrite(read_messages=True,send_messages=False) for member in deadies
+                    }
                 }
 
                 # Create a new category if needed
@@ -219,15 +315,16 @@ async def on_message(message):
                     await channel.send(intro_msg)
 
                     # Set all access rules in the database
-                    for victim in abductees:
-                        db.set_user_in_channel(channel.id,victim,3)
-                    for user in viewers:
-                        if db_get(user.id,'role') in ['Dead','Spectator']:
-                            db.set_user_in_channel(channel.id,user.id,4)
-                        elif db_get(user.id,'frozen') == 1:
-                            db.set_user_in_channel(channel.id,user.id,2)
-                        else:
-                            db.set_user_in_channel(channel.id,user.id,1)
+                    for member in viewers:
+                        db.set_user_in_channel(channel.id,member.id,1)
+                    for member in frozones:
+                        db.set_user_in_channel(channel.id,member.id,2)
+                    for member in abductees:
+                        db.set_user_in_channel(channel.id,member.id,3)
+                    for member in deadies:
+                        if db.isParticipant(member.id,True,True) == True:
+                            db.set_user_in_channel(channel.id,member.id,4)
+
 
                 except Exception as e: # Catch any thrown exceptions and send an error to the user.
                     await message.channel.send('It seems like I\'ve encountered an error! Please let the Game Masters know about this!')
@@ -249,6 +346,7 @@ async def on_message(message):
         for element in mailbox.polls:
             # element.channel
             # element.purpose
+            # element.user_id
             # element.description
 
             msg = element.description + '\n'
@@ -283,8 +381,29 @@ async def on_message(message):
                 for emoji in emoji_table:
                     await msg.add_reaction(emoji)
                 msg_table.append(msg)
-            db.add_poll(msg_table,element.purpose,element.user_id)
+            db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
+
+        for element in mailbox.deletecategories:
+            id = element.channel
+            category = client.get_channel(id)
+            if category != None:
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
+                await bot_message.add_reaction('👍')
+                def check(reaction, user):
+                    return user == message.author and str(reaction.emoji) == '👍'
+                try:
+                    reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
+                except asyncio.TimeoutError:
+                    await message.channel.send('Confirmation timed out.')
+                else:
+                    await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    await message.channel.send('\n:thumbsup: Channels and category deleted')
+            else:
+                await message.channel.send('Sorry, I couldn\'t find that category.')
 
     # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(120)
@@ -304,4 +423,7 @@ async def on_ready():
 print(ascii)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
-client.run(config.TOKEN)
+try:
+    client.run(config.TOKEN)
+except:
+    print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')

@@ -3,15 +3,16 @@ from config import game_log
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
     def __init__(self,evaluate_polls = False):
-        self.gamelog = []       # Send message to gamelog channel
-        self.botspam = []       # Send message to botspam channel
-        self.storytime = []     # Send message to storytime channel
-        self.answer = []        # Send message to triggered channel
-        self.channel = []       # Send message to channel
-        self.player = []        # Send message to user
-        self.newchannels = []   # Create new channel
-        self.oldchannels = []   # Edit existing channel
-        self.polls = []         # Create new polls
+        self.gamelog = []          # Send message to gamelog channel
+        self.botspam = []          # Send message to botspam channel
+        self.storytime = []        # Send message to storytime channel
+        self.answer = []           # Send message to triggered channel
+        self.channel = []          # Send message to channel
+        self.player = []           # Send message to user
+        self.newchannels = []      # Create new channel
+        self.oldchannels = []      # Edit existing channel
+        self.polls = []            # Create new polls
+        self.deletecategories = [] # Delete categories and channels they contain
 
         self.evaluate_polls = evaluate_polls
 
@@ -111,6 +112,10 @@ class Mailbox:
         self.polls.append(PollRequest(channel_id,purpose,user_id,description))
         return self
 
+    def delete_category(self, channel_id):
+        self.deletecategories.append(CategoryDelete(channel_id))
+        return self
+
 # Class used to send messages through the mailbox
 class Message:
     def __init__(self,content,temporary = False,destination = '',reactions=[],embed = False):
@@ -145,6 +150,13 @@ class ChannelChange:
         self.victim = victim
         self.number = number
 
+class CategoryDelete:
+    # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
+    # This is because settlers is just a database function to execute. When changing a channel, the id is known and
+    # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
+    def __init__(self,channel):
+        self.channel = channel
+
 class PollRequest:
     def __init__(self,channel_id,purpose,user_id,description):
         self.channel = channel_id
@@ -158,7 +170,8 @@ class PollRequest:
 
 class PollToEvaluate:
     def __init__(self,database_tuple):
-        self.msg_table = database_tuple[1]
+        self.purpose = database_tuple[1]
         self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
 
-        self.msg_table = [int(database_tuple[i+3]) for i in range(len(database_tuple) - 3) if int(database_tuple[i+3]) != 0]
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
