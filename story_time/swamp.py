@@ -13,7 +13,7 @@ def kidnap():
     has contact with the outside. That player is The Thing. Kill them to be set free again.**"""
     msg_table.append(msg)
 
-    msg = """Yesterday was a relativel pleasant day. The execution was a wild one! In the evening, while on your way home, \
+    msg = """Yesterday was a relatively pleasant day. The execution was a wild one! In the evening, while on your way home, \
     you saw a silhouette in the bushes, waving at you. Confused by what it could mean, *(does someone wish to talk to you in private? \
     Another conspiracy channel?)* you follow the silhouette into the forest. Once you reach the swamp, you lose the \
     human-like figure, and you only see the shadow of a deer staring right at you.
