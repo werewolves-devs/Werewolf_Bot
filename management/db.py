@@ -103,7 +103,7 @@ def personal_channel(user_id,channel_id):
     user_id -> the user's id
     channel_id -> the channel's id
     """
-    if db_get(user_id,"channel") == str(channel_id):
+    if int(db_get(user_id,"channel")) == int(channel_id):
         return True
     return False
 
