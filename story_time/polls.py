@@ -92,8 +92,5 @@ def story_text(purpose):
 
         msg = "The town decided to have a brutal public execution at the end of the day! Everything\'s prepared and all ready, now we just need to choose a victim."
         msg_table.append(msg)
-
-        msg = ".....LET'S FUCKING MURDER SOMEONE!"
-        msg_table.append(msg)
     
     return msg_table[random.randint(0,len(msg_table)-1)]
