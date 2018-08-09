@@ -5,6 +5,15 @@ roles_list = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller","B
 "Infected Wolf","Lone Wolf","Sacred Wolf","Tanner","Warlock","White Werewolf","Wolf's Cub","Angel","Despot","Devil","Demon",
 "Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer","The Thing","Undead","Vampire"," Zombie"]
 
+wolf_pack = ["Werewolf","Bloody Butcher","Hell Hound","Infected Wolf","Sacred Wolf","White Werewolf","Wolf's Cub"]
+
+villager_team = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller","Baker","Butcher","Barber","Crowd Seeker",
+"Cult Leader","Cult Member","Cupid","Cursed Civilian","Dog","Executioner","Exorcist","Fortune Teller","Fortune Apprentice",
+"Grandma","Hooker","Huntress","Idiot","Innkeeper","Jack Robinson","Look-Alike","Macho","Mad Scientist","Priest","Priestess",
+"Raven","Robin Jackson","Royal Knight","Runner","Town Elder","Witch"]
+wolf_team = ["Werewolf","Bloody Butcher","Curse Caster","Hell Hound","Infected Wolf","Lone Wolf","Sacred Wolf","Tanner",
+"Warlock","White Werewolf","Wolf's Cub"]
+
 # Converts the required string to its position in the SQLite database.
 # Raises an error if it cannot find the string.
 def positionof(column):
@@ -52,7 +61,9 @@ def positionof(column):
         return 20
     if column == "ccs":
         return 21
-    
+    if column == 'horseman':
+        return 22
+
     raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
 
 def check_for_int(s):

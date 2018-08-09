@@ -39,7 +39,7 @@ def test_database():
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
-  assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0)
+  assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0, 0)
   assert db.db_get(1,'channel') == game_log
   assert db.isParticipant(1) == False
   assert db.isParticipant(1,True) == True
@@ -51,7 +51,7 @@ def test_database():
   db.add_category('24')
   assert db.count_categories() == 1
   assert db.get_category() == 24
-  assert db.get_columns() == [(u'1',)]
+  assert db.get_columns() == [(1,)]
   assert db.channel_get('1234555') == None
   db.add_channel('1234555',1)
   assert db.get_category() == 24
