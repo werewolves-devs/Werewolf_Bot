@@ -118,4 +118,5 @@ def mexican():
   assert db.get_standoff(1) == [[1,'2','Huntress','1'],[2,'3','Cupid','1']]
   db.delete_standoff(2)
   assert db.get_standoff(1) == [[1,'2','Huntress','1']]
+  assert 0 == 1
   reset.reset(True)
