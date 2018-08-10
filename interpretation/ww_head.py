@@ -258,6 +258,8 @@ def process(message, isGameMaster = False, isAdmin = False):
                 return[Mailbox().respond('Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
             if owner_id != None:
                 owner_object = guild.get_member(int(owner_id))
+            else:
+                owner_object = None
             embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
             if owner_object != None and owner_id != None:
                 embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
@@ -343,16 +345,22 @@ def process(message, isGameMaster = False, isAdmin = False):
                 return [func.nightly_kill(user_id,target[0])]
 
             if is_command(message,['assassinate','kill'],True) and user_role == "Assassin":
-                return [Mailbox().respond("")]
+                msg = "**Usage:** Kill another player.\n\n`" + prefix + "kill <player>`\n\n"
+                msg += "**Example:** `" + prefix + "kill @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by Assassins during the night."
+                return [Mailbox().respond(msg,True)]
 
             '''aura'''
             # The command for aura tellers
             if is_command(message,['aura','tell','vision']) and user_role == "Aura Teller":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.aura(user_id,target[0])]
             if is_command(message,['aura','tell','vision'],True) and user_role == "Aura Teller":
-                # TODO
-                return todo()
+                msg = "**Usage:** View a player's aura.\n\nn`" + prefix + "aura <player>`\n\n"
+                msg += "**Example:** `" + prefix + "aura @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by Aura Tellers during the night."
 
             '''barber_kill'''
             # Barber kill - to assassinate a victim during the day
@@ -360,8 +368,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['assassinate','barber_kill','cut'],True) and user_role == "Barber":
-                # TODO
-                return todo()
+                msg = "**Usage:** Kill a player during the day.\n\n`" + prefix + "cut <player>`\n\n"
+                msg += "**Example:** `" + prefix + "cut @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by barbers during the day. This command only works once, so choose wisely."
 
             '''seek'''
             # Crowd seeker's power
@@ -369,8 +378,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['crowd','seek'],True) and user_role == "Crowd Seeker":
-                # TODO
-                return todo()
+                msg = "**Usage:** Inspect a player's role.\n\n`" + prefix + "seek <player> <role>`\n\n"
+                msg += "**Example:** `" + prefix + "seek @Randium#621 Innocent`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by crowd seekers during the first night."
 
             '''kiss'''
             # Cupid's power to fall in love with someone.
@@ -378,8 +388,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['kiss','love','shoot'],True) and user_role == "Cupid":
-                # TODO
-                return todo()
+                msg = "**Usage:** Fall in love with another player.\n\n`" + prefix + "love <player>`\n\n"
+                msg += "**Example:** `" + prefix + "love @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by the Cupid during the night."
 
             '''follow'''
             # The command that allows the dog to choose a side.
@@ -387,8 +398,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['bark','become','choose','follow'],True) and user_role == "Dog":
-                # TODO
-                return todo()
+                msg = "**Usage:** Choose a role to play as.\n\n`" + prefix + "choose <role>`\n\n"
+                msg += "**Example:** `" + prefix + "choose Innocent`\nThe options are **Innocent**, **Cursed Civilian** and **Werewolf**. "
+                msg += "This command can only be used by the dog during the first night."
 
             '''execute'''
             # This command allows the executioner to choose a replacement target.
@@ -396,8 +408,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['choose','execute'],True) and user_role == "Executioner":
-                # TODO
-                return todo()
+                msg = "**Usage:** Choose a victim to die instead of you on the lynch.\n\n`" + prefix + "execute <player>`\n\n"
+                msg += "**Example:** `" + prefix + "execute @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by executioners it can be used for an unlimited amount of times."
 
             '''undoom'''
             # The Exorcist's command.
@@ -405,8 +418,9 @@ def process(message, isGameMaster = False, isAdmin = False):
                 # TODO
                 return todo()
             if is_command(message,['exercise','exorcise','undoom'],True) and user_role == "Exorcist":
-                # TODO
-                return todo()
+                msg = "**Usage:** Undoom a player.\n\n`" + prefix + "undoom <player>`\n\n"
+                msg += "**Example:** `" + prefix + "undoom @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by ."
 
             '''inspect'''
             # The fortune teller's command.
@@ -447,11 +461,14 @@ def process(message, isGameMaster = False, isAdmin = False):
             '''unfreeze'''
             # The innkeeper's command
             if is_command(message,['melt','unfreeze']) and user_role == "Innkeeper":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.unfreeze(user_id,target[0])]
             if is_command(message,['melt','unfreeze'],True) and user_role == "Innkeeper":
-                # TODO
-                return todo()
+                msg = "**Usage:** Unfreeze a frozen player.\n\n`" + prefix + "melt <player>`\n\n"
+                msg += "**Example:** `" + prefix + "melt @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by Innkeepers during the night."
 
             '''copy'''
             # The Look-Alike's command
