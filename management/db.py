@@ -464,7 +464,6 @@ def add_standoff(victim_id,role,murderer):
 
 def get_standoff(user_id):
     """Gain a list of standoffs from a user; this is a list of players they will take with them when they die."""
-    # NOT TESTED YET - PLEASE DO
     c.execute("SELECT * FROM 'standoff' WHERE murderer =?",(user_id,))
 
     returntable = []
