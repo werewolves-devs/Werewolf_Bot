@@ -33,7 +33,7 @@ splashes = [
 "What are cogs?",
 "This is MY project. You\'re just freeloaders.",
 "You've got three weeks to fix EVERYTHING.",
-"No-one agrees? Too bad! Myy idea it is.",
+"No-one agrees? Too bad! My idea it is.",
 "The next version will be written in Java only!"
 ]
 
