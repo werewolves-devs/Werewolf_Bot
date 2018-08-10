@@ -78,7 +78,7 @@ def test_database():
   assert db.get_category() == None
   reset.reset(True)
 
-  
+
 # Make sure the check module is working as intended
 def check_check():
   class message:
@@ -105,4 +105,17 @@ def control_freezers():
   assert db.delete_freezer(1,7) == False
   assert db.delete_freezer(1,4) == True
   assert db.get_freezers(1) == [(3, 'Booh'), (5, 'Hooker')]
+  reset.reset(True)
+
+def mexican():
+  reset.reset(True)
+  db.add_standoff(2,'Huntress',1)
+  db.add_standoff(3,'Cupid',1)
+  db.add_standoff(1,'Cupid',3)
+  print(db.get_standoff(3))
+  print(db.get_standoff(1))
+  assert db.get_standoff(3) == [[3,'1','Cupid','3']]
+  assert db.get_standoff(1) == [[1,'2','Huntress','1'],[2,'3','Cupid','1']]
+  db.delete_standoff(2)
+  assert db.get_standoff(1) == [[1,'2','Huntress','1']]
   reset.reset(True)
