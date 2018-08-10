@@ -206,13 +206,14 @@ async def on_message(message):
             # 3 -> read = False
             # 4 -> give dead role + remove participant role
 
-            channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
+            channel = client.get_channel(int(element.channel))
+            user = client.get_user(int(element.victim))
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
             elif element.number == 2:
+                print('Permission request detected!')
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
