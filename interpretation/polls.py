@@ -3,12 +3,18 @@ from management.dynamic import day_number
 from interpretation.check import check_for_int
 
 class Vote:
-    def __init__(self,user_id,emoji,votes = 1):
+    def __init__(self,user_id,emoji,votes = -1):
         if check_for_int(user_id) == True:
             self.user = user_id
             self.type = 'user'
             self.emoji = emoji
-            self.votes = int(votes)
+            if votes == -1:
+                if int(db_get(user_id,'undead')) == 1:
+                    self.votes = 0
+                else:
+                    self.votes = 1
+            else:
+                self.votes = int(votes)
         else:
             self.user = user_id
             self.type = 'generic'
@@ -49,7 +55,10 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
             user_table.append(vote[0])
 
     # Evaluate table, filter double votes and continue
-    voting_table = [Vote(vote[0],vote[1],int(db_get(vote[0],'votes'))) for vote in voting_table if vote[0] in user_table]
+    if purpose == 'lynch':
+        voting_table = [Vote(vote[0],vote[1],int(db_get(vote[0],'votes'))) for vote in voting_table if vote[0] in user_table]
+    else:
+        voting_table = [Vote(vote[0],vote[1]) for vote in voting_table if vote[0] in user_table]
     blacklist = [Disqualified(user) for user in blacklist]
     blacklist2 = [Disqualified(user,1) for user in blacklist2]
     blacklist.extend(blacklist2)
@@ -133,6 +142,8 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
 
         if i > 0:
             log += "**TOTAL: {} votes**\n\n".format(i)
+        else:
+            log += '\n\n'
 
         if i == max_i:
             chosen_emoji = ''
@@ -152,14 +163,14 @@ def count_votes(voting_table, purpose = 'lynch', mayor = 0):
             log += "<@{}> has been disqualified for voting on themselves.\n".format(cheater.user)
 
     if chosen_emoji != '':
-        answer += "\n__The emoji {} has the most votes, making <@{}> the winner of this poll!__".format(chosen_emoji,emoji_to_player(chosen_emoji))
-        log += "\n__The emoji {} has the most votes, effectively making <@{}> the winner of this poll.__".format(chosen_emoji,emoji_to_player(chosen_emoji))
+        answer += "\nThe emoji {} has the most votes, making <@{}> the winner of this poll!".format(chosen_emoji,emoji_to_player(chosen_emoji))
+        log += "\nThe emoji {} has the most votes, effectively making <@{}> the winner of this poll.".format(chosen_emoji,emoji_to_player(chosen_emoji))
     elif emoji_table != []:
-        answer += "\n__It seems like we\'ve reached a tie! No-one will win this poll, I\'m sorry!__"
-        log += "\n__The poll has reached a tie and will not choose a winner.__"
+        answer += "\nIt seems like we\'ve reached a tie! No-one will win this poll, I\'m sorry!"
+        log += "\nThe poll has reached a tie and will not choose a winner."
     else:
-        answer += "\n__It seems like no-one has voted! Well, in that case, there won\'t be a winner either.__"
-        log += "\n__No votes have been registered.__"
+        answer += "\nIt seems like no-one has voted! Well, in that case, there won\'t be a winner either."
+        log += "\nNo votes have been registered."
 
     return log, answer, chosen_emoji
 
