@@ -111,6 +111,9 @@ def nightly_kill(user_id,victim_id):
         return Mailbox().respond("I am sorry! You currently don't have this ability available!",True)
     db_set(user_id,'uses',uses - 1)
 
+    if user_id == victim_id:
+        return Mailbox().respond("I am sorry, but you cannot attempt suicide!\nNot because it's not an option, no, just because we want to see you SUFFER!",True)
+
     user_role = db_get(user_id,'role')
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
@@ -295,3 +298,65 @@ def cupid_kiss(user_id,victim_id):
         answer.msg_add("<@{}>, the town's favourite **{}**, has decided to trust <@{}>.".format(victim_id,victim_role,user_id))
 
     return answer.msg_add("\nTogether, they will survive this town!")
+
+def dog_follow(user_id,role):
+    """This function allows the dog to choose a role to become.
+    The function assumes the player is a cupid and has provided a role, so make sure to have filtered this out already.
+    The role does not need to be Innocent, Cursed Civilian or Werewolf yet.
+    The function returns a Mailbox.
+
+    user_id -> the dog who chooses a role
+    role -> the role they'd like to be"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently cannot choose someone to fall in love with!",True)
+    db_set(user_id,'uses',uses - 1)
+
+    user_channel = int(db_get(user_id,'channel'))
+
+    if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
+        return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
+
+    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role))
+    answer.log("The **Dog** <@{}> has chosen to become a")
+
+    if role == 'Innocent':
+        answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
+    if role == 'Cursed Civilian':
+        answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
+    if role == 'Werewolf':
+        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!")
+        # TODO: Add dog to wolf channel
+
+    db_set(user_id,'role',role)
+    return answer
+
+def executioner(user_id,victim_id):
+    """This function allows the Executioner to choose a victim that will die in their place, may they get lynched during the day.
+    The function assumes the player is a huntress and has provided a living participant, so make sure to have filtered this out already.
+    The function returns a Mailbox.
+
+    Keyword arguments:
+    user_id -> the huntress' id
+    victim_id -> the target's id"""
+
+    user_channel = int(db_get(user_id,'channel'))
+
+    answer = Mailbox()
+
+    user_found = False
+    for action in db.get_standoff(user_id):
+        if action[2] == 'Huntress':
+            db.delete_standoff(action[0])
+            if int(action[1]) != victim_id:
+                user_found = True
+                answer.msg("You no longer have <@{}> as your target.".format(int(action[1])))
+
+    db.add_standoff(victim_id,'Huntress',user_id)
+    answer.msg("You have successfully chosen <@{}> as your ",user_channel)
+    if user_found:
+        answer.msg_add("new ")
+    answer.msg_add("target!")
+
+    return answer
