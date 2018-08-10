@@ -18,7 +18,6 @@ def see(user_id,victim_id):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have the ability to see this player!",True)
-    db_set(user_id,'uses',uses - 1)
 
     victim_emoji = db_get(victim_id,"emoji")
     victim_fakerole = db_get(victim_id,"fakerole")
@@ -36,6 +35,8 @@ def see(user_id,victim_id):
         return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t reach them through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You tried to see <@{}>... but you couldn\'t find them! Almost as if they had disappeared in thin air!\nWhat happened?",user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
 
     # Follow this procedure if the user has been enchanted.
     if int(db_get(user_id,"echanted")) == 1 and random.random() < 0.6:
@@ -68,7 +69,6 @@ def disguise(user_id,victim_id,role):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have the ability to disguise anyone!",True)
-    db_set(user_id,'uses',uses - 1)
 
     user_channel = int(db_get(user_id,'channel'))
     user_role = db_get(user_id,'role')
@@ -84,6 +84,8 @@ def disguise(user_id,victim_id,role):
         return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel)
     if victim_abducted == 1:
         return Mailbox().msg("After having finished your great disguise, it seems like you couldn\'t find your target! Where have they gone off to?",user_channel)
+
+    db_set(user_id,'uses',uses - 1)
 
     db_set(victim_id,'fakerole',role)
     answer = Mailbox().msg("You have successfully disguised <@{}> as the **{}**!".format(victim_id,role),user_channel)
@@ -138,7 +140,6 @@ def powder(user_id,victim_id):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently cannot powder anyone!",True)
-    db_set(user_id,'uses',uses - 1)
 
     user_role = db_get(user_id,'role')
     user_channel = db_get(user_id,'channel')
@@ -146,11 +147,19 @@ def powder(user_id,victim_id):
 
     victim_role = db_get(victim_id,'role')
     victim_powdered = int(db_get(victim_id,'powdered'))
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
 
     if victim_role == 'Pyromancer':
         return Mailbox().msg("I am sorry, <@{}>, but you cannot powder a pyromancer!".format(user_id),user_channel,True)
     if victim_powdered == 1:
         return Mailbox().msg("I am terribly sorry, but <@{}> has already been powdered! Please choose another victim.".format(victim_id),user_channel,True)
+    if victim_abducted == 1:
+        return Mailbox().msg("You have attempted to powder <@{}>... but you cannot find them! Have they left the town?".format(victim_id),user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You tried to powder <@{}>... but it's not so easy to powder an ice cube! Let's try someone else.".format(victim_id),user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
 
     # Powder the player
     answer = Mailbox().msg("You have successfully powdered <@{}>!".format(victim_id),user_channel)
@@ -236,7 +245,6 @@ def aura(user_id,victim_id):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have the ability to see this player!",True)
-    db_set(user_id,'uses',uses - 1)
 
     victim_emoji = db_get(victim_id,"emoji")
     victim_role = db_get(victim_id,"role")
@@ -253,6 +261,8 @@ def aura(user_id,victim_id):
         return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t see their aura all the way through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You tried to inspect <@{}>... but their aura seemed empty! Almost as if they weren't there!\nYou decided to inspect someone else.",user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
 
     if victim_role in wolf_pack:
         answer = Mailbox().msg("🐺 - <@{}> has a **RED AURA** - they are taking part in the wolf pack!".format(victim_id),user_channel)
@@ -272,7 +282,6 @@ def cupid_kiss(user_id,victim_id):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently cannot choose someone to fall in love with!",True)
-    db_set(user_id,'uses',uses - 1)
 
     user_channel = int(db_get(user_id,'channel'))
 
@@ -285,6 +294,8 @@ def cupid_kiss(user_id,victim_id):
         return Mailbox().msg("Your love arrows just do not seem to be able to reach your chosen lover! They are frozen! Please try someone else.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You wanted to throw an arrow at your target... but you cannot find them! It's almost as if they had disappeared from this town!",user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
 
     answer = Mailbox().edit_cc(user_channel,victim_id,1).dm("Welcome, <@{}>!".format(victim_id),user_channel)
     answer.log("The **Cupid** <@{}> has chosen to fall in love with <@{}>.".format(victim_id))
@@ -311,12 +322,13 @@ def dog_follow(user_id,role):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently cannot choose someone to fall in love with!",True)
-    db_set(user_id,'uses',uses - 1)
 
     user_channel = int(db_get(user_id,'channel'))
 
     if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
         return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
 
     answer = Mailbox().msg("You have chosen to become the **{}**!".format(role))
     answer.log("The **Dog** <@{}> has chosen to become a")
