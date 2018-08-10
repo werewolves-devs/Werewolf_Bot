@@ -150,4 +150,6 @@ def is_command(message,commandlist,help=False):
             return True
         if message.content.startswith(prefix + 'help ' + command) and help == True:
             return True
+        if message.content.startswith('?' + command) and help == True:
+            return True
     return False

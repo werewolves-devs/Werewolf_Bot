@@ -79,11 +79,11 @@ def disguise(user_id,victim_id,role):
     victim_abducted = int(db_get(victim_id,'abducted'))
 
     if user_undead == 1:
-        return Mailbox().dm("I am sorry! You are undead, meaning you can no longer disguise people!",user_id)
+        return Mailbox().dm("I am sorry! You are undead, meaning you can no longer disguise people!",user_id,True)
     if victim_frozen == 1:
-        return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel)
+        return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel,True)
     if victim_abducted == 1:
-        return Mailbox().msg("After having finished your great disguise, it seems like you couldn\'t find your target! Where have they gone off to?",user_channel)
+        return Mailbox().msg("After having finished your great disguise, it seems like you couldn\'t find your target! Where have they gone off to?",user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -95,7 +95,10 @@ def disguise(user_id,victim_id,role):
     else:
         answer.msg("That\'s it for today! You can\'t disguise any more players.",user_channel,True)
 
-    return answer.log("**{}** <@{}> has disguised <@{}>, the **{}**, as the **{}**!".format(user_role,user_id,victim_id,victim_role,role))
+    answer.log("**{}** <@{}> has disguised <@{}>, the **{}**, as the **{}**!".format(user_role,user_id,victim_id,victim_role,role))
+    if victim_role == role:
+        answer.log_add("\n...does that sound stupid? *Of course!* But how are they supposed to know?")
+    return answer
 
 def nightly_kill(user_id,victim_id):
     """This function adds a kill to the kill queue based on the user's role.
@@ -345,30 +348,103 @@ def dog_follow(user_id,role):
     return answer
 
 def executioner(user_id,victim_id):
-    """This function allows the Executioner to choose a victim that will die in their place, may they get lynched during the day.
+    """This function allows the Executioner / huntress to choose a victim that will die in their place, may they get lynched during the day.
     The function assumes the player is a huntress and has provided a living participant, so make sure to have filtered this out already.
     The function returns a Mailbox.
 
     Keyword arguments:
-    user_id -> the huntress' id
+    user_id -> the huntress/executioner's id
     victim_id -> the target's id"""
 
     user_channel = int(db_get(user_id,'channel'))
-
+    role = db_get(user_id,'role')
     answer = Mailbox()
 
     user_found = False
     for action in db.get_standoff(user_id):
-        if action[2] == 'Huntress':
+        if (action[2] == 'Huntress' or action[2] == 'Executioner') and role == action[2]:
             db.delete_standoff(action[0])
             if int(action[1]) != victim_id:
                 user_found = True
                 answer.msg("You no longer have <@{}> as your target.".format(int(action[1])))
 
-    db.add_standoff(victim_id,'Huntress',user_id)
+    db.add_standoff(victim_id,role,user_id)
     answer.msg("You have successfully chosen <@{}> as your ",user_channel)
     if user_found:
         answer.msg_add("new ")
     answer.msg_add("target!")
 
     return answer
+
+def silence(user_id,victim_id):
+    """This fuction is taking grandma's action of silencing people.
+    The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
+    The function returns a Mailbox.
+
+    user_id -> the grandma who silences the victim
+    victim_id -> the player who shall be silenced"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently don't have the ability to silence anyone!",True)
+
+    user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+
+    if user_undead == 1:
+        return Mailbox().dm("I am sorry! You are undead, meaning you can no longer silence people!",user_id)
+    if victim_frozen == 1:
+        return Mailbox().msg("Don't worry. <@{}>'s so cold, that they probably won't make any noise tomorrow.".format(victim_id),user_channel,True)
+    if victim_abducted == 1:
+        return Mailbox().msg("It seems like <@{}> has disappeared! Oh well, at least then they won't make any noises either.",user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
+
+    db_set(victim_id,'votes',0)
+    answer = Mailbox().msg("You have successfully silenced <@{}>!".format(victim_id),user_channel)
+
+    if uses - 1 > 0:
+        answer.msg("You can silence **{}** more players tonight!".format(uses-1),user_channel,True)
+    else:
+        answer.msg("That\'s it for tonight! You can\'t silence any more players.",user_channel,True)
+
+    return answer.log("**Grandma** <@{}> has silenced <@{}>.".format(user_id,victim_id))
+
+def unfreeze(user_id,victim_id):
+    """This function allows the innkeeper to unfreeze frozen victims.
+    The function assumes both players are participants, of which the casting user is an innkeeper. Make sure to have filtered this out already.
+    The other user does not need to be frozen.
+    The function returns a Mailbox.
+
+    Keyword arguments:
+    user_id -> the innkeeper who unfrozes a player
+    victim_id -> the frozen player who is about to be unfrozen"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently don't have the ability to unfreeze anyone!",True)
+
+    user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+
+    if user_undead == 1:
+        return Mailbox().msg("I'm sorry! You are undead, meaning that you can no longer unfreeze people!",user_channel,True)
+    if victim_abducted == 1:
+        return Mailbox().msg("You wanted to warm up <@{}>... but you weren't able to find them! That is strange...",user_channel,True)
+    if victim_frozen == 0:
+        return Mailbox().msg("This player isn't frozen! Please choose another target.",user_channel,True)
+
+    db_set(victim_id,'frozen',0)
+
+    answer = Mailbox().msg("You have successfully unfrozen <@{}>!".format(victim_id),user_channel)
+    for channel in db.unfreeze(victim_id):
+        answer.edit_cc(channel,victim_id,1)
+
+    answer.dm("Great news, <@{}>! You have been unfrozen by an **Innkeeper**! You can now take part with the town again!".format(victim_id),victim_id)
+    return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
