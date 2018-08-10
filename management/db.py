@@ -449,7 +449,6 @@ def delete_freezer(user_id,victim_id):
     return True
 
 def add_standoff(victim_id,role,murderer):
-    # NOT TESTED YET - PLEASE DO
     """Add a new order to the kill queue.
 
     Keyword arguments:
