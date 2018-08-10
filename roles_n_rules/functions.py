@@ -1,4 +1,4 @@
-import roles_n_rules.commands as ctory
+import story_time.commands as ctory
 import management.db as db
 import random
 from management.position import wolf_pack

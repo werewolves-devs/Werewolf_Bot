@@ -26,7 +26,7 @@ def process(message, isGameMaster = False, isAdmin = False):
 
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
-        return [Mailbox().new_poll(message.channel.id,'lynch',message.author.id,message.content.split(' ',1)[1])]
+        return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
 
     # =============================================================
     #
