@@ -30,7 +30,7 @@ def reset(skip = False):
     c.execute("CREATE TABLE 'channels' ('channel_id' TEXT PRIMARY KEY NOT NULL, 'owner' TEXT NOT NULL)")
     c.execute("CREATE TABLE 'channel_rows' ('id' INTEGER PRIMARY KEY NOT NULL)")
     c.execute("CREATE TABLE 'freezers' ('king' INTEGER NOT NULL, 'victim' INTEGER NOT NULL, 'role' TEXT NOT NULL)")
-    c.execute("CREATE TABLE 'standoff' ('killer' INTEGER NOT NULL, 'victim' INTEGER NOT NULL, 'type' TEXT NOT NULL);")
+    c.execute("CREATE TABLE 'standoff' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'victim' TEXT NOT NULL, 'role' TEXT NOT NULL, 'murderer' TEXT NOT NULL);")
     number = float(config.max_participants)/20
     if number > int(number):
         number += 1

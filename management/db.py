@@ -448,10 +448,37 @@ def delete_freezer(user_id,victim_id):
     conn.commit()
     return True
 
-def add_standoff():
-    """Add a new kill condition to the database."""
-    pass
-    # TODO
+def add_standoff(victim_id,role,murderer):
+    """Add a new order to the kill queue.
+
+    Keyword arguments:
+    victim_id -> the id of the victim to be attacked
+    role -> the role of the attacker
+    murderer -> id of the attacker (random attacker if multiple)
+    """
+    data = [victim_id,role,murderer]
+    c.execute("INSERT INTO 'standoff' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)
+    conn.commit()
+    return
+
+def get_standoff(user_id):
+    """Gain a list of standoffs from a user; this is a list of players they will take with them when they die."""
+    c.execute("SELECT * FROM 'standoff' WHERE murderer =?",(user_id,))
+
+    returntable = []
+    for element in c.fetchall():
+        print(element)
+        returntable.append([element[i] for i in range(4)])
+
+    return returntable
+
+def delete_standoff(standoff_id):
+    """Remove a standoff from the database. This is generally not needed, but is used for occasions like the huntress who chooses a new target.
+
+    Keyword arguments:
+    standoff_id -> the database id of the standoff"""
+    c.execute("DELETE FROM 'standoff' WHERE id =?",(standoff_id,))
+    conn.commit()
 
 def random_wolf():
     """Find and get a random wolf pack member"""
