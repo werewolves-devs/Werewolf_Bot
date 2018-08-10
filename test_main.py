@@ -22,7 +22,7 @@ def test_positionof():
   assert positionof("bitten") == 16
   assert positionof("id") == 0
 
-def kill_queue_test():
+def test_kill_queue():
   db.add_kill(12738912739821,"Barber")
   db.add_kill(12347892374923,"White Werewolf","7289347983274")
   assert db.get_kill() == [1,u'12738912739821',u'Barber',u'']
@@ -80,7 +80,7 @@ def test_database():
 
 
 # Make sure the check module is working as intended
-def check_check():
+def test_check():
   class message:
     content = "Deze tekst is Nederlands, maar bevat 4 cijfers; 1999 8 en 1 ! Jazeker, dat zijn er vier. Zoiets zou een Hooker zoals jij nooit opmerken."
 
@@ -93,7 +93,7 @@ def check_check():
   assert check.roles(x,1) == ['Hooker']
   assert check.roles(x,2) == False
 
-def control_freezers():
+def test_control_freezers():
   reset.reset(True)
   assert db.add_freezer(1,3,'Pyromancer') == None
   assert db.add_freezer(1,3,'The Thing') == 'Pyromancer'
@@ -107,7 +107,7 @@ def control_freezers():
   assert db.get_freezers(1) == [(3, 'Booh'), (5, 'Hooker')]
   reset.reset(True)
 
-def mexican():
+def test_mexican():
   reset.reset(True)
   db.add_standoff(2,'Huntress',1)
   db.add_standoff(3,'Cupid',1)
