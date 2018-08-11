@@ -99,7 +99,6 @@ async def on_message(message):
                     poll_msg = await poll_channel.get_message(msg)
                     for emoji in poll_msg.reactions:
                         users = await emoji.users().flatten()
-                        print(users) # To confirm I did this right.
 
                         for person in users:
                             if db.isParticipant(person.id):
