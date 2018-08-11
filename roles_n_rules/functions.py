@@ -1,3 +1,4 @@
+import story_time.roleswap_msg as rolestory
 import story_time.commands as ctory
 import management.db as db
 import random
@@ -48,6 +49,8 @@ def see(user_id,victim_id):
             answer.log("I mean, <@{}> *is* a **Flute Player**, so it wouldn't really matter. But hey! They don't need to know. 😉")
 
         return answer
+
+    # TODO: Add undead thing.
 
     answer = Mailbox().msg("{} - <@{}> has the role of the `{}`!".format(victim_emoji,victim_id,victim_fakerole),user_channel)
 
@@ -249,14 +252,12 @@ def aura(user_id,victim_id):
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have the ability to see this player!",True)
 
-    victim_emoji = db_get(victim_id,"emoji")
     victim_role = db_get(victim_id,"role")
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
 
     user_channel = int(db_get(user_id,"channel"))
     user_undead = int(db_get(user_id,'undead'))
-    user_role = db_get(user_id,"role")
 
     if user_undead == 1:
         return Mailbox().dm("You are undead! This means that you can no longer inspect players. I\'m sorry!",user_id)
@@ -300,11 +301,11 @@ def cupid_kiss(user_id,victim_id):
 
     db_set(user_id,'uses',uses - 1)
 
-    answer = Mailbox().edit_cc(user_channel,victim_id,1).dm("Welcome, <@{}>!".format(victim_id),user_channel)
-    answer.log("The **Cupid** <@{}> has chosen to fall in love with <@{}>.".format(victim_id))
-    answer.dm("Hello there, <@{}>! The **Cupid** <@{}> has chosen to fall in love with you!\n".format(user_id))
+    answer = Mailbox().edit_cc(user_channel,victim_id,1).msg("Welcome, <@{}>!".format(victim_id),user_channel)
+    answer.log("The **Cupid** <@{}> has chosen to fall in love with <@{}>.".format(user_id,victim_id))
+    answer.dm("Hello there, <@{}>! The **Cupid** <@{}> has chosen to fall in love with you!\n".format(victim_id,user_id),victim_id)
     answer.dm_add("For the rest of the game, you two will remain partners. Be open and honest, as you cannot win if the other dies!\n")
-    answer.dm_add("Good luck!").msg("<@{}> and <@{}> have fallen in love with each other! ".format(user_id,victim_id))
+    answer.dm_add("Good luck!")
 
     if victim_undead == 1:
         answer.msg_add("<@{}>, while pretending to be a **{}**, is secretly an **Undead**!".format(victim_id,victim_role))
@@ -333,7 +334,7 @@ def dog_follow(user_id,role):
 
     db_set(user_id,'uses',uses - 1)
 
-    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role))
+    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
     answer.log("The **Dog** <@{}> has chosen to become a")
 
     if role == 'Innocent':
@@ -341,7 +342,7 @@ def dog_follow(user_id,role):
     if role == 'Cursed Civilian':
         answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
     if role == 'Werewolf':
-        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!")
+        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_channel)
         # TODO: Add dog to wolf channel
 
     db_set(user_id,'role',role)
@@ -366,7 +367,7 @@ def executioner(user_id,victim_id):
             db.delete_standoff(action[0])
             if int(action[1]) != victim_id:
                 user_found = True
-                answer.msg("You no longer have <@{}> as your target.".format(int(action[1])))
+                answer.msg("You no longer have <@{}> as your target.".format(int(action[1])),user_channel)
 
     db.add_standoff(victim_id,role,user_id)
     answer.msg("You have successfully chosen <@{}> as your ",user_channel)
@@ -440,6 +441,7 @@ def unfreeze(user_id,victim_id):
     if victim_frozen == 0:
         return Mailbox().msg("This player isn't frozen! Please choose another target.",user_channel,True)
 
+    db_set(user_id,'uses',uses - 1)
     db_set(victim_id,'frozen',0)
 
     answer = Mailbox().msg("You have successfully unfrozen <@{}>!".format(victim_id),user_channel)
@@ -448,3 +450,47 @@ def unfreeze(user_id,victim_id):
 
     answer.dm("Great news, <@{}>! You have been unfrozen by an **Innkeeper**! You can now take part with the town again!".format(victim_id),victim_id)
     return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
+
+def purify(user_id,victim_id):
+    """This function allows the priestess to purify targets.  
+    The function assumes both players are participants, and that the casting user is a priestess. Make sure to have filtered this out beforehand.  
+    The function returns a Mailbox."""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently don't have the ability to purify anyone!",True)
+    
+    user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_role = db_get(victim_id,'role')
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+
+    if user_undead == 1:
+        return Mailbox().msg("I am sorry! You cannot purify anyone while you're **Undead**!",user_channel,True)
+    if victim_abducted == 1:
+        return Mailbox().msg("You have attempted to purify <@{}>... but your powers cannot locate them! Strange...".format(victim_id),user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You wanted to purify <@{}>, but you were unable to reach them through the thick layer of ice surrounding them".format(victim_id),user_channel,True)
+
+    answer = Mailbox()
+    db_set(user_id,'uses',uses - 1)
+
+    if victim_role in ['Cursed Civilian','Sacred Wolf']:
+        answer.msg("Your powers' results were **positive**. They are no longer cursed civilians or sacred wolves!",user_channel)
+        answer.log("The **Priestess** <@{}> has purified the **{}** <@{}>.".format(user_id,victim_role,victim_id))
+        if victim_role == 'Cursed Civilian':
+            db_set(victim_id,'role','Innocent')
+            answer.dm(rolestory.to_innocent(victim_id,'Cursed Civlian'),victim_id)
+        if victim_role == 'Sacred Wolf':
+            db_set(victim_id,'role','Werewolf')
+            answer.dm("This message yet needs to be written!",victim_id) # TODO
+    elif victim_role in ['Innocent','Werewolf']:
+        answer.msg("Your powers' results were **neutral**. They were already innocent or a werewolf!",user_channel)
+        answer.log("The **Priestess** <@{}> has attempted to purify the **{}** <@{}>.".format(user_id,victim_role,victim_id))
+    else:
+        answer.msg("Your powers' results were **negative**. They weren't cursed civilians or sacred wolves, so they couldn't be purified!",user_channel)
+        answer.log("The **Priestess** <@{}> has ineffectively attempted to purify the **{}** <@{}>.".format(user_id,victim_role,victim_id))
+    
+    return answer
