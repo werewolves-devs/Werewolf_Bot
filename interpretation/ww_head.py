@@ -441,8 +441,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''inspect'''
             # The fortune teller's command.
             if is_command(message, ['forsee', 'inspect', 'see', 'tell']) and user_role == "Fortune Teller":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.see(user_id,target[0])]
             if is_command(message, ['forsee', 'inspect', 'see', 'tell'], True) and user_role == "Fortune Teller":
                 # TODO
                 return todo()
@@ -507,8 +509,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''purify'''
             # The Priestess' command
             if is_command(message, ['heal', 'light', 'purify', 'sacrify']) and user_role == "Priestess":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.purify(user_id,target[0])]
             if is_command(message, ['heal', 'light', 'purify', 'sacrify'], True) and user_role == "Priestess":
                 # TODO
                 return todo()
@@ -579,18 +583,25 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''disguise'''
             # The tanner's command
             if is_command(message, ['change', 'cloth', 'disguise', 'hide']) and user_role == "Tanner":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                disguise = check.roles(message,1)
+                if not disguise:
+                    return [Mailbox().respond("**INVALID SYNTAX:** \nPlease make sure to provide a role.")]
+                return [func.disguise(user_id,target[0],disguise[0])]
             if is_command(message, ['change', 'cloth', 'disguise', 'hide'], True) and user_role == "Tanner":
                 # TODO
                 return todo()
 
             '''inspect'''
             # The Warlock's command
-            if is_command(message, ['forsee', 'inspect', 'see', 'tell']) and user_role == "Priestess":
-                # TODO
-                return todo()
-            if is_command(message, ['forsee', 'inspect', 'see', 'tell'], True) and user_role == "Priestess":
+            if is_command(message, ['forsee', 'inspect', 'see', 'tell']) and user_role == "Warlock":
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.see(user_id,target[0])]
+            if is_command(message, ['forsee', 'inspect', 'see', 'tell'], True) and user_role == "Warlock":
                 # TODO
                 return todo()
 

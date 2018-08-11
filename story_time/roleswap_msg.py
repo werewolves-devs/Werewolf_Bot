@@ -11,10 +11,12 @@ def to_innocent(victim_id,old_role = 'Cursed Civlian'):
     msg = 'You have known your whole life that you had a curse hanging around you. You woke up with it, '
     msg += 'you worked with it, you ate with it and you went to sleep with it.\n'
     msg += 'However, you had a strange feeling lately. Not the strange way the curse gave you, no, more like an... '
-    msg += 'rnlighting feeling. You have slowly started to feel better and better, until at some point '
+    msg += 'enlighting feeling. You have slowly started to feel better and better, until at some point '
     msg += 'the bad feeling was completely gone!\n'
     msg += '**You have turned into an Innocent and you are no longer a Cursed Civlian. The rules remain the same, '
     msg += 'you will just no longer turn into a wolf.**'
 
     if old_role == 'Cursed Civilian':
         return msg
+
+    return "This is weird! This DM should've been different!"

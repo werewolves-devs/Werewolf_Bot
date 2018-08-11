@@ -40,19 +40,23 @@ def see(user_id,victim_id):
     db_set(user_id,'uses',uses - 1)
 
     # Follow this procedure if the user has been enchanted.
-    if int(db_get(user_id,"echanted")) == 1 and random.random() < 0.6:
-        answer = Mailbox().msg("{} - <@{}> has the role of the `Flute Player`!".format(victim_emoji,victim_id),user_channel)
-        answer.log("<@{0}> has attempted to see the role of <@{1}>. However, their enchantment effect worked, showing <@{1}> as the **Flute Player!**".format(user_id,victim_id))
+    # It ensures there is a 40% chance they get their guess wrong.
+    if int(db_get(user_id,"enchanted")) == 1 and random.random() < 0.6:
+        answer = Mailbox().msg("*NOTE: You are enchanted, your result has a 40% chance of showing as the Flute player*\n{} - <@{}> has the role of the `Flute Player`!".format(victim_emoji,victim_id),user_channel)
+        answer.log("<@{0}> has attempted to see the role of <@{1}>. However, being enchanted made <@{1}> show as the **Flute Player!**".format(user_id,victim_id))
 
         # Easter egg
         if victim_role == "Flute Player":
-            answer.log("I mean, <@{}> *is* a **Flute Player**, so it wouldn't really matter. But hey! They don't need to know. 😉")
+            answer.log("<@{}> has seen the role of <@{}> (**Flute Player**) due to their enchantment effects. But hey! They don't need to know they actually *are* a **Flute Player**!. 😉".format(user_id, victim_id))
 
         return answer
 
     # TODO: Add undead thing.
 
-    answer = Mailbox().msg("{} - <@{}> has the role of the `{}`!".format(victim_emoji,victim_id,victim_fakerole),user_channel)
+    elif int(db_get(user_id,"enchanted")) == 1:
+        answer = Mailbox().msg("*NOTE: You are enchanted, your result has a 40% chance of showing as the Flute player*\n{} - <@{}> has the role of the `{}`!".format(victim_emoji,victim_id,victim_fakerole),user_channel)
+    else:
+        answer = Mailbox().msg("{} - <@{}> has the role of the `{}`!".format(victim_emoji,victim_id,victim_fakerole),user_channel)
 
     if victim_fakerole != victim_role:
         answer.log("<@{}>, the town's **{}**, has attempted to see <@{}>, the **{}**. ".format(user_id,user_role,victim_id,victim_role))
@@ -452,14 +456,14 @@ def unfreeze(user_id,victim_id):
     return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
 
 def purify(user_id,victim_id):
-    """This function allows the priestess to purify targets.  
-    The function assumes both players are participants, and that the casting user is a priestess. Make sure to have filtered this out beforehand.  
+    """This function allows the priestess to purify targets.
+    The function assumes both players are participants, and that the casting user is a priestess. Make sure to have filtered this out beforehand.
     The function returns a Mailbox."""
 
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have the ability to purify anyone!",True)
-    
+
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
 
@@ -482,7 +486,7 @@ def purify(user_id,victim_id):
         answer.log("The **Priestess** <@{}> has purified the **{}** <@{}>.".format(user_id,victim_role,victim_id))
         if victim_role == 'Cursed Civilian':
             db_set(victim_id,'role','Innocent')
-            answer.dm(rolestory.to_innocent(victim_id,'Cursed Civlian'),victim_id)
+            answer.dm(rolestory.to_innocent(victim_id,'Cursed Civilian'),victim_id)
         if victim_role == 'Sacred Wolf':
             db_set(victim_id,'role','Werewolf')
             answer.dm("This message yet needs to be written!",victim_id) # TODO
@@ -492,5 +496,5 @@ def purify(user_id,victim_id):
     else:
         answer.msg("Your powers' results were **negative**. They weren't cursed civilians or sacred wolves, so they couldn't be purified!",user_channel)
         answer.log("The **Priestess** <@{}> has ineffectively attempted to purify the **{}** <@{}>.".format(user_id,victim_role,victim_id))
-    
+
     return answer

@@ -69,12 +69,12 @@ async def on_message(message):
     # Check if the message author has the Game Master role
     isGameMaster = False
     if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+        if game_master in [y.id for y in message.author.roles]:
             isGameMaster = True
 
     isAdmin = False
     if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+        if administrator in [y.id for y in message.author.roles]:
             isAdmin = True
 
     result = process(message,isGameMaster,isAdmin)
