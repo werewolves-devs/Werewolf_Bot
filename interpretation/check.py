@@ -115,6 +115,13 @@ def roles(message,amount= -1,delete_duplicates = False):
             if message.content[i:].lower().startswith(role.lower()):
                 role_table.append(role)
 
+    # Remove overlapping role names
+    for role in role_table:
+        if role == 'White Werewolf':
+            role_table.remove('Werewolf')
+        if role == 'Priestess':
+            role_table.remove('Priest')
+
     if delete_duplicates == True:
         role_table = list(set(role_table))
 
