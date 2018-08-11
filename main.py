@@ -18,7 +18,7 @@ splashes = [
 'I made it, we *HAVE* to use it',
 'Standards? What are they?',
 'Nah, we don\'t use libraries here.',
-'The mailbox system is a \'good idea',
+'The mailbox system is a \'good idea\'',
 'Leaking tokens is fun!',
 'Let\'s just shove everything into main.py, who still does organization in 2018',
 'Works on my machine',
@@ -79,6 +79,8 @@ async def on_message(message):
         if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
             isAdmin = True
 
+    # This function asks in interpretation\ww_head.py what it should do.
+    # In return, it receives a list of mailboxes that is unpacked down below.
     result = process(message,isGameMaster,isAdmin)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
@@ -86,6 +88,7 @@ async def on_message(message):
 
     for mailbox in result:
 
+        # If a Mailbox says so, all existing polls will be evaluated.
         if mailbox.evaluate_polls == True:
             for poll in db.get_all_polls():
                 # poll.msg_table -> list of message ids
@@ -132,6 +135,7 @@ async def on_message(message):
                         pass
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
+        # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
@@ -139,6 +143,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the botspam, this is where it's sent.
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
             for emoji in element.reactions:
@@ -146,6 +151,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the storytime (in-game announcements) channel, this is where it's sent.
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
@@ -153,6 +159,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages are sent here if they are a direct message to the one sending a command.
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
@@ -160,7 +167,10 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages that are destined for a specific channel, are sent here.
         for element in mailbox.channel:
+          
+            # The following code is sent if the message is an embed.
             if element.embed:
                 if element.destination == "spam":
                     msg = await botspam_channel.send(embed=element.content)
@@ -174,6 +184,7 @@ async def on_message(message):
                         await msg.add_reaction(emoji)
                     if element.temporary == True:
                         temp_msg.append(msg)
+            # The following code is sent if the message is a regular message.
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
@@ -181,6 +192,7 @@ async def on_message(message):
                 if element.temporary == True:
                     temp_msg.append(msg)
 
+        # DMs are sent here.
         for element in mailbox.player:
             member = client.get_user(element.destination)
             if member == None:
@@ -193,6 +205,7 @@ async def on_message(message):
                 if element.temporary == True:
                     temp_msg.append(msg)
 
+        # Settings of existing channels are altered here.
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
@@ -229,7 +242,7 @@ async def on_message(message):
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
-
+        # New channels are created here.
         for element in mailbox.newchannels:
             # element.name - name of the channel;
             # element.owner - owner of the channel;
@@ -345,6 +358,7 @@ async def on_message(message):
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
 
+        # Polls are created here.
         for element in mailbox.polls:
             # element.channel
             # element.purpose
@@ -386,6 +400,7 @@ async def on_message(message):
             db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
+        # Categories are deleted here.
         for element in mailbox.deletecategories:
             id = element.channel
             category = client.get_channel(id)
@@ -407,7 +422,7 @@ async def on_message(message):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
-    # Delete all temporary messages after "five" seconds.
+    # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
         await msg.delete()
