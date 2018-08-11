@@ -1,33 +1,43 @@
-# Discord API / Login settings
-TOKEN = "yo_momma's_sized_token_here"
+from configparser import ConfigParser
 
+config = ConfigParser()
+
+with open('config.ini') as fp:
+    config.read_file(fp)
+
+discord = config['discord']
+
+TOKEN = discord['token']
 
 # Rules 'n' settings
-max_channels_per_category = 50
-max_participants = 40
-max_cc_per_user = 8
-season = "1"
+max_channels_per_category = int(discord['max_channels_per_category'])
+max_participants = int(discord['max_participants'])
+max_cc_per_user = int(discord['max_cc_per_user'])
+season = discord['season']
 
-ww_prefix = '!'
-act_prefix = '-'
-universal_prefix = "#!003-88-6521"
-
-# Database settings
-dynamic_config = "dynamic.json"
-general_database = 'general.db'
-database = 'game.db'
-max_channels_per_category = 50
-
-# List of specific channels
-welcome_channel = 456880220486631424
-game_log = 456880259636396034
-bot_spam = 446046437114118145
-story_time = 446205631159074818
+ww_prefix = discord['ww_prefix']
+act_prefix = discord['act_prefix']
 
 # List of specific roles
-administrator = 0
-game_master = 456884637638328332
-participant = 456881451745411089
-dead_participant = 457498358077063170
-frozen_participant = 457498631344357387
-suspended = 0 # TODO
+roles = config['roles']
+
+administrator = int(roles['administrator'])
+game_master = int(roles['game_master'])
+participant = int(roles['participant'])
+dead_participant = int(roles['dead_participant'])
+frozen_participant = int(roles['frozen_participant'])
+# TODO
+suspended = int(roles['suspended'])
+
+# List of specific channels
+channels = config['channels']
+welcome_channel = int(channels['welcome_channel'])
+game_log = int(channels['game_log'])
+bot_spam = int(channels['bot_spam'])
+story_time = int(channels['story_time'])
+
+# Database settings
+database = config['database']
+dynamic_config = database['dynamic_config']
+general_database = database['general_database']
+database = database['database']

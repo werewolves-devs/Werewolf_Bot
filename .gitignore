@@ -54,4 +54,5 @@ coverage.xml
 docs/_build/
 
 # Custom
-database.db
+*.db
+config.ini
