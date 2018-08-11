@@ -10,6 +10,7 @@ from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye
+import story_time.eastereggs as eggs
 
 
 def todo():
@@ -326,7 +327,7 @@ def process(message, isGameMaster=False, isAdmin=False):
                     command.respond(
                         "Sorry bud, ya can\'t remove the cc's owner! Blame the people who used to do this on purpose.")
                 else:
-                    command.edit_cc(member, message_channel, 0)
+                    command.edit_cc(message_channel, member, 0)
                     command.respond(cc_goodbye(member))
             return [command]
 
@@ -421,8 +422,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''execute'''
             # This command allows the executioner to choose a replacement target.
             if is_command(message, ['choose', 'execute']) and user_role == "Executioner":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.executioner(user_id,target[0])]
             if is_command(message,['choose','execute'],True) and user_role == "Executioner":
                 msg = "**Usage:** Choose a victim to die instead of you on the lynch.\n\n`" + prefix + "execute <player>`\n\n"
                 msg += "**Example:** `" + prefix + "execute @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
@@ -452,8 +455,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''silence'''
             # Grandma's command.
             if is_command(message, ['knit', 'knot', 'silence']) and user_role == "Grandma":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.silence(user_id,target[0])]
             if is_command(message, ['knit', 'knot', 'silence'], True) and user_role == "Grandma":
                 # TODO
                 return todo()
@@ -470,8 +475,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''hunt'''
             # The huntress' command. Used to keep track of whom will be shot.
             if is_command(message, ['hunt', 'shoot']) and user_role == "Huntress":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.executioner(user_id,target[0])]
             if is_command(message, ['hunt', 'shoot'], True) and user_role == "Huntress":
                 # TODO
                 return todo()
@@ -760,6 +767,14 @@ def process(message, isGameMaster=False, isAdmin=False):
     if is_command(message, ['signup'], True):
         msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
         return [Mailbox().respond(msg, True)]
+
+    # -----------------------
+    # Easter eggs
+    if is_command(message,['randiumlooks','whatdoesrandiumlooklike']):
+        answer = Mailbox()
+        for phrase in eggs.randiumlooks():
+            answer.respond(phrase)
+        return [answer]
 
     if message.content.startswith(prefix):
         return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
