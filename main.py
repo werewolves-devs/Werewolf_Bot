@@ -213,7 +213,6 @@ async def on_message(message):
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
             elif element.number == 2:
-                print('Permission request detected!')
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
