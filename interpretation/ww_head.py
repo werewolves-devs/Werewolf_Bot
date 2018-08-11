@@ -15,7 +15,7 @@ from roles_n_rules.commands import cc_goodbye
 def todo():
     return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!", True)]
 
-
+# Finally found where all the roles are added
 def process(message, isGameMaster=False, isAdmin=False):
     user_id = message.author.id
     message_channel = message.channel.id

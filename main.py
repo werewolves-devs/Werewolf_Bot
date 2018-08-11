@@ -18,23 +18,23 @@ splashes = [
 'I made it, we *HAVE* to use it',
 'Standards? What are they?',
 'Nah, we don\'t use libraries here.',
-'The mailbox system is a \'good idea\'',
+'The mailbox system is a \'good idea',
 'Leaking tokens is fun!',
 'Let\'s just shove everything into main.py, who still does organization in 2018',
 'Works on my machine',
 'Always use a database. What\'s a JSON?',
 'Powered by Electricity',
 'Who still writes docs in 2018?',
-"First normal form? What does that mean?",
-"By using a relational database but with nonrelational practices we get the worst of both worlds!",
-"I haven\'t paid attention or read any comments, therefor it\'s impossible to understand!",
-"Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.",
-"I don\'t wanna explain, just Google it.",
-"What are cogs?",
-"This is MY project. You\'re just freeloaders.",
-"You've got three weeks to fix EVERYTHING.",
-"No-one agrees? Too bad! Myy idea it is.",
-"The next version will be written in Java only!"
+'First normal form? What does that mean?',
+'By using a relational database with nonrelational practices we get the worst of both worlds!',
+'I haven\'t paid attention or read any comments, therefore it\'s impossible to understand!',
+'Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.',
+'I don\'t wanna explain, just Google it.',
+'What are cogs?',
+'This is MY project. You\'re just freeloaders.',
+'You\'ve got three weeks to fix EVERYTHING.',
+'No-one agrees? Too bad! My idea it is.',
+'The next version will be written in Java only!'
 ]
 
 import discord
@@ -42,6 +42,7 @@ import random
 import asyncio
 
 # Import config data
+# Imports go (folder name).(file name)
 import story_time.cc_creation as creation_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator
 from config import ww_prefix as prefix
@@ -72,6 +73,7 @@ async def on_message(message):
         if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
+    # Checks if the message author has a Admin role
     isAdmin = False
     if message.guild == gamelog_channel.guild:
         if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
@@ -79,6 +81,7 @@ async def on_message(message):
 
     result = process(message,isGameMaster,isAdmin)
 
+    # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
 
     for mailbox in result:
@@ -128,7 +131,7 @@ async def on_message(message):
                         # TODO: kill poor victim
                         pass
 
-
+        #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
@@ -249,7 +252,7 @@ async def on_message(message):
                     element.members.append(element.owner)
                 for buddy in element.settlers:
                     if buddy not in element.members:
-                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem, \
+                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem,
                         but it does at least indicate a flaw in the bot's code. Please, report this to the Game Masters!"""
                         await client.get_channel(message.channel).send(msg)
                         element.members.append(buddy)
@@ -387,7 +390,7 @@ async def on_message(message):
             id = element.channel
             category = client.get_channel(id)
             if category != None:
-                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irreversibly delete all channels contained within the specified category. Please use with discretion.')
                 await bot_message.add_reaction('👍')
                 def check(reaction, user):
                     return user == message.author and str(reaction.emoji) == '👍'
