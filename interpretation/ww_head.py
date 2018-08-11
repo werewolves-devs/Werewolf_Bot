@@ -9,7 +9,7 @@ from interpretation.check import is_command
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from roles_n_rules.commands import cc_goodbye
+from story_time.commands import cc_goodbye
 
 
 def todo():
