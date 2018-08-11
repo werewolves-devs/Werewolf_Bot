@@ -2,8 +2,8 @@ import random
 
 def barber_kill_story(barber_id,victim_id):
     story_table = []
-    
-    msg = "What the town did not realize, was that there was someone amongst them who hated <@{}> so much,".format(victim_id)
+
+    msg = "What the town did not realize was that there was someone amongst them who hated <@{}> so much,".format(victim_id)
     msg += " that they thought they had to be cut up in pieces!"
     msg += " It wasn't long after the body of <@{}> was found when people realised it must've been the barber".format(victim_id)
     msg += " who performed this assassination!\n"
@@ -29,8 +29,8 @@ def barber_kill_story(barber_id,victim_id):
     msg += " effectively beheading their client.\n"
     msg += "<@{}>, realising what the consequences would be, prepared themselves for a long time in jail, or even getting lynched that day,".format(barber_id)
     msg += " but found out nothing would happen!\n"
-    msg += "Apparently, this town had the weird role that going to the barber made the barber responsible of your life. Not their fault if you die.\n"
-    msg += "After this day, however, no-noe visited <@{}>'s barbershop anymore, forcing them to close for good.\n".format(barber_id)
+    msg += "Apparently, this town had a weird rule that going to the barber made the barber responsible of your life. Not their fault if you die.\n"
+    msg += "After this day, however, no-one visited <@{}>'s barbershop anymore, forcing them to close for good.\n".format(barber_id)
     msg += "*<@{}>, a barber, has assassinated <@{}> and has become an **Innocent**!*"
 
     story_table.append(msg)
