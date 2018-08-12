@@ -362,8 +362,12 @@ def executioner(user_id,victim_id):
     victim_id -> the target's id"""
 
     user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
     role = db_get(user_id,'role')
     answer = Mailbox()
+
+    if user_undead == 1:
+        return Mailbox().msg("I am sorry! Once you're undead, your target is set!",user_channel)
 
     user_found = False
     for action in db.get_standoff(user_id):
