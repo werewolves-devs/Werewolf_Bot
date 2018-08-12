@@ -3,7 +3,7 @@ from discord import Embed
 
 import interpretation.check as check
 import roles_n_rules.functions as func
-from config import max_cc_per_user
+from config import max_cc_per_user, season
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
@@ -198,7 +198,7 @@ def process(message, isGameMaster=False, isAdmin=False):
             msg += "**Example:** `" + prefix + "whois @Randium#6521`\nThe command will only answer in the botspam-channel, "
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
-        help_msg += "`" + prefix + "whois` - Gain a user's information"
+        help_msg += "`" + prefix + "whois` - Gain a user's information\n"
 
     # =============================================================
     #
@@ -306,7 +306,13 @@ def process(message, isGameMaster=False, isAdmin=False):
             member_text = ""
             for member in get_channel_members(message.channel.id):
                 member_text += "<@" + str(member) + "> "
-            embed.add_field(name='Channel Name', value=message.channel.name)
+            # Parse channel name
+            channel_display = ''
+            for letter in message.channel.name:
+                if letter == '_':
+                    channel_display += '\\'
+                channel_display += letter
+            embed.add_field(name='Channel Name', value=channel_display[3+len(season):])
             embed.add_field(name='Participants', value=member_text)
             embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
             return [Mailbox().embed(embed, message.channel.id)]
@@ -444,8 +450,13 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''follow'''
             # The command that allows the dog to choose a side.
             if is_command(message, ['bark', 'become', 'choose', 'follow']) and user_role == "Dog":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                disguise = check.roles(message,1)
+                if not disguise:
+                    return [Mailbox().respond("**INVALID SYNTAX:** \nPlease make sure to provide a role.")]
+                return [func.disguise(user_id,target[0],disguise[0])]
             if is_command(message,['bark','become','choose','follow'],True) and user_role == "Dog":
                 msg = "**Usage:** Choose a role to play as.\n\n`" + prefix + "choose <role>`\n\n"
                 msg += "**Example:** `" + prefix + "choose Innocent`\nThe options are **Innocent**, **Cursed Civilian** and **Werewolf**. "
@@ -876,11 +887,12 @@ def process(message, isGameMaster=False, isAdmin=False):
     help_msg += "\n\n*If you have any more questions, feel free to ask any of the Game Masters!*"
 
     '''help'''
-    if is_command(message,['help']):
+    if is_command(message,['help']) and is_command(message,['help'],True) == False:
         return [Mailbox().respond(help_msg,True)]
     if is_command(message,['help'],True):
         answer = Mailbox().respond("Hey there! `" + prefix + "help` will give you a list of commands that you can use.")
         answer.respond_add("\nIf you have any questions, feel free to ask any of the Game Masters!")
+        return [answer]
 
     if message.content.startswith(prefix):
         return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
