@@ -1,4 +1,4 @@
-from config import ww_prefix as prefix
+import config
 from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player, isParticipant
 from management.position import roles_list
@@ -144,7 +144,7 @@ def check_for_int(s):
         return False
 
 # Checks if an input requests a given command
-def is_command(message,commandlist,help=False):
+def is_command(message,commandlist,help=False,prefix=config.ww_prefix):
     """Check if the message starts with the given command or its aliases.
 
     Keyword arguments:
