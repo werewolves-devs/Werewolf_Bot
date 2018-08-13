@@ -487,7 +487,7 @@ def enchant(user_id,victim_id):
 
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
-        return Mailbox().respond("I am sorry! You currently don't have the ability to unfreeze anyone!",True)
+        return Mailbox().respond("I am sorry! You currently don't have the ability to enchant anyone!",True)
 
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
@@ -496,7 +496,8 @@ def enchant(user_id,victim_id):
     victim_abducted = int(db_get(victim_id,'abducted'))
     victim_enchanted = int(db_get(victim_id,'enchanted'))
 
-    # TODO: Prevent flute player from enchanting themselves or another flute player.
+    if db_get(victim_id,'role') == 'Flute Player':
+        return Mailbox().msg("You cannot enchant a flute player, sorry.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You wanted to warm up <@{}>... but you weren't able to find them! That is strange...",user_channel,True)
     if victim_frozen == 1:
