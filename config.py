@@ -8,12 +8,14 @@ max_participants = 40
 max_cc_per_user = 8
 season = "1"
 
-prefix = '!'
+ww_prefix = '!'
+act_prefix = '-'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
 dynamic_config = "dynamic.json"
-database = 'database.db'
+general_database = 'general.db'
+database = 'game.db'
 max_channels_per_category = 50
 
 # List of specific channels
@@ -23,6 +25,7 @@ bot_spam = 446046437114118145
 story_time = 446205631159074818
 
 # List of specific roles
+administrator = 0
 game_master = 456884637638328332
 participant = 456881451745411089
 dead_participant = 457498358077063170

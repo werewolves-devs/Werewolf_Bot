@@ -2,15 +2,19 @@ from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
-    def __init__(self):
-        self.gamelog = []       # Send message to gamelog channel
-        self.botspam = []       # Send message to botspam channel
-        self.storytime = []     # Send message to storytime channel
-        self.answer = []        # Send message to triggered channel
-        self.channel = []       # Send message to channel
-        self.player = []        # Send message to user
-        self.newchannels = []   # Create new channel
-        self.oldchannels = []   # Edit existing channel
+    def __init__(self,evaluate_polls = False):
+        self.gamelog = []          # Send message to gamelog channel
+        self.botspam = []          # Send message to botspam channel
+        self.storytime = []        # Send message to storytime channel
+        self.answer = []           # Send message to triggered channel
+        self.channel = []          # Send message to channel
+        self.player = []           # Send message to user
+        self.newchannels = []      # Create new channel
+        self.oldchannels = []      # Edit existing channel
+        self.polls = []            # Create new polls
+        self.deletecategories = [] # Delete categories and channels they contain
+
+        self.evaluate_polls = evaluate_polls
 
     def log(self,content,temporary = False,reactions = []):
         """Send a message to the gamelog channel."""
@@ -76,9 +80,14 @@ class Mailbox:
         self.channel[-1].react(emoji)
         return self
 
+    def embed(self, embed, destination, temporary = False, reactions=[]):
+        """Send a message to a given channel"""
+        self.channel.append(Message(embed,temporary,destination,reactions,True))
+        return self
+
     def dm(self,content,user_id,temporary = False,reactions = []):
         """Send a DM to a given user"""
-        self.player.append(Message(content,temporary,user_id))
+        self.player.append(Message(content,temporary,user_id,reactions))
         return self
     def dm_add(self,moar_content):
         """Add some text to the last DM"""
@@ -88,7 +97,7 @@ class Mailbox:
         """Add a reaction to the last DM"""
         self.player[-1].react(emoji)
         return self
-  
+
     def create_cc(self,channel_name,channel_owner,members = [],settlers=[]):
         """Send an order to create a channel"""
         self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers))
@@ -98,13 +107,23 @@ class Mailbox:
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
 
+    def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
+        """Send a request to make a poll in the given channel"""
+        self.polls.append(PollRequest(channel_id,purpose,user_id,description))
+        return self
+
+    def delete_category(self, channel_id):
+        self.deletecategories.append(CategoryDelete(channel_id))
+        return self
+
 # Class used to send messages through the mailbox
 class Message:
-    def __init__(self,content,temporary = False,destination = '',reactions=[]):
+    def __init__(self,content,temporary = False,destination = '',reactions=[],embed = False):
         self.content = content
         self.temporary = temporary
         self.destination = destination
         self.reactions = reactions
+        self.embed = embed
     def add(self,moar_content):
         self.content += str(moar_content)
         return self
@@ -117,14 +136,42 @@ class ChannelCreate:
     def __init__(self,name,owner,members=[],settlers=[]):
         self.name = name
         self.owner = owner
-        self.members = []
-        self.settlers = []
-        
+        self.members = members
+        self.settlers = settlers
+        if owner not in members:
+            self.members.append((owner))
+
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
-    # can be executed easily. However, this isn't the case when 
+    # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
     def __init__(self,channel,victim,number):
         self.channel = channel
         self.victim = victim
         self.number = number
+
+class CategoryDelete:
+    # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
+    # This is because settlers is just a database function to execute. When changing a channel, the id is known and
+    # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
+    def __init__(self,channel):
+        self.channel = channel
+
+class PollRequest:
+    def __init__(self,channel_id,purpose,user_id,description):
+        self.channel = channel_id
+        self.purpose = purpose
+        self.user_id = user_id
+
+        if len(description) > 512:
+            self.description = description[0:512]
+        else:
+            self.description = description
+
+class PollToEvaluate:
+    def __init__(self,database_tuple):
+        self.purpose = database_tuple[1]
+        self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
+
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
