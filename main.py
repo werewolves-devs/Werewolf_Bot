@@ -221,8 +221,6 @@ async def on_message(message):
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
-            # Reminder: Add some different welcome messages
-            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
