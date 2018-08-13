@@ -7,7 +7,7 @@ import asyncio
 import datetime
 
 # Import config data
-from config import universal_prefix as prefix, WW_TOKEN as token, bot_spam, activity_hours
+from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours
 
 client = discord.Client()
 
