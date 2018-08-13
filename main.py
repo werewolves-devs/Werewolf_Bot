@@ -69,12 +69,12 @@ async def on_message(message):
     # Check if the message author has the Game Master role
     isGameMaster = False
     if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.author.roles]:
+        if game_master in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
     isAdmin = False
     if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.author.roles]:
+        if administrator in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isAdmin = True
 
     result = process(message,isGameMaster,isAdmin)
@@ -402,7 +402,7 @@ async def on_message(message):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
-    # Delete all temporary messages after "five" seconds.
+    # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
         await msg.delete()
