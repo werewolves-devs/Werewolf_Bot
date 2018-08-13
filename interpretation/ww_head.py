@@ -14,7 +14,7 @@ import story_time.eastereggs as eggs
 
 
 def todo():
-    return [Mailbox().spam("I am terribly sorry! This command doesn't exist yet!", True)]
+    return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
 
 def process(message, isGameMaster=False, isAdmin=False):
@@ -720,8 +720,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''enchant'''
             # The flute player's command
             if is_command(message, ['enchant', 'flute']) and user_role == "Flute Player":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.enchant(user_id,target[0])]
             if is_command(message, ['enchant', 'flute'], True) and user_role == "Flute Player":
                 # TODO
                 return todo()
@@ -743,8 +745,13 @@ def process(message, isGameMaster=False, isAdmin=False):
             # The ice king's command to add a guess about a user to their list.
             # Note that this command could/should be usable at any time, as long as the submit command isn't
             if is_command(message, ['add', 'guess', 'freeze']) and user_role == "Ice King":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [func.freeze(user_id)]
+                guessed_role = check.roles(message,1,True)
+                if not guessed_role:
+                    return [func.freeze(user_id,target[0])]
+                return [func.freeze(user_id,target[0],guessed_role[0])]
             if is_command(message, ['add', 'guess', 'freeze'], True) and user_role == "Ice King":
                 # TODO
                 return todo()
@@ -754,8 +761,7 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''submit'''
             # The ice king's command to submit the list of people of whom they have guessed their roles.
             if is_command(message, ['guess_that', 'freeze_all', 'submit']) and user_role == "Ice King":
-                # TODO
-                return todo()
+                return [func.freeze_all(user_id)]
             if is_command(message, ['guess_that', 'freeze_all', 'submit'], True) and user_role == "Ice King":
                 # TODO
                 return todo()
