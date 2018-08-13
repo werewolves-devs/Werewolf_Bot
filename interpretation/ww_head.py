@@ -263,8 +263,12 @@ def process(message, isGameMaster=False, isAdmin=False):
                     user_id)]
 
             db_set(user_id, 'ccs', num_cc_owned + 1)
-            return [Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members).spam(
-                "<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))]
+            answer = Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members)
+            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))
+            if num_cc_owned + 1 >= max_cc_per_user:
+                answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n")
+                answer.spam_add("Use `" + prefix + "donate` to give them more channels to create!")
+            return [answer]
 
         if is_command(message, ['cc'], True):
             msg = "**Usage:** create a *conspiracy channel*, a private channel where one can talk with a selected group of players.\n\n"
@@ -272,6 +276,25 @@ def process(message, isGameMaster=False, isAdmin=False):
             msg += "Please do not abuse this command to create empty channels without a purpose. Abuse will be noticed and dealt with accordingly."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "cc` - Create a new conspiracy channel.\n"
+
+        '''donate'''
+        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
+        # It will not be used very often in practice, but it'll get the active players relaxed.
+        # They all start hysterically panicking when you start talking about finite amounts.
+        if is_command(message,['donate','give_cc','more_cc']):
+            target = check.users(message,1,True,True)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+            number = check.numbers(message,1)
+            if not number:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
+
+            ccs_owned = int(db_get(target[0],'ccs'))
+            db_set(target[0],'ccs',ccs_owned-number)
+            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
+        if is_command(message,['donate','give_cc','more_cc'],True):
+            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
+        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
 
         '''info'''
         # This command allows users to view information about a conspiracy channel.
@@ -426,8 +449,13 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''seek'''
             # Crowd seeker's power
             if is_command(message, ['crowd', 'seek']) and user_role == "Crowd Seeker":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                guessed_role = check.roles(message,1,True)
+                if not guessed_role:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to name a role.")]
+                return [func.seek(user_id,target[0],guessed_role[0])]
             if is_command(message,['crowd','seek'],True) and user_role == "Crowd Seeker":
                 msg = "**Usage:** Inspect a player's role.\n\n`" + prefix + "seek <player> <role>`\n\n"
                 msg += "**Example:** `" + prefix + "seek @Randium#621 Innocent`\nThe command is compatible with user emojis as a replacement for mentions. "
@@ -568,8 +596,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''holify'''
             # The Priest's command
             if is_command(message, ['holify', 'sacrify', 'water']) and user_role == "Priest":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.nightly_kill(user_id,target[0])]
             if is_command(message, ['holify', 'sacrify', 'water'], True) and user_role == "Priest":
                 # TODO
                 return todo()
@@ -658,8 +688,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''devour'''
             # The Lone wolf's command
             if is_command(message, ['chew', 'devour', 'eat', 'kill', 'munch']) and user_role == "Lone Wolf":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.nightly_kill(user_id,target[0])]
             if is_command(message, ['chew', 'devour', 'eat', 'kill', 'munch'], True) and user_role == "Lone Wolf":
                 # TODO
                 return todo()
@@ -733,8 +765,10 @@ def process(message, isGameMaster=False, isAdmin=False):
             '''unite'''
             # The horseman's command
             if is_command(message, ['apocalypse', 'clean', 'unite']) and user_role == "Horseman":
-                # TODO
-                return todo()
+                target = check.users(message,1,True,True)
+                if not target:
+                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+                return [func.nightly_kill(user_id,target[0])]
             if is_command(message, ['apocalypse', 'clean', 'unite'], True) and user_role == "Horseman":
                 # TODO
                 return todo()
