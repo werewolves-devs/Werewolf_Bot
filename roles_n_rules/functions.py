@@ -32,10 +32,10 @@ def see(user_id,victim_id):
 
     if user_undead == 1:
         return Mailbox().dm("You are undead! This means that you can no longer inspect players. I\'m sorry!",user_id)
-    if victim_frozen == 1:
-        return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t reach them through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You tried to see <@{}>... but you couldn\'t find them! Almost as if they had disappeared in thin air!\nWhat happened?",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t reach them through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -87,10 +87,10 @@ def disguise(user_id,victim_id,role):
 
     if user_undead == 1:
         return Mailbox().dm("I am sorry! You are undead, meaning you can no longer disguise people!",user_id,True)
-    if victim_frozen == 1:
-        return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("After having finished your great disguise, it seems like you couldn\'t find your target! Where have they gone off to?",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("I am sorry, but <@{}> is too cold for that! You\'ll need a lot more than warm suit to get \'em warmed up.".format(victim_id),user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -126,6 +126,8 @@ def nightly_kill(user_id,victim_id):
     if user_id == victim_id:
         return Mailbox().respond("I am sorry, but you cannot attempt suicide!\nNot because it's not an option, no, just because we want to see you SUFFER!",True)
 
+    # TODO: Prevent targeting of abducted/frozen players.
+
     user_role = db_get(user_id,'role')
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
@@ -160,14 +162,16 @@ def powder(user_id,victim_id):
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
 
-    if victim_role == 'Pyromancer':
-        return Mailbox().msg("I am sorry, <@{}>, but you cannot powder a pyromancer!".format(user_id),user_channel,True)
-    if victim_powdered == 1:
-        return Mailbox().msg("I am terribly sorry, but <@{}> has already been powdered! Please choose another victim.".format(victim_id),user_channel,True)
+    if victim_id == user_id:
+        return Mailbox().respond("I'm sorry, bud, you can't powder yourself.")
     if victim_abducted == 1:
         return Mailbox().msg("You have attempted to powder <@{}>... but you cannot find them! Have they left the town?".format(victim_id),user_channel,True)
     if victim_frozen == 1:
         return Mailbox().msg("You tried to powder <@{}>... but it's not so easy to powder an ice cube! Let's try someone else.".format(victim_id),user_channel,True)
+    if victim_role == 'Pyromancer':
+        return Mailbox().msg("I am sorry, <@{}>, but you cannot powder a pyromancer!".format(user_id),user_channel,True)
+    if victim_powdered == 1:
+        return Mailbox().msg("I am terribly sorry, but <@{}> has already been powdered! Please choose another victim.".format(victim_id),user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -230,10 +234,10 @@ def aura(user_id,victim_id):
 
     if user_undead == 1:
         return Mailbox().dm("You are undead! This means that you can no longer inspect players. I\'m sorry!",user_id)
-    if victim_frozen == 1:
-        return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t see their aura all the way through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("You tried to inspect <@{}>... but their aura seemed empty! Almost as if they weren't there!\nYou decided to inspect someone else.",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You have tried to inspect <@{}>, but it turns out you couldn\'t see their aura all the way through the ice! Luckily, you had the opportunity to try again.",user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -263,10 +267,12 @@ def cupid_kiss(user_id,victim_id):
     victim_abducted = int(db_get(victim_id,'abducted'))
     victim_undead = int(db_get(victim_id,'undead'))
 
-    if victim_frozen == 1:
-        return Mailbox().msg("Your love arrows just do not seem to be able to reach your chosen lover! They are frozen! Please try someone else.",user_channel,True)
+    if victim_id == user_id:
+        return Mailbox().respond("So you wanna fall in love with yourself, huh? Too bad, your partner really has to be someone ELSE.")
     if victim_abducted == 1:
         return Mailbox().msg("You wanted to throw an arrow at your target... but you cannot find them! It's almost as if they had disappeared from this town!",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("Your love arrows just do not seem to be able to reach your chosen lover! They are frozen! Please try someone else.",user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -294,7 +300,7 @@ def dog_follow(user_id,role):
 
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
-        return Mailbox().respond("I am sorry! You currently cannot choose someone to fall in love with!",True)
+        return Mailbox().respond("I am sorry! You currently cannot choose a role to become!",True)
 
     user_channel = int(db_get(user_id,'channel'))
 
@@ -331,6 +337,8 @@ def executioner(user_id,victim_id):
     role = db_get(user_id,'role')
     answer = Mailbox()
 
+    if user_id == victim_id:
+        return Mailbox().respond("I'm sorry, <@{}>. You cannot choose to kill yourself instead of yourself.".format(user_id))
     if user_undead == 1:
         return Mailbox().msg("I am sorry! Once you're undead, your target is set!",user_channel)
 
@@ -370,10 +378,10 @@ def silence(user_id,victim_id):
 
     if user_undead == 1:
         return Mailbox().dm("I am sorry! You are undead, meaning you can no longer silence people!",user_id)
-    if victim_frozen == 1:
-        return Mailbox().msg("Don't worry. <@{}>'s so cold, that they probably won't make any noise tomorrow.".format(victim_id),user_channel,True)
     if victim_abducted == 1:
         return Mailbox().msg("It seems like <@{}> has disappeared! Oh well, at least then they won't make any noises either.",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("Don't worry. <@{}>'s so cold, that they probably won't make any noise tomorrow.".format(victim_id),user_channel,True)
 
     db_set(user_id,'uses',uses - 1)
 
@@ -488,6 +496,7 @@ def enchant(user_id,victim_id):
     victim_abducted = int(db_get(victim_id,'abducted'))
     victim_enchanted = int(db_get(victim_id,'enchanted'))
 
+    # TODO: Prevent flute player from enchanting themselves or another flute player.
     if victim_abducted == 1:
         return Mailbox().msg("You wanted to warm up <@{}>... but you weren't able to find them! That is strange...",user_channel,True)
     if victim_frozen == 1:
@@ -531,6 +540,7 @@ def freeze(user_id,victim_id = None,role = None):
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
 
+    # tODO: Prevent ice kings from guessing another ice kings (or themselves).
     if victim_abducted == 1:
         return Mailbox().msg("You tried to freeze <@{}>... but you couldn't find them! That is strange.".format(victim_id),user_channel,True)
     if victim_frozen == 1:
