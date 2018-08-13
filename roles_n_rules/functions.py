@@ -502,3 +502,140 @@ def purify(user_id,victim_id):
         answer.log("The **Priestess** <@{}> has ineffectively attempted to purify the **{}** <@{}>.".format(user_id,victim_role,victim_id))
 
     return answer
+
+def enchant(user_id,victim_id):
+    """This function allows the flute player to enchant targets.
+    The function assumes both players are participants, of which the casting user is a flute player. Make sure to have filtered this out already.
+    The function returns a Mailbox.
+
+    Keyword arguments:
+    user_id -> the flute player who enchants the player
+    victim_id -> the player who's enchanted"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently don't have the ability to unfreeze anyone!",True)
+
+    user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+    victim_enchanted = int(db_get(victim_id,'enchanted'))
+
+    if victim_abducted == 1:
+        return Mailbox().msg("You wanted to warm up <@{}>... but you weren't able to find them! That is strange...",user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You failed to enchant your target, as they were frozen to the bone!.",user_channel,True)
+    if victim_enchanted == 1:
+        return Mailbox().msg("I am terribly sorry, but you cannot enchant a player who already *IS* enchanted!",user_channel,True)
+
+    answer = Mailbox().msg("You have successfully enchanted <@{}>!".format(victim_id),user_channel)
+    db_set(user_id,'uses',uses - 1)
+
+    if user_undead == 1:
+        answer.dm("You're an Undead, so you can't actually enchant anyone... but this will help you keep up your cover!",user_id)
+        answer.log("The **Undead** <@{}> has pretended to enchant <@{}>.".format(user_id,victim_id))
+    else:
+        answer.log("The **Flute Player** <@{}> has enchanted <@{}>.".format(user_id,victim_id))
+        db_set(victim_id,'enchanted',1)
+
+    return answer
+
+def freeze(user_id,victim_id = None,role = None):
+    """This function allows the ice king to add a user to their list of potential freezers, or possibly remove one.
+    The function assumes both players are participants, so make sure to have filtered this out already.
+    The function returns a Mailbox.
+
+    Keyword arguments:
+    user_id -> the ice king's id
+    victim_id -> the guessed one's id
+    role -> the role they were guessed as. (None if removing the guessed one)"""
+
+    user_channel = int(db_get(user_id,'channel'))
+
+    if victim_id == None:
+        if db.get_freezers(user_id) == []:
+            return Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)
+
+        msg = "__Your current guesses:__\n"
+        for freezer in db.get_freezers(user_id):
+            msg += "{}. <@{}> - {}\n".format(db_get(freezer[0],'emoji'),freezer[0],freezer[1])
+        return Mailbox().msg(msg,user_channel,True)
+
+    victim_frozen = int(db_get(victim_id,'frozen'))
+    victim_abducted = int(db_get(victim_id,'abducted'))
+
+    if victim_abducted == 1:
+        return Mailbox().msg("You tried to freeze <@{}>... but you couldn't find them! That is strange.".format(victim_id),user_channel,True)
+    if victim_frozen == 1:
+        return Mailbox().msg("You don't need to freeze <@{}>, you silly! They're already frozen!".format(victim_id),user_channel,True)
+
+    if role == None:
+        if db.delete_freezer(user_id,victim_id) == True:
+            return Mailbox().msg("You have removed <@{}> from your freeze list.".format(victim_id),user_channel,True)
+        return Mailbox().msg("**INVALID SYNTAX:** No role provided!\n\nMake sure to provide with a role to add a user to your freeze list.",user_channel,True)
+
+    old_role = db.add_freezer(user_id,victim_id,role)
+
+    if old_role == None:
+        return Mailbox().msg("You have added <@{}> to your list as the **{}**.".format(victim_id,role),user_channel,True)
+    return Mailbox().msg("You have switched <@{}> from the **{}** to the **{}**.".format(victim_id,old_role,role),user_channel,True)
+
+def freeze_all(user_id):
+    """This function allows the ice king to potentially freeze all their guessed players.
+    The function assumes the ice king is a participant, so make sure to have filtered this out already.
+    The function returns a Mailbox.
+
+    Keyword arguments:
+    user_id -> the ice king's id"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently don't have the ability to submit a freezing list!",True)
+    db_set(user_id,'uses',uses - 1)
+
+    user_channel = int(db_get(user_id,'channel'))
+    user_undead = int(db_get(user_id,'undead'))
+    correct = 0
+    incorrect = 0
+
+    for frozone in db.get_freezers(user_id):
+        if not db.isParticipant(frozone[0]) or int(db_get(frozone[0],'abducted')) == 1:
+            db.delete_freezer(user_id,frozone[0])
+        elif frozone[1] != db_get(frozone[0],'role'):
+            incorrect += 1
+        else:
+            correct += 1
+
+    if user_undead == 1:
+        answer = Mailbox().msg("You have submitted a list that contains {} players. The result was **unsuccessful**. ".format(correct+incorrect),user_channel)
+        answer.msg_add("This means that at least one role was incorrect!")
+        answer.log("The **Undead** <@{}> has pretended to submit a freeze list.".format(user_id))
+        answer.dm("Hey, you're **Undead**, so this list would've failed anyway - but this helps a little to keep up your cover! 😉",user_id)
+        return answer
+
+    if incorrect > 0:
+        answer = Mailbox().msg("You have submitted a list that contains {} players. The result was **unsuccessful**. ".format(correct+incorrect),user_channel)
+        answer.msg_add("This means that at least one role was incorrect!")
+        answer.log("The **Ice King** <@{}> has submitted an **unsuccessful** freeze list. ".format(user_id))
+        answer.log_add("The list contained {} guesses, of which {} were correct.".format(incorrect+correct,correct))
+        return answer
+
+    # This will execute if all users on the list are correct.
+    answer = Mailbox().msg("You have submitted a list that contains {} players. The result was **successful**!\n".format(correct),user_channel)
+    if correct > 4:
+        answer.msg_add("Congratulations! You guessed them all correctly! ").msg_react('🎉')
+    answer.msg_add("Your guessed users will now be frozen.")
+
+
+    for supersuit in db.get_freezers(user_id):
+        db_set(supersuit[0],'frozen',1)
+        db.delete_freezer(user_id,supersuit[0])
+
+        for channel_id in db.freeze(user_id):
+            answer.edit_cc(channel_id,supersuit[0],2)
+
+    # TODO: Give players access to frozen realm.
+
+    return answer
