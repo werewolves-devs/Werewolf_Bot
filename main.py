@@ -402,7 +402,7 @@ async def on_message(message):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
-    # Delete all temporary messages after about two minutes.
+    # Delete all temporary messages after "five" seconds.
     await asyncio.sleep(120)
     for msg in temp_msg:
         await msg.delete()
