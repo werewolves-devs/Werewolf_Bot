@@ -221,6 +221,8 @@ async def on_message(message):
             # 2 -> give frozen (if they don't have it yet)
             # 3 -> read = False
             # 4 -> give dead role + remove participant role
+            # 5 -> mute
+            # 6 -> also mute, no read
 
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
@@ -228,12 +230,14 @@ async def on_message(message):
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
-            elif element.number == 2:
+            elif element.number == 2 or element.number == 5:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
             elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 4:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
+            elif element.number == 6:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
