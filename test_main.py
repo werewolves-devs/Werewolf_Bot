@@ -3,6 +3,7 @@
 from config import max_channels_per_category, game_log
 from management.position import positionof
 import interpretation.check as check
+import management.setup as setup
 import management.db as db
 import reset
 
@@ -120,3 +121,7 @@ def test_mexican():
   db.delete_standoff(2)
   assert db.get_standoff(1) == [[1,'2','Huntress','1']]
   reset.reset(True)
+
+def test_rolepool():
+  reset.reset(True)
+  setup.add_role("Werewolf",2)
