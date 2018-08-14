@@ -63,3 +63,14 @@ def cc_goodbye(victim_id):
     msg_table.append(msg)
 
     return msg_table[random.randint(0,len(msg_table) - 1)]
+
+def cc_welcome(victim_id):
+    msg_table = []
+
+    msg = "<@{}> spotted! Agents, report!\n'Clear', 'Clear!', 'Clear.'\n\n*Run, **The Secret Show**."
+    msg_table.append(msg)
+
+    msg = "Looks like <@{}> wants to join the party. Well here they are."
+    msg_table.append(msg)
+
+    return msg_table[random.randint(0,len(msg_table) - 1)]
