@@ -19,15 +19,16 @@ database = 'game.db'
 max_channels_per_category = 50
 
 # List of specific channels
-welcome_channel = 456880220486631424
+welcome_channel = 477533423578382336
 game_log = 456880259636396034
-bot_spam = 446046437114118145
-story_time = 446205631159074818
+bot_spam = 477533423578382336
+story_time = 477533978547453972
 
 # List of specific roles
-administrator = 0
+administrator = 446235596722012160
 game_master = 456884637638328332
 participant = 456881451745411089
 dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
+
