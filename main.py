@@ -54,20 +54,6 @@ import management.db as db
 
 client = discord.Client()
 
-def get_role(server_roles, target_id):
-    for each in server_roles:
-       if each.id == target_id:
-           return each
-    return None
-
-async def remove_all_game_roles(member):
-    for role in member.roles:
-        if role.id == config.frozen_participant:
-            await member.remove_roles(role, reason="Updating CC permissions")
-        if role.id == config.dead_participant:
-            await member.remove_roles(role, reason="Updating CC permissions")
-        if role.id == config.suspended:
-            await member.remove_roles(role, reason="Updating CC permissions")
 
 # Whenever a message is sent.
 @client.event
@@ -80,23 +66,21 @@ async def on_message(message):
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
-    # Check if the message author has the Game Master role
     isGameMaster = False
-    if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.guild.get_member(message.author.id).roles]:
-            isGameMaster = True
-
-    # Check if the message author has the Admin role
     isAdmin = False
-    if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.guild.get_member(message.author.id).roles]:
-            isAdmin = True
-
-    # Check if the message author is an admin bot
     isPeasant = False
-    if message.guild == gamelog_channel.guild:
-        if peasant in [y.id for y in message.guild.get_member(message.author.id).roles] and message.author.bot == True:
-            isPeasant = True
+    try:
+        if message.guild == gamelog_channel.guild:
+            role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
+
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and message.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
 
     result = process(message,isGameMaster,isAdmin,isPeasant)
 
@@ -229,38 +213,20 @@ async def on_message(message):
             # 5 -> mute
             # 6 -> also mute, no read
 
-            channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
-            main_guild = botspam_channel.guild
-            member = main_guild.get_member(element.victim)
-            await remove_all_game_roles(member)
+            channel = client.get_channel(int(element.channel))
+            user = client.get_user(int(element.victim))
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 2:
+            elif element.number == 2 or element.number == 5:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
             elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 4:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-            elif element.number == 5:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 6:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 7:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-            elif element.number == 8:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
