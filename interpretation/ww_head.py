@@ -3,7 +3,7 @@ from discord import Embed
 
 import interpretation.check as check
 import roles_n_rules.functions as func
-from config import max_cc_per_user, season
+from config import max_cc_per_user, season, universal_prefix as unip
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
@@ -17,7 +17,7 @@ def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
 
-def process(message, isGameMaster=False, isAdmin=False):
+def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
     message_channel = message.channel.id
     user_role = db_get(user_id, 'role')
@@ -31,6 +31,38 @@ def process(message, isGameMaster=False, isAdmin=False):
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
         return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
+
+    # =============================================================
+    #
+    #                         BOT COMMANDS
+    #
+    # =============================================================
+    if isPeasant == True:
+        if is_command(message,['warn'],False,unip):
+            # Warn the user that they've been active for a while.
+            answer = Mailbox().story("Hey there, <@{}>! You have been idling for about 48 hours now!\n".format(message.mentions[0].id))
+            return [answer.story_add("Please let us hear from you within 24 hours, or you will be disqualified for idling out.")]
+
+        if is_command(message,['idle'],False,unip):
+            # Kill the inactive user
+            answer = Mailbox().story("<@{}> has been killed due to inactivity.".format(message.mentions[0].id))
+            return [answer]
+
+        if is_command(message,['pay'],False,unip):
+            # Initiate the first round of starting the day.
+            return [Mailbox(True)]
+
+        if is_command(message,['day'],False,unip):
+            # Initiate the second round of starting the day.
+            pass
+
+        if is_command(message,['pight',False,unip]):
+            # Initiate the first round of starting the night.
+            return [Mailbox(True)]
+
+        if is_command(message,['night'],False,unip):
+            # Initiate the second round of starting the night.
+            pass
 
     # =============================================================
     #

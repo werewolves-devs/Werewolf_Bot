@@ -418,7 +418,7 @@ def add_freezer(user_id,victim_id,role):
     user_id -> the role of the ice king casting the guess
     victim_id -> the player whose role is guessed
     role -> the role that victim_id is guessed to be  """
-    c.execute("SELECT role FROM 'freezers' WHERE victim =?",(victim_id,))
+    c.execute("SELECT role FROM 'freezers' WHERE victim =? AND king =?",(victim_id,user_id))
     answer = c.fetchone()
     if answer == None:
         c.execute("INSERT INTO 'freezers' (king,victim,role) VALUES (?,?,?)",(user_id,victim_id,role))
@@ -433,6 +433,7 @@ def get_freezers(user_id):
 
     user_id -> the id of the ice king"""
     c.execute("SELECT victim, role FROM freezers WHERE king =?",(user_id,))
+    print(user_id)
     return c.fetchall()
 
 def delete_freezer(user_id,victim_id):

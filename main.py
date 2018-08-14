@@ -43,7 +43,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator
+from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
@@ -86,12 +86,19 @@ async def on_message(message):
         if game_master in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
+    # Check if the message author has the Admin role
     isAdmin = False
     if message.guild == gamelog_channel.guild:
         if administrator in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isAdmin = True
 
-    result = process(message,isGameMaster,isAdmin)
+    # Check if the message author is an admin bot
+    isPeasant = False
+    if message.guild == gamelog_channel.guild:
+        if peasant in [y.id for y in message.guild.get_member(message.author.id).roles] and message.author.bot == True:
+            isPeasant = True
+
+    result = process(message,isGameMaster,isAdmin,isPeasant)
 
     temp_msg = []
 
@@ -457,6 +464,6 @@ print(ascii)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-    client.run(config.TOKEN)
+    client.run(config.WW_TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')
