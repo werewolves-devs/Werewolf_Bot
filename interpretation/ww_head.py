@@ -9,7 +9,7 @@ from interpretation.check import is_command
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from story_time.commands import cc_goodbye
+from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 
 
@@ -232,7 +232,7 @@ def process(message, isGameMaster=False, isAdmin=False):
                     command.edit_cc(message_channel, member, 2)
                 else:
                     command.edit_cc(message_channel, member, 1)
-            return [command.respond("Please wait whilst I save your changes...")]
+            return [command.respond(cc_welcome(member))]
 
         if is_command(message, ['add'], True):
             msg = "**Usage:** Add a user to the existing conspiracy channel.\n\n`" + prefix + "add <user>`\n\n"
