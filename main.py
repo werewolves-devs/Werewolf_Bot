@@ -70,13 +70,13 @@ async def on_message(message):
     # Check if the message author has the Game Master role
     isGameMaster = False
     if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+        if game_master in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isGameMaster = True
 
     # Checks if the message author has a Admin role
     isAdmin = False
     if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
+        if administrator in [y.id for y in message.guild.get_member(message.author.id).roles]:
             isAdmin = True
 
     # This function asks in interpretation\ww_head.py what it should do.
@@ -169,7 +169,7 @@ async def on_message(message):
 
         # The messages that are destined for a specific channel, are sent here.
         for element in mailbox.channel:
-          
+
             # The following code is sent if the message is an embed.
             if element.embed:
                 if element.destination == "spam":
@@ -224,8 +224,8 @@ async def on_message(message):
             # 5 -> mute
             # 6 -> also mute, no read
 
-            channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
+            channel = client.get_channel(int(element.channel))
+            user = client.get_user(int(element.victim))
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 1:
@@ -241,8 +241,6 @@ async def on_message(message):
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
-            # Reminder: Add some different welcome messages
-            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
