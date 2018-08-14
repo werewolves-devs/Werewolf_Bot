@@ -60,6 +60,15 @@ def get_role(server_roles, target_id):
            return each
     return None
 
+async def remove_all_game_roles(member):
+    for role in member.roles:
+        if role.id == config.frozen_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.dead_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.suspended:
+            await member.remove_roles(role, reason="Updating CC permissions")
+
 # Whenever a message is sent.
 @client.event
 async def on_message(message):
