@@ -1,5 +1,5 @@
 # Discord API / Login settings
-TOKEN = "NDAxNzE2MzgwODAzNTMwNzUy.DlRUzw.uqvjVUeUGazF2Y03JQRoOOwlboA"
+TOKEN = "yo_momma's_sized_token_here"
 
 
 # Rules 'n' settings
