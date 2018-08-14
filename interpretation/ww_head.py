@@ -324,7 +324,7 @@ def process(message, isGameMaster=False, isAdmin=False):
                     command.respond(
                         "Sorry bud, ya can\'t remove the cc's owner! Blame the people who used to do this on purpose.")
                 else:
-                    command.edit_cc(member, message_channel, 0)
+                    command.edit_cc(member.id, message_channel, 0)
                     command.respond(cc_goodbye(member))
             return [command]
 
