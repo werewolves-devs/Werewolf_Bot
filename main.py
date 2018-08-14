@@ -54,6 +54,11 @@ import management.db as db
 
 client = discord.Client()
 
+def get_role(server_roles, target_id):
+    for each in server_roles:
+       if each.id == target_id:
+           return each
+    return None
 
 # Whenever a message is sent.
 @client.event
