@@ -260,46 +260,6 @@ def get_columns():
     c.execute("SELECT * FROM channel_rows")
     return c.fetchall()
 
-def abduct(user_id):
-    """Returns a list of channels that need to be changed to abduct a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,1,3)
-
-def unabduct(user_id):
-    """Returns a list of channels that need to be changed to unabduct a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,3,1)
-
-def freeze(user_id):
-    """Returns a list of channels that need to be changed to freeze a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,1,2)
-
-def unfreeze(user_id):
-    """Returns a list of channels that need to be changed to unfreeze a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,2,1)
-
-def kill(user_id):
-    """Returns a list of channels that need to be changed to kill a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return [channel_change_all(user_id,i,4) for i in range(4)]
-
 def get_category():
     """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
