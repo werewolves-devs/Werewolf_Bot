@@ -54,6 +54,14 @@ import management.db as db
 
 client = discord.Client()
 
+async def remove_all_game_roles(member):
+    for role in member.roles:
+        if role.id == config.frozen_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.dead_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.suspended:
+            await member.remove_roles(role, reason="Updating CC permissions")
 
 # Whenever a message is sent.
 @client.event
@@ -208,8 +216,12 @@ async def on_message(message):
             # 5 -> mute
             # 6 -> also mute, no read
 
-            channel = client.get_channel(int(element.channel))
-            user = client.get_user(int(element.victim))
+            channel = client.get_channel(element.channel)
+            user = client.get_user(element.victim)
+            main_guild = botspam_channel.guild
+            # member =main_guild.get_member(element.victim)
+            member = main_guild.get_member(element.victim)
+            await remove_all_game_roles(member)
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
             elif element.number == 1:
