@@ -1,7 +1,6 @@
 import sqlite3
-#from config import database
+from config import database
 
-database = "game.db"
 conn = sqlite3.connect(database)
 c = conn.cursor()
 
