@@ -68,11 +68,8 @@ def test_database():
   assert db.channel_get('1234555') == (u'1234555',u'1',u'2')
   assert db.channel_get('1234555',1) == '2'
   assert db.channel_change_all(1,2,3) == [u'1234555']
-  assert switch.cc_unabduct(1) == Mailbox().spam("<@1> is no longer abducted.").edit_cc('1234555',1,1)
   db.signup(420,"BenTechy66",":poop:")
   assert db.channel_get('12211') == (u'12211',u'1',u'1',u'0')
-  assert switch.cc_freeze('1') == Mailbox().spam("<@> was frozen.").edit_cc('1234555',1,2).edit_cc('12211',1,2)
-  assert switch.cc_abduct('420') == Mailbox().spam("<@420> has been abducted.")
 
   for i in range(max_channels_per_category - 2):
     assert db.get_category() == 24
