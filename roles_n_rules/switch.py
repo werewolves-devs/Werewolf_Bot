@@ -79,7 +79,7 @@ def start_game():
         return Mailbox().respond("I'm sorry! A game cannot be started while there's another one going on already!")
 
     # Choose the roles out of the given role-pool
-    role-pool = []
+    role_pool = []
     for choice in view_roles:
         for i in range(choice.amount):
             role-pool.append(choice.role)
