@@ -1,4 +1,4 @@
-from management.db import db_get, db_set, channel_change_all
+from management.db import db_get, db_set, channel_change_all, channel_get
 from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
@@ -163,6 +163,7 @@ class Mailbox:
             self.edit_cc(channel_id,user_id,5)
         for channel_id in channel_change_all(user_id,7,4):
             self.edit_cc(channel_id,user_id,4)
+        return self
     
     def suspend(self,user_id):
         """Suspend a user.  
@@ -183,7 +184,22 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,6,8):
             self.edit_cc(channel_id,user_id,8)
         for channel_id in channel_change_all(user_id,7,8):
-            self.edit_cc(channel_id,user_id,8)        
+            self.edit_cc(channel_id,user_id,8) 
+        return self     
+
+    def mute(self,user_id,channel_id):
+        """Mute a user. Users cannot be muted in channels they do not take part in, or channels they are frozen in.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        self.spam("<@{}> has been muted in <#{}>".format(user_id,channel_id))
+
+        channel_settings = int(channel_get(channel_id,user_id))
+
+        if channel_settings == 1:
+            self.edit_cc(channel_id,user_id,5)
+        if channel_settings == 3:
+            self.edit_cc(channel_id,user_id,6)
+        return self
+        
 
 # Class used to send messages through the mailbox
 class Message:
