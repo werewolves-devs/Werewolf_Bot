@@ -1,3 +1,4 @@
+from main_classes import Mailbox
 from management import db, dynamic as dy, setup
 from management.db import db_get, db_set, channel_change_all
 from management.setup import view_roles
@@ -80,7 +81,7 @@ def start_game():
 
     # Choose the roles out of the given role-pool
     role_pool = []
-    for choice in view_roles:
+    for choice in view_roles():
         for i in range(choice.amount):
             role_pool.append(choice.role)
 
