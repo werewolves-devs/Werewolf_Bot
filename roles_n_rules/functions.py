@@ -268,6 +268,10 @@ def cupid_kiss(user_id,victim_id,voluntarily = True):
     victim_abducted = int(db_get(victim_id,'abducted'))
     victim_undead = int(db_get(victim_id,'undead'))
 
+    # If involuntary, make the cupid choose again.
+    if voluntarily == False and (victim_id == user_id or victim_abducted == 1 or victim_frozen == 1):
+        return False 
+
     if victim_id == user_id:
         return Mailbox().respond("So you wanna fall in love with yourself, huh? Too bad, your partner really has to be someone ELSE.")
     if victim_abducted == 1:
