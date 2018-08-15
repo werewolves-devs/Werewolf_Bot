@@ -860,7 +860,7 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. /n/n`" + prefix + "age<number>\`n\n**Example:** `!age 19`"
+        msg = "**USAGE:** This command is used to set your age. /n/n`!age<number>\n\n**Example:** `!age 19`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 
@@ -871,8 +871,9 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['profile'], True):
-        # TODO
-        return todo()
+        msg = "**USAGE:** The use of this command is so that you can view your own profile, if you add another players name, you can view their profile . /n/n` + prefix + /n/n **Example:** `!profile or !profile Randium"
+      
+        return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
     '''signup'''
