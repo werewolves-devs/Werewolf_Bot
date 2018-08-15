@@ -31,9 +31,16 @@ class Choice:
         self.role = role
 
 def view_roles():
-    # TODO: Create a list that displays all chosen roles in the database.
-    # The function should return a list of instances of the Choice class.
-    pass
+    """Gives a list that displays all chosen roles in the database.
+
+    Returns: a list of instances of the Choice class.
+    """
+    c.execute("SELECT  * from 'role-pool'")
+    rows = c.fetchall()
+    result = []
+    for row in rows:
+        result.append(Choice(role=row['role'], amount=row['amount']))
+    return result
 
 
 if __name__ == "__main__":
