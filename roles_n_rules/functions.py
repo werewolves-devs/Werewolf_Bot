@@ -1,5 +1,6 @@
 import story_time.roleswap_msg as rolestory
 import story_time.commands as ctory
+import roles_n_rules.switch as switch
 import management.db as db
 import random
 from management.position import wolf_pack
@@ -561,7 +562,7 @@ def freeze(user_id,victim_id = None,role = None):
 def freeze_all(user_id):
     """This function allows the ice king to potentially freeze all their guessed players.
     The function assumes the ice king is a participant, so make sure to have filtered this out already.
-    The function returns a Mailbox.
+    The function returns a list of Mailboxes.
 
     Keyword arguments:
     user_id -> the ice king's id"""
@@ -604,17 +605,17 @@ def freeze_all(user_id):
         answer.msg_add("Congratulations! You guessed them all correctly! ").msg_react('🎉')
     answer.msg_add("Your guessed users will now be frozen.")
 
+    freezing_list = [answer]
 
     for supersuit in db.get_freezers(user_id):
         db_set(supersuit[0],'frozen',1)
         db.delete_freezer(user_id,supersuit[0])
 
-        for channel_id in db.freeze(user_id):
-            answer.edit_cc(channel_id,supersuit[0],2)
+        freezing_list.append(switch.cc_freeze(supersuit[0]))
 
     # TODO: Give players access to frozen realm.
 
-    return answer
+    return freezing_list
 
 def seek(user_id,victim_id,role):
     """This fuction allows the crowd seeker to inspect players.
