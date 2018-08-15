@@ -29,9 +29,17 @@ def poll_list():
 
     return c.fetchall()
 
-def player_list():
+def player_list(alive_only = False,available_only = False):
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
-    return [int(item[0]) for item in poll_list()]
+    player_list = [int(item[0]) for item in poll_list()]
+    
+    if alive_only == False and available_only == False:
+        return player_list
+
+    if available_only == False:
+        player_list = [player for player in player_list if db_get(player,'role') not in ['Spectator','Dead']]
+
+    return [player for player in player_list if int(db_get(player,'adbucted')) == 0 and int(db_get(player,'frozen')) == 0]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
@@ -129,6 +137,7 @@ def db_set(user_id,column,value):
     column -> the relevant part of info
     value -> the new value it should be set to
     """
+    positionof(column) # Make sure the value is valid.
     c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
     conn.commit()
 
