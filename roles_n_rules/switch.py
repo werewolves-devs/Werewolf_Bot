@@ -100,7 +100,7 @@ def pay():
                 chosen = cupid_kiss(user_id,forced_victim,False)
             
             answer.append(chosen)
-`
+
         # Force Dog to become Innocent
         if user_role == "Dog":
             db_set(user_id,'role',"Innocent")
