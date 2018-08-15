@@ -100,9 +100,22 @@ def pay():
                 chosen = cupid_kiss(user_id,forced_victim,False)
             
             answer.append(chosen)
-
+`
         # Force Dog to become Innocent
         if user_role == "Dog":
+            db_set(user_id,'role',"Innocent")
+            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
+            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
+            answer.append(response)
+
+        # Remove hooker effects
+        db_set(user_id,'sleepingover',0)
+        for standoff in db.get_standoff(user_id):
+            if standoff[2] == 'Hooker':
+                db.delete_standoff(standoff[0])
+
+        # Force Look-Alike to become Innocent
+        if user_role == "Look-Alike":
             db_set(user_id,'role',"Innocent")
             response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
             response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
