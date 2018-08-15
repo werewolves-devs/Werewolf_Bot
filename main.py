@@ -59,7 +59,8 @@ def get_role(server_roles, target_id):
        if each.id == target_id:
            return each
     return None
- async def remove_all_game_roles(member):
+
+async def remove_all_game_roles(member):
     for role in member.roles:
         if role.id == config.frozen_participant:
             await member.remove_roles(role, reason="Updating CC permissions")
@@ -211,20 +212,7 @@ async def on_message(message):
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
-            # element.number - type of setting to set to:
-                # 0 - no access     (no view, no type)
-                # 1 - access        (view + type)
-                # 2 - frozen        (view, no type)
-                # 3 - abducted      (no view, no type)
-                # 4 - dead          (dead role?)
-
-            # 0 -> read = False
-            # 1 -> read = True
-            # 2 -> give frozen (if they don't have it yet)
-            # 3 -> read = False
-            # 4 -> give dead role + remove participant role
-            # 5 -> mute
-            # 6 -> also mute, no read
+            # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
@@ -270,14 +258,6 @@ async def on_message(message):
             # element.owner - owner of the channel;
             # element.members - members of the channel
             # element.settlers - members for whom this shall become their home channel
-            #
-            # @Participant      - no view + type
-            # @dead Participant - view + no type
-            # @everyone         - no view + no type
-
-            # All you need to do is create a channel where only the channel owner has access.
-            # The other members are given access through another Mailbox.
-            # You could make the work easier if you also posted a cc channel message already over here.
 
             if ' ' not in element.name:
 
@@ -310,6 +290,8 @@ async def on_message(message):
                             deadies.append(member)
                         else:
                             viewers.append(member)
+                    elif db_get(user,'role') == 'Suspended':
+                        pass
                     else:
                         deadies.append(member)
 

@@ -2,10 +2,17 @@ import sqlite3
 import random
 from config import database, max_channels_per_category, max_participants
 from management.position import positionof, check_for_int, wolf_pack
-from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
 c = conn.cursor()
+
+class PollToEvaluate:
+    def __init__(self,database_tuple):
+        self.purpose = database_tuple[1]
+        self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
+
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
 
 def execute(cmd_string):
     """Execute a command straight into the database. Avoiding usage recommended.
@@ -29,9 +36,17 @@ def poll_list():
 
     return c.fetchall()
 
-def player_list():
+def player_list(alive_only = False,available_only = False):
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
-    return [int(item[0]) for item in poll_list()]
+    player_list = [int(item[0]) for item in poll_list()]
+    
+    if alive_only == False and available_only == False:
+        return player_list
+
+    if available_only == False:
+        player_list = [player for player in player_list if db_get(player,'role') not in ['Spectator','Dead']]
+
+    return [player for player in player_list if int(db_get(player,'adbucted')) == 0 and int(db_get(player,'frozen')) == 0]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
@@ -75,7 +90,7 @@ def get_user(id):
 
 # This function makes sure the user is a participant.
 # If the user is a spectator, it returns whatever spectator is set to.
-def isParticipant(id,spectator = False,dead = False):
+def isParticipant(id,spectator = False,dead = False,suspended = False):
     """Checks if the user is a registered participant in the database
 
     Keyword arguments:
@@ -92,6 +107,9 @@ def isParticipant(id,spectator = False,dead = False):
 
     if db_get(id,'role') == u'Dead':
         return dead
+
+    if db_get(id,'role') == u'Suspended':
+        return suspended
 
     return True
 

@@ -1,6 +1,5 @@
 import story_time.roleswap_msg as rolestory
 import story_time.commands as ctory
-import roles_n_rules.switch as switch
 import management.db as db
 import random
 from management.position import wolf_pack
@@ -249,7 +248,7 @@ def aura(user_id,victim_id):
     answer = Mailbox().msg("🐶 - <@{}> has a **GREEN AURA** - they are not taking part in the wolf pack.".format(victim_id),user_channel)
     return answer.log("The **Aura Teller** <@{}> has inspected <@{}>, who, being the **{}**, wasn't part of the wolf pack.".format(user_id,victim_id,victim_role))
 
-def cupid_kiss(user_id,victim_id):
+def cupid_kiss(user_id,victim_id,voluntarily = True):
     """This function makes the cupid fall in love with a partner.
     The function assumes the player is a cupid and has the correct role, so make sure to have filtered this out already.
     The function returns a Mailbox.
@@ -267,6 +266,10 @@ def cupid_kiss(user_id,victim_id):
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
     victim_undead = int(db_get(victim_id,'undead'))
+
+    # If involuntary, make the cupid choose again.
+    if voluntarily == False and (victim_id == user_id or victim_abducted == 1 or victim_frozen == 1):
+        return False 
 
     if victim_id == user_id:
         return Mailbox().respond("So you wanna fall in love with yourself, huh? Too bad, your partner really has to be someone ELSE.")
@@ -427,8 +430,7 @@ def unfreeze(user_id,victim_id):
     db_set(victim_id,'frozen',0)
 
     answer = Mailbox().msg("You have successfully unfrozen <@{}>!".format(victim_id),user_channel)
-    for channel in db.unfreeze(victim_id):
-        answer.edit_cc(channel,victim_id,1)
+    answer.unfreeze(victim_id)
 
     answer.dm("Great news, <@{}>! You have been unfrozen by an **Innkeeper**! You can now take part with the town again!".format(victim_id),victim_id)
     return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
@@ -605,17 +607,13 @@ def freeze_all(user_id):
         answer.msg_add("Congratulations! You guessed them all correctly! ").msg_react('🎉')
     answer.msg_add("Your guessed users will now be frozen.")
 
-    freezing_list = [answer]
-
     for supersuit in db.get_freezers(user_id):
-        db_set(supersuit[0],'frozen',1)
         db.delete_freezer(user_id,supersuit[0])
-
-        freezing_list.append(switch.cc_freeze(supersuit[0]))
+        answer.freeze(supersuit[0])
 
     # TODO: Give players access to frozen realm.
 
-    return freezing_list
+    return answer
 
 def seek(user_id,victim_id,role):
     """This fuction allows the crowd seeker to inspect players.
@@ -631,7 +629,6 @@ def seek(user_id,victim_id,role):
         return Mailbox().respond("I am sorry! You currently don't have the ability to seek anyone!",True)
 
     user_channel = int(db_get(user_id,'channel'))
-    user_role = db_get(user_id,'role')
     user_undead = int(db_get(user_id,'undead'))
 
     victim_role = db_get(victim_id,'role')

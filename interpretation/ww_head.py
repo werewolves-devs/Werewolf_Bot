@@ -12,6 +12,7 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 
+PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
@@ -90,7 +91,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "delete_category` - Delete a category.\n"
-
+    else:
+        if is_command(message, ['delete_category']):
+            return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
     # =============================================================
     #
     #                         GAME MASTERS
@@ -231,6 +234,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "whois` - Gain a user's information\n"
+    else:
+        if is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+            return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
     #
@@ -828,7 +834,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             # The ice king's command to submit the list of people of whom they have guessed their roles.
             if is_command(message, ['guess_that', 'freeze_all', 'submit']) and user_role == "Ice King":
                 # Note : func.freeze_all() returns a list of mailboxes. That's why there are no [] around this function.
-                return func.freeze_all(user_id)
+                return [func.freeze_all(user_id)]
             if is_command(message, ['guess_that', 'freeze_all', 'submit'], True) and user_role == "Ice King":
                 # TODO
                 return todo()
@@ -878,6 +884,32 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return todo()
             if user_role == "The Thing" and user_undead == 0:
         	    help_msg += "`" + prefix + "create_swamp` - Create swamp with chosen players. (The Thing only)\n"
+    else:
+        # I'd just like to say that I'm having to go through 600 FUCKING LINES OF CODE
+        # to get this list, purely because Randium CAN'T WRITE A FUCKNG FRAMEWORK
+        # WHY CAN'T YOU JUST USE ext.commands FROM discord.py WHICH JUST WORKS
+        # WHY DO YOU HAVE TO DO THIS FOR FUCKS SAKE
+        # ahem
+        if is_command(message, [
+            # In the end, I did some regexes to extract this list automatically.
+            # I *hope* that all the commands are here; but if not, don't blame me
+            # or my dodgy shell golf, blame randium's awful structuring.
+            # Rant over.
+                'abduct', 'abduct_all', 'add', 'apocalypse', 'assassinate', 'aura',
+                'barber_kill', 'bark', 'become', 'cast', 'cc', 'change', 'chew', 'choose',
+                'clean', 'cloth', 'copy', 'corrupt', 'cough', 'create_swamp', 'creeper',
+                'crowd', 'curse', 'cut', 'death', 'devour', 'disguise', 'donate', 'eat',
+                'enchant', 'end', 'execute', 'exercise', 'exorcise', 'flute', 'follow',
+                'forsee', 'freeze', 'freeze_all', 'fuck', 'give_amulet', 'give_cc', 'guess',
+                'guess_that', 'heal', 'hide', 'holify', 'hook', 'hunt', 'imitate', 'infect',
+                'info', 'inspect', 'kidnap', 'kill', 'kiss', 'knit', 'knot', 'life', 'light',
+                'love', 'melt', 'mirror', 'more_cc', 'munch', 'murder', 'myrole', 'poison',
+                'powder', 'prevent', 'purify', 'raven', 'remove', 'resemble', 'reveal',
+                'sacrify', 'save', 'see', 'seek', 'shoot', 'silence', 'sleep', 'sneeze',
+                'start_cliche_horror_movie', 'stop', 'submit', 'swamp', 'tell', 'threaten',
+                'turn', 'undoom', 'unfreeze', 'unite', 'vision', 'wager', 'water',]):
+                return [Mailbox().respond(PERMISSION_MSG.format("Participant"), True)]
+
 
     # =============================================================
     #

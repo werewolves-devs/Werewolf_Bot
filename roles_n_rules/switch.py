@@ -1,73 +1,72 @@
+from main_classes import Mailbox
 from management import db, dynamic as dy, setup
 from management.db import db_get, db_set, channel_change_all
 from management.setup import view_roles
-
-def cc_freeze(user_id):
-    db_set(user_id,'frozen',1)
-    answer = Mailbox().spam("<@{}> was frozen.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,2):
-        answer.edit_cc(channel,user_id,2)
-    return answer
-
-def cc_unfreeze(user_id):
-    db_set(user_id,'frozen',0)
-    answer = Mailbox().spam("<@{}> is no longer frozen.".format(user_id))
-
-    for channel in channel_change_all(user_id,2,1):
-        answer.edit_cc(channel,user_id,1)
-    return answer
-
-def cc_abduct(user_id):
-    db_set(user_id,'abducted',1)
-    answer = Mailbox().spam("<@{}> has been abducted.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,3):
-        answer.edit_cc(channel,user_id,3)
-    for channel in channel_change_all(user_id,5,6):
-        answer.edit_cc(channel,user_id,6)
-    return answer
-
-def cc_unabduct(user_id):
-    db_set(user_id,'abducted',0)
-    answer = Mailbox().spam("<@{}> is no longer abducted.".format(user_id))
-
-    for channel in channel_change_all(user_id,3,1):
-        answer.edit_cc(channel,user_id,1)
-    for channel in channel_change_all(user_id,6,5):
-        answer.edit_cc(channel,user_id,5)
-    for channel in channel_change_all(user_id,7,4):
-        answer.edit_cc(channel,user_id,4)
-
-def cc_suspend(user_id):
-    answer = Mailbox().spam("<@{}> has been suspended.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,2,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,3,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,4,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,5,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,6,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,7,8):
-        answer.edit_cc(channel,user_id,8)
-    return answer
+from roles_n_rules.functions import cupid_kiss
+import random
+import roles_n_rules.role_data as roles
 
 def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
-    answer = Mailbox(True)
-    for user in db.player_list():
-        user_role = db_get(user,'role')
+    answer = [Mailbox(True)]
+    for user_id in db.player_list():
+        user_role = db_get(user_id,'role')
+        dy.next_day()
+
+        # Remove potential night uses
+        for i in range(len(roles.night_users)):
+            if user_role in roles.night_users[i]:
+                if i > 0:
+                    db_set(user_id,'uses',0)
+                break
+
+        # Give potential day uses
+        for i in range(len(roles.day_users)):
+            if user_role in roles.day_users[i]:
+                # Give one-time users their one-time power
+                if i == 0:
+                    if dy.day_number() == 0:
+                        db_set(user_id,'uses',1)
+                    break
+                
+                db_set(user_id,'uses',i)
+                break
+
+        # Force Cupid to fall in love
+        if user_role == "Cupid" and db_get(user_id,'uses') > 0:
+            chosen = False
+            attempts = 0
+
+            while not chosen and attempts < 100:
+                forced_victim = random.choice(db.player_list(True,True))
+                chosen = cupid_kiss(user_id,forced_victim,False)
+            
+            answer.append(chosen)
+
+        # Force Dog to become Innocent
+        if user_role == "Dog":
+            db_set(user_id,'role',"Innocent")
+            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
+            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
+            answer.append(response)
+
+        # Remove hooker effects
+        db_set(user_id,'sleepingover',0)
+        for standoff in db.get_standoff(user_id):
+            if standoff[2] == 'Hooker':
+                db.delete_standoff(standoff[0])
+
+        # Force Look-Alike to become Innocent
+        if user_role == "Look-Alike":
+            db_set(user_id,'role',"Innocent")
+            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
+            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
+            answer.append(response)
 
         # Remove tanner disguises
-        db_set(user,'fakerole',user_role)
+        db_set(user_id,'fakerole',user_role)
 
 def start_game():
     """This function is triggered at the start of the game. If successful, the function returns a Mailbox.
@@ -80,7 +79,7 @@ def start_game():
 
     # Choose the roles out of the given role-pool
     role_pool = []
-    for choice in view_roles:
+    for choice in view_roles():
         for i in range(choice.amount):
             role_pool.append(choice.role)
 
