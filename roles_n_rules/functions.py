@@ -249,7 +249,7 @@ def aura(user_id,victim_id):
     answer = Mailbox().msg("🐶 - <@{}> has a **GREEN AURA** - they are not taking part in the wolf pack.".format(victim_id),user_channel)
     return answer.log("The **Aura Teller** <@{}> has inspected <@{}>, who, being the **{}**, wasn't part of the wolf pack.".format(user_id,victim_id,victim_role))
 
-def cupid_kiss(user_id,victim_id):
+def cupid_kiss(user_id,victim_id,voluntarily = True):
     """This function makes the cupid fall in love with a partner.
     The function assumes the player is a cupid and has the correct role, so make sure to have filtered this out already.
     The function returns a Mailbox.
@@ -631,7 +631,6 @@ def seek(user_id,victim_id,role):
         return Mailbox().respond("I am sorry! You currently don't have the ability to seek anyone!",True)
 
     user_channel = int(db_get(user_id,'channel'))
-    user_role = db_get(user_id,'role')
     user_undead = int(db_get(user_id,'undead'))
 
     victim_role = db_get(victim_id,'role')

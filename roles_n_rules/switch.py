@@ -88,6 +88,7 @@ def pay():
                 db_set(user_id,'uses',i)
                 break
 
+
         # Remove tanner disguises
         db_set(user_id,'fakerole',user_role)
 
