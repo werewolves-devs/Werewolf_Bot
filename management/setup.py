@@ -25,8 +25,14 @@ def add_role(role,amount = 1):
     c.execute("DELETE FROM 'role-pool' WHERE amount <= 0")
     conn.commit()
 
+class Choice:
+    def __init__(self,role,amount):
+        self.amount = amount
+        self.role = role
+
 def view_roles():
-    # TODO
+    # TODO: Create a list that displays all chosen roles in the database.
+    # The function should return a list of instances of the Choice class.
     pass
 
 

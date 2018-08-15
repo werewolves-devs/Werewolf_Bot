@@ -827,7 +827,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''submit'''
             # The ice king's command to submit the list of people of whom they have guessed their roles.
             if is_command(message, ['guess_that', 'freeze_all', 'submit']) and user_role == "Ice King":
-                return [func.freeze_all(user_id)]
+                # Note : func.freeze_all() returns a list of mailboxes. That's why there are no [] around this function.
+                return func.freeze_all(user_id)
             if is_command(message, ['guess_that', 'freeze_all', 'submit'], True) and user_role == "Ice King":
                 # TODO
                 return todo()
