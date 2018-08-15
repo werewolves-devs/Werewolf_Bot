@@ -59,7 +59,8 @@ def get_role(server_roles, target_id):
        if each.id == target_id:
            return each
     return None
- async def remove_all_game_roles(member):
+
+async def remove_all_game_roles(member):
     for role in member.roles:
         if role.id == config.frozen_participant:
             await member.remove_roles(role, reason="Updating CC permissions")
