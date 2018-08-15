@@ -82,8 +82,8 @@ def start_game():
     role_pool = []
     for choice in view_roles:
         for i in range(choice.amount):
-            role-pool.append(choice.role)
+            role_pool.append(choice.role)
 
-    if len(db.player_list) > len(role-pool):
+    if len(db.player_list) > len(role_pool):
         print("The game cannot be started while there are less roles available than that there are participants signed up.")
         return Mailbox()
