@@ -129,6 +129,7 @@ def db_set(user_id,column,value):
     column -> the relevant part of info
     value -> the new value it should be set to
     """
+    positionof(column) # Make sure the value is valid.
     c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
     conn.commit()
 
