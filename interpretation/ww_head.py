@@ -12,6 +12,7 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 
+PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
@@ -90,7 +91,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "delete_category` - Delete a category.\n"
-
+    else:
+        if is_command(message, ['delete_category']):
+            return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
     # =============================================================
     #
     #                         GAME MASTERS
