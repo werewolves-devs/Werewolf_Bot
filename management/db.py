@@ -83,7 +83,7 @@ def get_user(id):
 
 # This function makes sure the user is a participant.
 # If the user is a spectator, it returns whatever spectator is set to.
-def isParticipant(id,spectator = False,dead = False):
+def isParticipant(id,spectator = False,dead = False,suspended = False):
     """Checks if the user is a registered participant in the database
 
     Keyword arguments:
@@ -100,6 +100,9 @@ def isParticipant(id,spectator = False,dead = False):
 
     if db_get(id,'role') == u'Dead':
         return dead
+
+    if db_get(id,'role') == u'Suspended':
+        return suspended
 
     return True
 
