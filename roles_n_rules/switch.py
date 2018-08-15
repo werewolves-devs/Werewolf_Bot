@@ -14,7 +14,7 @@ def cc_unfreeze(user_id):
     db_set(user_id,'frozen',0)
     answer = Mailbox().spam("<@{}> is no longer frozen.".format(user_id))
 
-    for channel in channel_change_all(user_id,2,1)):
+    for channel in channel_change_all(user_id,2,1):
         answer.edit_cc(channel,user_id,1)
     return answer
 
