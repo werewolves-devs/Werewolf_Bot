@@ -430,8 +430,7 @@ def unfreeze(user_id,victim_id):
     db_set(victim_id,'frozen',0)
 
     answer = Mailbox().msg("You have successfully unfrozen <@{}>!".format(victim_id),user_channel)
-    for channel in db.unfreeze(victim_id):
-        answer.edit_cc(channel,victim_id,1)
+    answer.unfreeze(victim_id)
 
     answer.dm("Great news, <@{}>! You have been unfrozen by an **Innkeeper**! You can now take part with the town again!".format(victim_id),victim_id)
     return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
@@ -608,32 +607,12 @@ def freeze_all(user_id):
         answer.msg_add("Congratulations! You guessed them all correctly! ").msg_react('🎉')
     answer.msg_add("Your guessed users will now be frozen.")
 
-    freezing_list = [answer]
-
     for supersuit in db.get_freezers(user_id):
-        db_set(supersuit[0],'frozen',1)
         db.delete_freezer(user_id,supersuit[0])
-
-        freezing_list.append(copied_freeze(supersuit[0]))
+        answer.freeze(supersuit[0])
 
     # TODO: Give players access to frozen realm.
 
-    return freezing_list
-
-def copied_freeze(user_id):
-    db_set(user_id,'frozen',1)
-    answer = Mailbox().spam("<@{}> was frozen.".format(user_id))
-
-    for channel in db.channel_change_all(user_id,1,2):
-        answer.edit_cc(channel,user_id,2)
-    return answer
-
-def copied_unfreeze(user_id):
-    db_set(user_id,'frozen',0)
-    answer = Mailbox().spam("<@{}> is no longer frozen.".format(user_id))
-
-    for channel in channel_change_all(user_id,2,1):
-        answer.edit_cc(channel,user_id,1)
     return answer
 
 def seek(user_id,victim_id,role):

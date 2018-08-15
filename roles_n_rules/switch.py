@@ -6,62 +6,6 @@ from roles_n_rules.functions import cupid_kiss
 import random
 import roles_n_rules.role_data as roles
 
-def cc_freeze(user_id):
-    db_set(user_id,'frozen',1)
-    answer = Mailbox().spam("<@{}> was frozen.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,2):
-        answer.edit_cc(channel,user_id,2)
-    return answer
-
-def cc_unfreeze(user_id):
-    db_set(user_id,'frozen',0)
-    answer = Mailbox().spam("<@{}> is no longer frozen.".format(user_id))
-
-    for channel in channel_change_all(user_id,2,1):
-        answer.edit_cc(channel,user_id,1)
-    return answer
-
-def cc_abduct(user_id):
-    db_set(user_id,'abducted',1)
-    answer = Mailbox().spam("<@{}> has been abducted.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,3):
-        answer.edit_cc(channel,user_id,3)
-    for channel in channel_change_all(user_id,5,6):
-        answer.edit_cc(channel,user_id,6)
-    return answer
-
-def cc_unabduct(user_id):
-    db_set(user_id,'abducted',0)
-    answer = Mailbox().spam("<@{}> is no longer abducted.".format(user_id))
-
-    for channel in channel_change_all(user_id,3,1):
-        answer.edit_cc(channel,user_id,1)
-    for channel in channel_change_all(user_id,6,5):
-        answer.edit_cc(channel,user_id,5)
-    for channel in channel_change_all(user_id,7,4):
-        answer.edit_cc(channel,user_id,4)
-
-def cc_suspend(user_id):
-    answer = Mailbox().spam("<@{}> has been suspended.".format(user_id))
-
-    for channel in channel_change_all(user_id,1,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,2,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,3,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,4,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,5,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,6,8):
-        answer.edit_cc(channel,user_id,8)
-    for channel in channel_change_all(user_id,7,8):
-        answer.edit_cc(channel,user_id,8)
-    return answer
-
 def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""

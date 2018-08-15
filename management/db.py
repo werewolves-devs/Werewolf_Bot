@@ -2,10 +2,17 @@ import sqlite3
 import random
 from config import database, max_channels_per_category, max_participants
 from management.position import positionof, check_for_int, wolf_pack
-from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
 c = conn.cursor()
+
+class PollToEvaluate:
+    def __init__(self,database_tuple):
+        self.purpose = database_tuple[1]
+        self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
+
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
 
 def execute(cmd_string):
     """Execute a command straight into the database. Avoiding usage recommended.
@@ -83,7 +90,7 @@ def get_user(id):
 
 # This function makes sure the user is a participant.
 # If the user is a spectator, it returns whatever spectator is set to.
-def isParticipant(id,spectator = False,dead = False):
+def isParticipant(id,spectator = False,dead = False,suspended = False):
     """Checks if the user is a registered participant in the database
 
     Keyword arguments:
@@ -100,6 +107,9 @@ def isParticipant(id,spectator = False,dead = False):
 
     if db_get(id,'role') == u'Dead':
         return dead
+
+    if db_get(id,'role') == u'Suspended':
+        return suspended
 
     return True
 
