@@ -1,4 +1,4 @@
-ascii = '''
+splash = '''
 
 888       888                                                  888  .d888       888888b.            888
 888   o   888                                                  888 d88P"        888  "88b           888
@@ -453,7 +453,7 @@ async def on_ready():
 
     await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
-print(ascii)
+print(splash)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
