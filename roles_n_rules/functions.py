@@ -1,6 +1,5 @@
 import story_time.roleswap_msg as rolestory
 import story_time.commands as ctory
-import roles_n_rules.switch as switch
 import management.db as db
 import random
 from management.position import wolf_pack
@@ -615,11 +614,19 @@ def freeze_all(user_id):
         db_set(supersuit[0],'frozen',1)
         db.delete_freezer(user_id,supersuit[0])
 
-        freezing_list.append(switch.cc_freeze(supersuit[0]))
+        freezing_list.append(copied_freeze(supersuit[0]))
 
     # TODO: Give players access to frozen realm.
 
     return freezing_list
+
+def copied_freeze(user_id):
+    db_set(user_id,'frozen',1)
+    answer = Mailbox().spam("<@{}> was frozen.".format(user_id))
+
+    for channel in channel_change_all(user_id,1,2):
+        answer.edit_cc(channel,user_id,2)
+    return answer
 
 def seek(user_id,victim_id,role):
     """This fuction allows the crowd seeker to inspect players.
