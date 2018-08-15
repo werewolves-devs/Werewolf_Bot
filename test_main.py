@@ -2,8 +2,9 @@
 # It will be better soon
 from config import max_channels_per_category, game_log
 from management.position import positionof
+from main_classes import Mailbox
+import roles_n_rules.switch as switch
 import interpretation.check as check
-import management.setup as setup
 import management.db as db
 import reset
 
@@ -67,11 +68,11 @@ def test_database():
   assert db.channel_get('1234555') == (u'1234555',u'1',u'2')
   assert db.channel_get('1234555',1) == '2'
   assert db.channel_change_all(1,2,3) == [u'1234555']
-  assert db.unabduct(1) == [u'1234555']
+  assert switch.cc_unabduct(1) == Mailbox().spam("<@1> is no longer abducted.").edit_cc('1234555',1,1)
   db.signup(420,"BenTechy66",":poop:")
   assert db.channel_get('12211') == (u'12211',u'1',u'1',u'0')
-  assert db.freeze('1') == [u'1234555',u'12211']
-  assert db.abduct('420') == []
+  assert switch.cc_freeze('1') == Mailbox().spam("<@> was frozen.").edit_cc('1234555',1,2).edit_cc('12211',1,2)
+  assert switch.cc_abduct('420') == Mailbox().spam("<@420> has been abducted.")
 
   for i in range(max_channels_per_category - 2):
     assert db.get_category() == 24
@@ -121,7 +122,3 @@ def test_mexican():
   db.delete_standoff(2)
   assert db.get_standoff(1) == [[1,'2','Huntress','1']]
   reset.reset(True)
-
-def test_rolepool():
-  reset.reset(True)
-  setup.add_role("Werewolf",2)
