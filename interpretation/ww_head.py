@@ -860,7 +860,7 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. /n/n`!age<number>\n\n**Example:** `!age 19`"
+        msg = "**USAGE:** This command is used to set your age. /n/n`" + prefix + "age<number>\`n\n**Example:** `!age 19`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 
