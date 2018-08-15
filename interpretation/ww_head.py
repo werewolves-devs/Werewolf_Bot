@@ -234,6 +234,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "whois` - Gain a user's information\n"
+    else:
+        if is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+            return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
     #
