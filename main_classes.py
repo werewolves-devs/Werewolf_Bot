@@ -1,3 +1,4 @@
+from management.db import db_get, db_set, channel_change_all
 from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
@@ -115,6 +116,74 @@ class Mailbox:
     def delete_category(self, channel_id):
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
+
+    
+    # Commands that change one's cc status
+    def freeze(self,user_id):
+        """Freeze a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'frozen',1)
+        self.spam("<@{}> was frozen.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,2):
+            self.edit_cc(channel_id,user_id,2)
+        return self
+    
+    def unfreeze(self,user_id):
+        """Unfreeze a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'frozen',0)
+        self.spam("<@{}> is no longer frozen.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,2,1):
+            self.edit_cc(channel_id,user_id,1)
+        return self
+    
+    def abduct(self,user_id):
+        """Abduct a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'abducted',1)
+        self.spam("<@{}> has been abducted.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,3):
+            self.edit_cc(channel_id,user_id,3)
+        for channel_id in channel_change_all(user_id,5,6):
+            self.edit_cc(channel_id,user_id,6)
+        return self
+    
+    def unabduct(self,user_id):
+        """Unabduct a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'abducted',0)
+        self.spam("<@{}> is no longer abducted.".format(user_id))
+    
+        for channel_id in channel_change_all(user_id,3,1):
+            self.edit_cc(channel_id,user_id,1)
+        for channel_id in channel_change_all(user_id,6,5):
+            self.edit_cc(channel_id,user_id,5)
+        for channel_id in channel_change_all(user_id,7,4):
+            self.edit_cc(channel_id,user_id,4)
+    
+    def suspend(self,user_id):
+        """Suspend a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'role','Suspended')
+        self.spam("<@{}> has been suspended.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,2,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,3,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,4,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,5,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,6,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,7,8):
+            self.edit_cc(channel_id,user_id,8)        
 
 # Class used to send messages through the mailbox
 class Message:
