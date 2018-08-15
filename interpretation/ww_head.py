@@ -884,6 +884,32 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return todo()
             if user_role == "The Thing" and user_undead == 0:
         	    help_msg += "`" + prefix + "create_swamp` - Create swamp with chosen players. (The Thing only)\n"
+    else:
+        # I'd just like to say that I'm having to go through 600 FUCKING LINES OF CODE
+        # to get this list, purely because Randium CAN'T WRITE A FUCKNG FRAMEWORK
+        # WHY CAN'T YOU JUST USE ext.commands FROM discord.py WHICH JUST WORKS
+        # WHY DO YOU HAVE TO DO THIS FOR FUCKS SAKE
+        # ahem
+        if is_command(message, [
+            # In the end, I did some regexes to extract this list automatically.
+            # I *hope* that all the commands are here; but if not, don't blame me
+            # or my dodgy shell golf, blame randium's awful structuring.
+            # Rant over.
+                'abduct', 'abduct_all', 'add', 'apocalypse', 'assassinate', 'aura',
+                'barber_kill', 'bark', 'become', 'cast', 'cc', 'change', 'chew', 'choose',
+                'clean', 'cloth', 'copy', 'corrupt', 'cough', 'create_swamp', 'creeper',
+                'crowd', 'curse', 'cut', 'death', 'devour', 'disguise', 'donate', 'eat',
+                'enchant', 'end', 'execute', 'exercise', 'exorcise', 'flute', 'follow',
+                'forsee', 'freeze', 'freeze_all', 'fuck', 'give_amulet', 'give_cc', 'guess',
+                'guess_that', 'heal', 'hide', 'holify', 'hook', 'hunt', 'imitate', 'infect',
+                'info', 'inspect', 'kidnap', 'kill', 'kiss', 'knit', 'knot', 'life', 'light',
+                'love', 'melt', 'mirror', 'more_cc', 'munch', 'murder', 'myrole', 'poison',
+                'powder', 'prevent', 'purify', 'raven', 'remove', 'resemble', 'reveal',
+                'sacrify', 'save', 'see', 'seek', 'shoot', 'silence', 'sleep', 'sneeze',
+                'start_cliche_horror_movie', 'stop', 'submit', 'swamp', 'tell', 'threaten',
+                'turn', 'undoom', 'unfreeze', 'unite', 'vision', 'wager', 'water',]):
+                return [Mailbox().respond(PERMISSION_MSG.format("Participant"), True)]
+
 
     # =============================================================
     #
