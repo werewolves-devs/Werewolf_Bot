@@ -4,7 +4,7 @@ from management.db import db_get, db_set, channel_change_all
 from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
 import random
-import role_data as roles
+import roles_n_rules.role_data as roles
 
 def cc_freeze(user_id):
     db_set(user_id,'frozen',1)
