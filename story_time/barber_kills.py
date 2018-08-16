@@ -16,7 +16,7 @@ def barber_kill_story(barber_id,victim_id):
     msg += " Though that may sound innocent or even *cute*, this was what finally led to the assassination of <@{}> on this day.".format(victim_id)
     msg += " They were found dead, lying in a dumpster behind the barbershop.\n"
     msg += "*<@{}>, originally a barber, has assassinated a victim and has now turned into a regular **Innocent**.".format(barber_id)
-    msg += " Meanwhile, unfortunately, <@{}> has deceased.*"
+    msg += " Meanwhile, unfortunately, <@{}> has deceased.*".format(victim_id)
 
     story_table.append(msg)
 
