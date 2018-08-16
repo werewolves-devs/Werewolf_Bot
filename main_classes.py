@@ -107,6 +107,22 @@ class Mailbox:
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
+        
+    def create_sc(self,user_id,role):
+        """Create a new secret channel for a given user."""
+        self.create_cc(role,0,[user_id],[user_id],True)
+        return self
+    def add_to_sc(self,user_id,role):
+        """Add a user to a yet to be made secret channel."""
+        for channel in self.newchannels:
+            if channel.secret and channel.name == role:
+                if user_id not in channel.members:
+                    channel.members.append(user_id)
+                if user_id not in channel.settlers:
+                    channel.settlers.append(user_id)
+                return self
+        self.create_sc(user_id,role)
+        return self
 
     def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
         """Send a request to make a poll in the given channel"""
