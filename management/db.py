@@ -347,6 +347,26 @@ def get_channel_members(channel_id, number = 1):
             members.append(int(user[0]))
     return members
 
+def get_secret_channels(role):
+    """Get a list of secret channels that have a certain role. The function returns a list of integers.  
+    
+    Keyword arguments:  
+    role -> the role of which the channel was created"""
+
+    c.execute("SELECT * FROM 'secret_channels' WHERE role =?")
+
+    return [int(pointer[1]) for pointer in c.fetchall()]
+
+def add_secret_channel(channel_id,role):
+    """Add a pointer towards a new secret channel in the database. Note this only adds the pointer, not the actual channel.  
+    
+    Keyword arguments:  
+    channel_id -> the id of the secret channel  
+    role -> the role that owns the channel"""
+
+    c.execute("INSERT INTO 'secret_channels' ('role','channel_id') VALUES (?,?);",(role,channel_id))
+    conn.commit()
+
 # Add a new participant to the database
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id,name,emoji))

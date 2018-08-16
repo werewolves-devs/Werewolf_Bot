@@ -119,3 +119,15 @@ def test_mexican():
   db.delete_standoff(2)
   assert db.get_standoff(1) == [[1,'2','Huntress','1']]
   reset.reset(True)
+
+def test_secrets():
+  reset.reset(True)
+  assert db.get_secret_channels('Assassin') == []
+  db.add_secret_channel(1,'Assassin')
+  db.add_secret_channel(2,'Assassin')
+  assert db.get_secret_channels('Assassin') == [1,2]
+  db.add_secret_channel(3,'Werewolf')
+  assert db.get_secret_channels('Assassin') == [1,2]
+  db.add_secret_channel(4,'Assassin')
+  assert db.get_secret_channels('Assassin') == [1,2,4]
+  reset.reset(True)
