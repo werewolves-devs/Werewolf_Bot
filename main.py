@@ -44,7 +44,7 @@ import asyncio
 # Import config data
 # Imports go (folder name).(file name)
 import story_time.cc_creation as creation_messages
-from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator
+from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
@@ -81,21 +81,24 @@ async def on_message(message):
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
-    # Check if the message author has the Game Master role
+    #check role of sender
     isGameMaster = False
-    if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.guild.get_member(message.author.id).roles]:
-            isGameMaster = True
-
-    # Checks if the message author has a Admin role
     isAdmin = False
-    if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.guild.get_member(message.author.id).roles]:
-            isAdmin = True
+    isPeasant = False
+    try:
+        if message.guild == gamelog_channel.guild:
+            role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
 
-    # This function asks in interpretation\ww_head.py what it should do.
-    # In return, it receives a list of mailboxes that is unpacked down below.
-    result = process(message,isGameMaster,isAdmin)
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and message.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    result = process(message,isGameMaster,isAdmin,isPeasant)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
@@ -223,20 +226,7 @@ async def on_message(message):
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
-            # element.number - type of setting to set to:
-                # 0 - no access     (no view, no type)
-                # 1 - access        (view + type)
-                # 2 - frozen        (view, no type)
-                # 3 - abducted      (no view, no type)
-                # 4 - dead          (dead role?)
-
-            # 0 -> read = False
-            # 1 -> read = True
-            # 2 -> give frozen (if they don't have it yet)
-            # 3 -> read = False
-            # 4 -> give dead role + remove participant role
-            # 5 -> mute
-            # 6 -> also mute, no read
+            # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
@@ -282,14 +272,6 @@ async def on_message(message):
             # element.owner - owner of the channel;
             # element.members - members of the channel
             # element.settlers - members for whom this shall become their home channel
-            #
-            # @Participant      - no view + type
-            # @dead Participant - view + no type
-            # @everyone         - no view + no type
-
-            # All you need to do is create a channel where only the channel owner has access.
-            # The other members are given access through another Mailbox.
-            # You could make the work easier if you also posted a cc channel message already over here.
 
             if ' ' not in element.name:
 
@@ -322,6 +304,8 @@ async def on_message(message):
                             deadies.append(member)
                         else:
                             viewers.append(member)
+                    elif db_get(user,'role') == 'Suspended':
+                        pass
                     else:
                         deadies.append(member)
 
@@ -475,6 +459,6 @@ print(splash)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-    client.run(config.TOKEN)
+    client.run(config.WW_TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')

@@ -13,6 +13,8 @@ villager_team = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller"
 "Raven","Robin Jackson","Royal Knight","Runner","Town Elder","Witch"]
 wolf_team = ["Werewolf","Bloody Butcher","Curse Caster","Hell Hound","Infected Wolf","Lone Wolf","Sacred Wolf","Tanner",
 "Warlock","White Werewolf","Wolf's Cub"]
+solo_team = ["Angel","Despot","Devil","Demon","Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer",
+"The Thing","Undead","Vampire","Zombie"]
 
 # Converts the required string to its position in the SQLite database.
 # Raises an error if it cannot find the string.

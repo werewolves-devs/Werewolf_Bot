@@ -2,10 +2,17 @@ import sqlite3
 import random
 from config import database, max_channels_per_category, max_participants
 from management.position import positionof, check_for_int, wolf_pack
-from main_classes import PollToEvaluate
 
 conn = sqlite3.connect(database)
 c = conn.cursor()
+
+class PollToEvaluate:
+    def __init__(self,database_tuple):
+        self.purpose = database_tuple[1]
+        self.blamed = database_tuple[2]
+        self.channel = database_tuple[3]
+
+        self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
 
 def execute(cmd_string):
     """Execute a command straight into the database. Avoiding usage recommended.
@@ -29,9 +36,17 @@ def poll_list():
 
     return c.fetchall()
 
-def player_list():
+def player_list(alive_only = False,available_only = False):
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
-    return [int(item[0]) for item in poll_list()]
+    player_list = [int(item[0]) for item in poll_list()]
+    
+    if alive_only == False and available_only == False:
+        return player_list
+
+    if available_only == False:
+        player_list = [player for player in player_list if db_get(player,'role') not in ['Spectator','Dead']]
+
+    return [player for player in player_list if int(db_get(player,'adbucted')) == 0 and int(db_get(player,'frozen')) == 0]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
@@ -75,7 +90,7 @@ def get_user(id):
 
 # This function makes sure the user is a participant.
 # If the user is a spectator, it returns whatever spectator is set to.
-def isParticipant(id,spectator = False,dead = False):
+def isParticipant(id,spectator = False,dead = False,suspended = False):
     """Checks if the user is a registered participant in the database
 
     Keyword arguments:
@@ -92,6 +107,9 @@ def isParticipant(id,spectator = False,dead = False):
 
     if db_get(id,'role') == u'Dead':
         return dead
+
+    if db_get(id,'role') == u'Suspended':
+        return suspended
 
     return True
 
@@ -129,6 +147,7 @@ def db_set(user_id,column,value):
     column -> the relevant part of info
     value -> the new value it should be set to
     """
+    positionof(column) # Make sure the value is valid.
     c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
     conn.commit()
 
@@ -260,46 +279,6 @@ def get_columns():
     c.execute("SELECT * FROM channel_rows")
     return c.fetchall()
 
-def abduct(user_id):
-    """Returns a list of channels that need to be changed to abduct a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,1,3)
-
-def unabduct(user_id):
-    """Returns a list of channels that need to be changed to unabduct a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,3,1)
-
-def freeze(user_id):
-    """Returns a list of channels that need to be changed to freeze a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,1,2)
-
-def unfreeze(user_id):
-    """Returns a list of channels that need to be changed to unfreeze a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return channel_change_all(user_id,2,1)
-
-def kill(user_id):
-    """Returns a list of channels that need to be changed to kill a player
-
-    Keyword arguments:
-    user_id -> the user's id
-    """
-    return [channel_change_all(user_id,i,4) for i in range(4)]
-
 def get_category():
     """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
@@ -418,7 +397,7 @@ def add_freezer(user_id,victim_id,role):
     user_id -> the role of the ice king casting the guess
     victim_id -> the player whose role is guessed
     role -> the role that victim_id is guessed to be  """
-    c.execute("SELECT role FROM 'freezers' WHERE victim =?",(victim_id,))
+    c.execute("SELECT role FROM 'freezers' WHERE victim =? AND king =?",(victim_id,user_id))
     answer = c.fetchone()
     if answer == None:
         c.execute("INSERT INTO 'freezers' (king,victim,role) VALUES (?,?,?)",(user_id,victim_id,role))
@@ -433,6 +412,7 @@ def get_freezers(user_id):
 
     user_id -> the id of the ice king"""
     c.execute("SELECT victim, role FROM freezers WHERE king =?",(user_id,))
+    print(user_id)
     return c.fetchall()
 
 def delete_freezer(user_id,victim_id):

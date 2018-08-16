@@ -3,7 +3,7 @@ from discord import Embed
 
 import interpretation.check as check
 import roles_n_rules.functions as func
-from config import max_cc_per_user, season
+from config import max_cc_per_user, season, universal_prefix as unip
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
@@ -12,12 +12,13 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 
+PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
-# Finally found where all the roles are added
-def process(message, isGameMaster=False, isAdmin=False):
+
+def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
     message_channel = message.channel.id
     user_role = db_get(user_id, 'role')
@@ -31,6 +32,38 @@ def process(message, isGameMaster=False, isAdmin=False):
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
         return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
+
+    # =============================================================
+    #
+    #                         BOT COMMANDS
+    #
+    # =============================================================
+    if isPeasant == True:
+        if is_command(message,['warn'],False,unip):
+            # Warn the user that they've been active for a while.
+            answer = Mailbox().story("Hey there, <@{}>! You have been idling for about 48 hours now!\n".format(message.mentions[0].id))
+            return [answer.story_add("Please let us hear from you within 24 hours, or you will be disqualified for idling out.")]
+
+        if is_command(message,['idle'],False,unip):
+            # Kill the inactive user
+            answer = Mailbox().story("<@{}> has been killed due to inactivity.".format(message.mentions[0].id))
+            return [answer]
+
+        if is_command(message,['pay'],False,unip):
+            # Initiate the first round of starting the day.
+            return [Mailbox(True)]
+
+        if is_command(message,['day'],False,unip):
+            # Initiate the second round of starting the day.
+            pass
+
+        if is_command(message,['pight',False,unip]):
+            # Initiate the first round of starting the night.
+            return [Mailbox(True)]
+
+        if is_command(message,['night'],False,unip):
+            # Initiate the second round of starting the night.
+            pass
 
     # =============================================================
     #
@@ -58,6 +91,8 @@ def process(message, isGameMaster=False, isAdmin=False):
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "delete_category` - Delete a category.\n"
+    elif is_command(message, ['delete_category']):
+        return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
 
     # =============================================================
     #
@@ -199,6 +234,8 @@ def process(message, isGameMaster=False, isAdmin=False):
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "whois` - Gain a user's information\n"
+    elif is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+        return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
     #
@@ -845,6 +882,22 @@ def process(message, isGameMaster=False, isAdmin=False):
                 return todo()
             if user_role == "The Thing" and user_undead == 0:
         	    help_msg += "`" + prefix + "create_swamp` - Create swamp with chosen players. (The Thing only)\n"
+    elif is_command(message, [
+        'abduct', 'abduct_all', 'add', 'apocalypse', 'assassinate', 'aura',
+        'barber_kill', 'bark', 'become', 'cast', 'cc', 'change', 'chew', 'choose',
+        'clean', 'cloth', 'copy', 'corrupt', 'cough', 'create_swamp', 'creeper',
+        'crowd', 'curse', 'cut', 'death', 'devour', 'disguise', 'donate', 'eat',
+        'enchant', 'end', 'execute', 'exercise', 'exorcise', 'flute', 'follow',
+        'forsee', 'freeze', 'freeze_all', 'fuck', 'give_amulet', 'give_cc', 'guess',
+        'guess_that', 'heal', 'hide', 'holify', 'hook', 'hunt', 'imitate', 'infect',
+        'info', 'inspect', 'kidnap', 'kill', 'kiss', 'knit', 'knot', 'life', 'light',
+        'love', 'melt', 'mirror', 'more_cc', 'munch', 'murder', 'myrole', 'poison',
+        'powder', 'prevent', 'purify', 'raven', 'remove', 'resemble', 'reveal',
+        'sacrify', 'save', 'see', 'seek', 'shoot', 'silence', 'sleep', 'sneeze',
+        'start_cliche_horror_movie', 'stop', 'submit', 'swamp', 'tell', 'threaten',
+        'turn', 'undoom', 'unfreeze', 'unite', 'vision', 'wager', 'water',]):
+        return [Mailbox().respond(PERMISSION_MSG.format("Participant"), True)]
+
 
     # =============================================================
     #
@@ -860,8 +913,8 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['age'], True):
-        # TODO
-        return todo()
+        msg = "**USAGE:** This command is used to set your age. /n/n`" + prefix + "age<number>\`n\n**Example:** `!age 19`"
+        return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 
     '''profile'''
@@ -871,8 +924,8 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['profile'], True):
-        # TODO
-        return todo()
+        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. /n/n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
+        return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
     '''signup'''
