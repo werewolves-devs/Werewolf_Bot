@@ -7,6 +7,7 @@ from config import max_cc_per_user, season, universal_prefix as unip
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
+from management.position import valid_distribution
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
@@ -32,6 +33,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     '''testpoll'''
     if is_command(message,['poll','testpoll']):
         return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
+
+    '''dist'''
+    if is_command(message,['dist','checkdist','check_dist']):
+        roles = check.roles(message)
+        if not roles:
+            return [Mailbox().respond("You gotta provide some roles, bud!",True)]
+        judgment = valid_distribution(roles)
+        if not judgment:
+            return [Mailbox().respond("Sorry, that's an invalid role distribution!",True)]
+        return [Mailbox().respond(judgment,True)]
 
     # =============================================================
     #
