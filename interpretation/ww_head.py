@@ -563,8 +563,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.see(user_id,target[0])]
             if is_command(message, ['forsee', 'inspect', 'see', 'tell'], True) and user_role == "Fortune Teller":
-                # TODO
-                return todo()
+                msg = "**Usage:** See a players role.\n\n`" + prefix + "+see <player>`\n\n"
+                msg += "**Example:** `" + prefix + "see @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by ."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Fortune Teller" and user_undead == 0:
                 help_msg += "`" + prefix + "see` - Inspect a player's role (Fortune Teller only)\n"
 
@@ -576,8 +578,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.silence(user_id,target[0])]
             if is_command(message, ['knit', 'knot', 'silence'], True) and user_role == "Grandma":
-                # TODO
-                return todo()
+                msg = "**Usage:** Silence upto three players.\n\n`" + prefix + "+silence <player> <player> <player>`\n\n"
+                msg += "**Example:** `" + prefix + "silence @Randium#6521 @Dezinator#3916 @BenTechy66#8809`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by ."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Grandma" and user_undead == 0:
                 help_msg += "`" + prefix + "silence` - Silence a player. (Grandma only)\n"
 
