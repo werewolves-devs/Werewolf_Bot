@@ -99,9 +99,9 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[]):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
@@ -218,11 +218,12 @@ class Message:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[]):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
+        self.secret = secret
         if owner not in members:
             self.members.append((owner))
 

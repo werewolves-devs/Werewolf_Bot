@@ -279,10 +279,16 @@ def get_columns():
     c.execute("SELECT * FROM channel_rows")
     return c.fetchall()
 
-def get_category():
+def get_category(secret = False):
     """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
-    c.execute("SELECT * FROM categories WHERE current = 1")
+
+    # Keep in mind; secret channels and conspiracy channels use different categories.
+    if not secret:
+        c.execute("SELECT * FROM categories WHERE current = 1")
+    else:
+        c.execute("SELECT * FROM 'secret_categories' WHERE current = 1")
+
     category = c.fetchone()
 
     if category == None:
@@ -292,13 +298,18 @@ def get_category():
 
     return int(category[1])
 
-def add_category(id):
+def add_category(id,secret=False):
     """Let the datbase know a new category has been appointed for the cc's, which has the given id.
 
     Keyword arguments:
     id -> the id of the category"""
-    c.execute("UPDATE categories SET current = 0;")
-    c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+    if not secret:
+        c.execute("UPDATE categories SET current = 0;")
+        c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+    else:
+        c.execute("UPDATE 'secret_categories' SET current = 0;")
+        c.execute("INSERT INTO 'secret_categories' ('id') VALUES (?);",(id,))
+
     conn.commit()
 
 def is_owner(user_id,channel_id):
@@ -324,9 +335,12 @@ def is_owner(user_id,channel_id):
 
     return False
 
-def count_categories():
+def count_categories(secret=False):
     """This function counts how many categories are currently registered, and returns the value as an integer."""
-    c.execute("SELECT COUNT(*) FROM 'categories';")
+    if not secret:
+        c.execute("SELECT COUNT(*) FROM 'categories';")
+    else:
+        c.execute("SELECT COUNT(*) FROM 'secret_categories';")
     return c.fetchone()[0]
 
 def get_channel_members(channel_id, number = 1):
