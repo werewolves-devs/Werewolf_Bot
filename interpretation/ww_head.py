@@ -871,8 +871,8 @@ def process(message, isGameMaster=False, isAdmin=False):
         # TODO
         return todo()
     if is_command(message, ['profile'], True):
-        # TODO
-        return todo()
+        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. /n/n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
+        return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
     '''signup'''
