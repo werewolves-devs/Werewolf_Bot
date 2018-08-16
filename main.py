@@ -260,6 +260,9 @@ async def on_message(message):
             # element.settlers - members for whom this shall become their home channel
             # element.secret - boolean if the channel is a secret channel
 
+            if element.secret:
+                element.owner = client.user.id
+
             if ' ' not in element.name:
 
                 main_guild = botspam_channel.guild # Find the guild we're in
