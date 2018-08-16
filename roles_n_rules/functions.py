@@ -564,7 +564,7 @@ def freeze(user_id,victim_id = None,role = None):
 def freeze_all(user_id):
     """This function allows the ice king to potentially freeze all their guessed players.
     The function assumes the ice king is a participant, so make sure to have filtered this out already.
-    The function returns a list of Mailboxes.
+    The function returns a Mailbox.
 
     Keyword arguments:
     user_id -> the ice king's id"""
