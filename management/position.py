@@ -55,9 +55,9 @@ def valid_distribution(role_table,just_checking=False):
     # Normalizing the values.
     # Note that the function would've already returned False
     # if the list was empty. We cannot divide by zero here.
-    counter_village = float(counter_village)/len(roles_list)
-    counter_wolf = float(counter_wolf)/len(roles_list)
-    counter_solo = float(counter_solo)/len(roles_list)
+    counter_village = float(counter_village)/len(role_table)
+    counter_wolf = float(counter_wolf)/len(role_table)
+    counter_solo = float(counter_solo)/len(role_table)
 
     answer = "The amount of villagers is... "
     if counter_village == 0:
@@ -67,7 +67,7 @@ def valid_distribution(role_table,just_checking=False):
     elif counter_village < 0.333:
         answer += "**SMALL**\n"
     elif counter_village < 0.45:
-        answer += "**ACCEPTABLE\n"
+        answer += "**ACCEPTABLE**\n"
     elif counter_village < 0.55:
         answer += "**OPTIMAL**\n"
     elif counter_village < 0.666:
@@ -136,7 +136,7 @@ def valid_distribution(role_table,just_checking=False):
     else:
         answer += "immense.\n"
     
-    if "White Werewolf" in roles_list:
+    if "White Werewolf" in role_table:
         answer += "The claimspace among wolves is "
 
         if counter_claimspace_wolf == 0:
