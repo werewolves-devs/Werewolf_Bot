@@ -1,5 +1,5 @@
 from main_classes import Mailbox
-from management import db, dynamic as dy, setup
+from management import db, dynamic as dy, setup, position as pos
 from management.db import db_get, db_set, channel_change_all
 from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
@@ -83,6 +83,28 @@ def start_game():
         for i in range(choice.amount):
             role_pool.append(choice.role)
 
-    if len(db.player_list) > len(role_pool):
+    if len(db.player_list()) > len(role_pool):
         print("The game cannot be started while there are less roles available than that there are participants signed up.")
-        return Mailbox()
+        return Mailbox().respond("Not enough roles to distribute available!",True)
+    
+    # If there are enough roles available, make a selection, evaluate the selection, and, if accepted, distribute the roles.
+    if not pos.valid_distribution(role_pool,True):
+        return Mailbox().respond("I am sorry, but I cannot use an invalid distribution to start the game!",True)
+    
+    attempts = 0
+    while attempts < 1000:
+        attempts += 1
+        chosen_roles = random.sample(role_pool,len(db.player_list()))
+
+        if pos.valid_distribution(chosen_roles,True) == True:
+
+            # Assign the roles to all users.
+            user_list = db.player_list()
+
+            for i in range(len(user_list)):
+                user_id = user_list[i]
+                user_role = chosen_roles[i]
+
+                db_set(user_id,'role',user_role)
+
+                # If necessary, create needed channel (or add to existing one)
