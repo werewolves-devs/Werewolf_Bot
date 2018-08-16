@@ -91,6 +91,8 @@ def start_game():
     if not pos.valid_distribution(role_pool,True):
         return Mailbox().respond("I am sorry, but I cannot use an invalid distribution to start the game!",True)
     
+    answer = Mailbox(True)
+
     attempts = 0
     while attempts < 1000:
         attempts += 1
@@ -107,4 +109,18 @@ def start_game():
 
                 db_set(user_id,'role',user_role)
 
-                # If necessary, create needed channel (or add to existing one)
+                if user_role in pos.personal_secrets:
+                    answer.create_sc(user_id,user_role)
+                if user_role in pos.shared_secrets:
+                    answer.add_to_sc(user_id,user_role)
+                
+                if user_role == "Cult Member":
+                    answer.add_to_sc(user_id,"Cult Leader")
+                if user_role in pos.wolf_pack:
+                    answer.add_to_sc(user_id,"Werewolf")
+                if user_role == "Bloody Butcher":
+                    answer.add_to_sc(user_id,"Baker")
+                if user_role == "Devil":
+                    answer.add_to_sc(user_id,"Demon")
+                if user_role == "Vampire":
+                    answer.add_to_sc(user_id,"Undead")
