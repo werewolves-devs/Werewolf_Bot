@@ -1,11 +1,13 @@
 # Discord API / Login settings
-TOKEN = "yo_momma's_sized_token_here"
+WW_TOKEN = "yo_mommas_token"
+TM_TOKEN = "yo_poppas_token"
 
 
 # Rules 'n' settings
 max_channels_per_category = 50
 max_participants = 40
 max_cc_per_user = 8
+activity_hours = 72
 season = "1"
 
 ww_prefix = '!'
@@ -31,4 +33,4 @@ participant = 456881451745411089
 dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
-
+peasant = 0 # TODO
