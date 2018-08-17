@@ -68,6 +68,11 @@ def pay():
 
         # Remove tanner disguises
         db_set(user_id,'fakerole',user_role)
+        
+        # Remove zombie tag
+        db_set(user_id,'bitten',0)
+
+        return answer
 
 def start_game():
     """This function is triggered at the start of the game. If successful, the function returns a Mailbox.
