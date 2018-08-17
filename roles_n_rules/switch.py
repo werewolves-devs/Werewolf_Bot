@@ -112,6 +112,14 @@ def start_game():
                 db_set(user_id,'fakerole',user_role)
                 db_set(user_id,'channel',config.game_log)
 
+                answer.dm("This message is giving you your role for season `{}` of the *Werewolves* game.\n\n".format(config.season),user_id)
+                answer.dm_add('Your role is `{}`.\n\n'.format(user_role))
+                answer.dm_add("**You are not allowed to share a screenshot of this message!** ")
+                answer.dm_add("You can claim whatever you want about your role, but you may under **NO** ")
+                answer.dm_add("circumstances show this message in any way to any other participants.\n")
+                answer.dm_add("We hope you are happy with the role you gained, and we hope you'll enjoy the game as much as we do.\n\n")
+                answer.dm_add("Good luck... 🌕")
+
                 if user_role in pos.personal_secrets:
                     answer.create_sc(user_id,user_role)
                 if user_role in pos.shared_secrets:
