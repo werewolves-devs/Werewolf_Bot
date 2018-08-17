@@ -591,8 +591,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['fuck', 'hook', 'sleep'], True) and user_role == "Hooker":
-                # TODO
-                return todo()
+                msg = "**Usage:** Choose a player to sleep with.\n\n`" + prefix + "sleep <player>`\n\n"
+                msg += "**Example:** `" + prefix + "sleep @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by Hookers."
+
+                return [Mailbox().respond(msg,True)]
             if user_role == "Hooker" and user_undead == 0:
                 help_msg += "`" + prefix + "hook` - Sleep with another player. (Hooker only)\n"
 
@@ -917,7 +920,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # TODO
         return todo()
     if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. /n/n`" + prefix + "age<number>\`n\n**Example:** `!age 19`"
+        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age<number>\n\n**Example:** `!age 19`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 
@@ -928,7 +931,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # TODO
         return todo()
     if is_command(message, ['profile'], True):
-        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. /n/n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
+        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
