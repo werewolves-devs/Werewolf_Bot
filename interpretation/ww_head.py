@@ -675,8 +675,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.purify(user_id,target[0])]
             if is_command(message, ['heal', 'light', 'purify', 'sacrify'], True) and user_role == "Priestess":
-                # TODO
-                return todo()
+                msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
+                msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Priestess."
+                return [Mailbox().respond(msg,True)]return todo()
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
