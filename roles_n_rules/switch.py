@@ -33,6 +33,7 @@ def pay():
                     break
                 
                 db_set(user_id,'uses',i)
+                answer.msg(power.power(user_role),db_get(user_id,'channel'))
                 break
 
         # Force Cupid to fall in love

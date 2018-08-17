@@ -43,6 +43,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
+import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
@@ -324,7 +325,7 @@ async def on_message(message):
                     title = "s{}_cc_{}".format(config.season,element.name)
                     category_name = 'S{} CCs PART {}'.format(config.season,db.count_categories(element.secret) + 1)
                 else:
-                    intro_msg = creation_messages.secret_intro(element.name,[v.id for v in viewers])
+                    intro_msg = secret_messages.creation(element.name,[v.id for v in viewers])
                     reason_msg = 'Secret {} channel created.'.format(element.name)
                     title = "s{}_{}".format(config.season,element.name)
                     category_name = 'S{} Secret Channels Part {}'.format(config.season,db.count_categories(element.secret) + 1)
