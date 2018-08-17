@@ -187,7 +187,7 @@ def get_kill():
     return kill
 
 # Register a new channel to the database
-def add_channel(channel_id,owner):
+def add_channel(channel_id,owner,secret=False):
 
     """Add a channel to the database.
 
@@ -198,7 +198,10 @@ def add_channel(channel_id,owner):
     c.execute("SELECT * FROM categories")
 
     # Tell the categories database the given category has yet received another channel
-    c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+    if not secret:
+        c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+    else:
+        c.execute("UPDATE 'secret_categories' SET channels = channels + 1 WHERE current = 1")
 
     c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
     conn.commit()
@@ -279,10 +282,16 @@ def get_columns():
     c.execute("SELECT * FROM channel_rows")
     return c.fetchall()
 
-def get_category():
+def get_category(secret = False):
     """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
-    c.execute("SELECT * FROM categories WHERE current = 1")
+
+    # Keep in mind; secret channels and conspiracy channels use different categories.
+    if not secret:
+        c.execute("SELECT * FROM categories WHERE current = 1")
+    else:
+        c.execute("SELECT * FROM 'secret_categories' WHERE current = 1")
+
     category = c.fetchone()
 
     if category == None:
@@ -292,13 +301,18 @@ def get_category():
 
     return int(category[1])
 
-def add_category(id):
+def add_category(id,secret=False):
     """Let the datbase know a new category has been appointed for the cc's, which has the given id.
 
     Keyword arguments:
     id -> the id of the category"""
-    c.execute("UPDATE categories SET current = 0;")
-    c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+    if not secret:
+        c.execute("UPDATE categories SET current = 0;")
+        c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+    else:
+        c.execute("UPDATE 'secret_categories' SET current = 0;")
+        c.execute("INSERT INTO 'secret_categories' ('id') VALUES (?);",(id,))
+
     conn.commit()
 
 def is_owner(user_id,channel_id):
@@ -324,9 +338,12 @@ def is_owner(user_id,channel_id):
 
     return False
 
-def count_categories():
+def count_categories(secret=False):
     """This function counts how many categories are currently registered, and returns the value as an integer."""
-    c.execute("SELECT COUNT(*) FROM 'categories';")
+    if not secret:
+        c.execute("SELECT COUNT(*) FROM 'categories';")
+    else:
+        c.execute("SELECT COUNT(*) FROM 'secret_categories';")
     return c.fetchone()[0]
 
 def get_channel_members(channel_id, number = 1):
@@ -346,6 +363,26 @@ def get_channel_members(channel_id, number = 1):
         if int(channel_get(channel_id,int(user[0]))) == int(number):
             members.append(int(user[0]))
     return members
+
+def get_secret_channels(role):
+    """Get a list of secret channels that have a certain role. The function returns a list of integers.  
+    
+    Keyword arguments:  
+    role -> the role of which the channel was created"""
+
+    c.execute("SELECT * FROM 'secret_channels' WHERE role =?",(role,))
+
+    return [int(pointer[1]) for pointer in c.fetchall()]
+
+def add_secret_channel(channel_id,role):
+    """Add a pointer towards a new secret channel in the database. Note this only adds the pointer, not the actual channel.  
+    
+    Keyword arguments:  
+    channel_id -> the id of the secret channel  
+    role -> the role that owns the channel"""
+
+    c.execute("INSERT INTO 'secret_channels' ('role','channel_id') VALUES (?,?);",(role,channel_id))
+    conn.commit()
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):

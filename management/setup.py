@@ -5,7 +5,7 @@ conn = sqlite3.connect(database)
 c = conn.cursor()
 
 def add_role(role,amount = 1):
-    """Ädd a given amount of a given role to the role-pool.
+    """Add a given amount of a given role to the role-pool.
 
     Keyword arguments:
     role -> the role that is added to the role-poll.
@@ -38,14 +38,5 @@ def view_roles():
     rows = c.fetchall()
     result = []
     for row in rows:
-        result.append(Choice(role=row['role'], amount=row['amount']))
+        result.append(Choice(role=row[0], amount=row[1]))
     return result
-
-
-if __name__ == "__main__":
-    c.execute("DROP TABLE IF EXISTS 'role-pool'")
-    c.execute("CREATE TABLE 'role-pool' ('role' TEXT PRIMARY KEY NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 0 )")
-    add_role("Innocent",3)
-    add_role("Werewolf",4)
-    add_role("Innocent",-10)
-    add_role("Cursed Civilian",-55)

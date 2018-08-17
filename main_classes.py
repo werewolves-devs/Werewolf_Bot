@@ -99,13 +99,41 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[]):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
+        return self
+        
+    def create_sc(self,user_id,role):
+        """Create a new secret channel for a given user."""
+        new_role = ''
+        for i in range(len(role)):
+            if role[i] == ' ':
+                new_role += '_'
+            else:
+                new_role += role[i] 
+        self.create_cc(new_role,0,[user_id],[user_id],True)
+        return self
+    def add_to_sc(self,user_id,role):
+        """Add a user to a yet to be made secret channel."""
+        new_role = ''
+        for i in range(len(role)):
+            if role[i] == ' ':
+                new_role += '_'
+            else:
+                new_role += role[i]
+        for channel in self.newchannels:
+            if channel.secret and channel.name == new_role:
+                if user_id not in channel.members:
+                    channel.members.append(user_id)
+                if user_id not in channel.settlers:
+                    channel.settlers.append(user_id)
+                return self
+        self.create_sc(user_id,new_role)
         return self
 
     def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
@@ -218,12 +246,13 @@ class Message:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[]):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
-        if owner not in members:
+        self.secret = secret
+        if owner not in members and owner != 0:
             self.members.append((owner))
 
 class ChannelChange:

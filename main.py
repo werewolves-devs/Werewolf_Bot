@@ -258,6 +258,10 @@ async def on_message(message):
             # element.owner - owner of the channel;
             # element.members - members of the channel
             # element.settlers - members for whom this shall become their home channel
+            # element.secret - boolean if the channel is a secret channel
+
+            if element.secret:
+                element.owner = client.user.id
 
             if ' ' not in element.name:
 
@@ -294,8 +298,7 @@ async def on_message(message):
                         pass
                     else:
                         deadies.append(member)
-
-                intro_msg = creation_messages.cc_intro([v.id for v in viewers])
+                    
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
@@ -315,22 +318,35 @@ async def on_message(message):
                     }
                 }
 
-                # Create a new category if needed
-                if db.get_category() == None:
-                    category = await main_guild.create_category('CC part {}'.format(db.count_categories()), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
-                    db.add_category(category.id)
+                if not element.secret:
+                    intro_msg = creation_messages.cc_intro([v.id for v in viewers])
+                    reason_msg = 'CC requested by ' + message.author.name
+                    title = "s{}_cc_{}".format(config.season,element.name)
+                    category_name = 'S{} CCs PART {}'.format(config.season,db.count_categories(element.secret) + 1)
                 else:
-                    category = main_guild.get_channel(db.get_category())
+                    intro_msg = creation_messages.secret_intro(element.name,[v.id for v in viewers])
+                    reason_msg = 'Secret {} channel created.'.format(element.name)
+                    title = "s{}_{}".format(config.season,element.name)
+                    category_name = 'S{} Secret Channels Part {}'.format(config.season,db.count_categories(element.secret) + 1)
+
+                # Create a new category if needed
+                if db.get_category(element.secret) == None:
+                    category = await main_guild.create_category(category_name, reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
+                    db.add_category(category.id,element.secret)
+                else:
+                    category = main_guild.get_channel(db.get_category(element.secret))
 
                 try:
                     # Create the text channel
-                    reason_msg = 'CC requested by ' + message.author.name
                     channel = await main_guild.create_text_channel(
-                        name="s{}_{}".format(config.season,element.name),
+                        name=title,
                         category=category,
                         overwrites=default_permissions,
                         reason=reason_msg)
-                    db.add_channel(channel.id,element.owner)
+                    db.add_channel(channel.id,element.owner,element.secret)
+                    if element.secret:
+                        db.add_secret_channel(channel.id,element.name)
+
                     await channel.send(intro_msg)
 
                     # Set all access rules in the database
