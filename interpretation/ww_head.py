@@ -591,7 +591,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['fuck', 'hook', 'sleep'], True) and user_role == "Hooker":
-                msg = "**Usage:** Choose a player to sleep with, if that player is a wolf, you die. When you are sleeping with someone you are not at home, so you wont get killed.\n\n`" + prefix + "sleep <player>`\n\n"
+                msg = "**Usage:** Choose a player to sleep with.\n\n`" + prefix + "sleep <player>`\n\n"
                 msg += "**Example:** `" + prefix + "sleep @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
                 msg += "This command can only be used by Hookers."
 
