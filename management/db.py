@@ -187,7 +187,7 @@ def get_kill():
     return kill
 
 # Register a new channel to the database
-def add_channel(channel_id,owner):
+def add_channel(channel_id,owner,secret=False):
 
     """Add a channel to the database.
 
@@ -198,7 +198,10 @@ def add_channel(channel_id,owner):
     c.execute("SELECT * FROM categories")
 
     # Tell the categories database the given category has yet received another channel
-    c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+    if not secret:
+        c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+    else:
+        c.execute("UPDATE 'secret_categories' SET channels = channels + 1 WHERE current = 1")
 
     c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
     conn.commit()

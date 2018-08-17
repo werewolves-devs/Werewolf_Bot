@@ -343,7 +343,7 @@ async def on_message(message):
                         category=category,
                         overwrites=default_permissions,
                         reason=reason_msg)
-                    db.add_channel(channel.id,element.owner)
+                    db.add_channel(channel.id,element.owner,element.secret)
                     if element.secret:
                         db.add_secret_channel(channel.id,element.name)
 
