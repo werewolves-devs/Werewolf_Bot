@@ -370,7 +370,7 @@ def get_secret_channels(role):
     Keyword arguments:  
     role -> the role of which the channel was created"""
 
-    c.execute("SELECT * FROM 'secret_channels' WHERE role =?")
+    c.execute("SELECT * FROM 'secret_channels' WHERE role =?",(role,))
 
     return [int(pointer[1]) for pointer in c.fetchall()]
 
