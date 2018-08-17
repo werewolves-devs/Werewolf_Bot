@@ -51,7 +51,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     # =============================================================
     if isPeasant == True:
         if is_command(message,['warn'],False,unip):
-            # Warn the user that they've been active for a while.
+            # Warn the user that they've been inactive for a while.
             answer = Mailbox().story("Hey there, <@{}>! You have been idling for about 48 hours now!\n".format(message.mentions[0].id))
             return [answer.story_add("Please let us hear from you within 24 hours, or you will be disqualified for idling out.")]
 
@@ -618,8 +618,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.executioner(user_id,target[0])]
             if is_command(message, ['hunt', 'shoot'], True) and user_role == "Huntress":
-                # TODO
-                return todo()
+                msg = "**Usage:** Choose a player as a death target.\n\n`" + prefix + "hunt <player>`\n\n"
+                msg += "**Example:** `" + prefix + "hunt @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by the Huntress."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Huntress" and user_undead == 0:
                 help_msg += "`" + prefix + "hunt` - Choose player as death target. (Huntress only)\n"
 
@@ -643,8 +645,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['copy', 'imitate', 'mirror', 'resemble'], True) and user_role == "Look-Alike":
-                # TODO
-                return todo()
+                msg = "**Usage:** Copy a players role.\n\n`" + prefix + "copy <player>`\n\n"
+                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. " 
+                msg += "This command can only be used by Look-Alike's."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Look-Alike":
                 help_msg += "`" + prefix + "copy` - Imitate another player. (Look-Alike only)\n"
 
@@ -656,8 +660,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.nightly_kill(user_id,target[0])]
             if is_command(message, ['holify', 'sacrify', 'water'], True) and user_role == "Priest":
-                # TODO
-                return todo()
+                msg = "**Usage:** Throw Holy water on a player.\n\n`" + prefix + "holify <player>`\n\n"
+                msg += "**Example:** `" + prefix + "holify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Priest."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Priest" and user_undead == 0:
                 help_msg += "`" + prefix + "holify` - Holify a player. (Priest only)\n"
 
