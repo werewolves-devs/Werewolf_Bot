@@ -3,7 +3,7 @@ roles_list = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller","B
 "Grandma","Hooker","Huntress","Idiot","Innkeeper","Jack Robinson","Look-Alike","Macho","Mad Scientist","Priest","Priestess",
 "Raven","Robin Jackson","Royal Knight","Runner","Town Elder","Witch","Werewolf","Bloody Butcher","Curse Caster","Hell Hound",
 "Infected Wolf","Lone Wolf","Sacred Wolf","Tanner","Warlock","White Werewolf","Wolf's Cub","Angel","Despot","Devil","Demon",
-"Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer","The Thing","Undead","Vampire","Zombie"]
+"Flute Player","Horseman","Ice King","Immortal","Psychopath","Pyromancer","The Thing","Undead","Vampire","Zombie"]
 
 wolf_pack = ["Werewolf","Bloody Butcher","Hell Hound","Infected Wolf","Sacred Wolf","White Werewolf","Wolf's Cub"]
 
@@ -13,7 +13,7 @@ villager_team = ["Innocent","Alcoholic","Amulet Holder","Assassin","Aura Teller"
 "Raven","Robin Jackson","Royal Knight","Runner","Town Elder","Witch"]
 wolf_team = ["Werewolf","Bloody Butcher","Curse Caster","Hell Hound","Infected Wolf","Lone Wolf","Sacred Wolf","Tanner",
 "Warlock","White Werewolf","Wolf's Cub"]
-solo_team = ["Angel","Despot","Devil","Demon","Flute Player","Four Horsemen","Ice King","Immortal","Psychopath","Pyromancer",
+solo_team = ["Angel","Despot","Devil","Demon","Flute Player","Horseman","Ice King","Immortal","Psychopath","Pyromancer",
 "The Thing","Undead","Vampire","Zombie"]
 
 claimspace_village = ["Innocent","Alcoholic","Cursed Civilian","Runner"]
@@ -21,8 +21,8 @@ claimspace_wolf = ["Werewolf","Sacred Wolf"]
 
 personal_secrets = ["Amulet Holder","Assassin","Aura Teller","Barber","Crowd Seeker","Cupid","Dog","Executioner",
 "Exorcist","Fortune Teller","Fortune Apprentice","Grandma","Hooker","Huntress","Innkeeper","Look-Alike","Priest",
-"Priestess","Raven","Royal Knight","Witch","Werewolf","Curse Caster","Infected Wolf","Lone Wolf","Tanner",
-"Warlock","White Werewolf","Devil","Four Horsemen"]
+"Priestess","Raven","Royal Knight","Witch","Curse Caster","Infected Wolf","Lone Wolf","Tanner",
+"Warlock","White Werewolf","Devil","Horseman"]
 
 shared_secrets = ["Baker","Butcher","Cult Leader","Werewolf","Hell Hound","Demon","Flute Player",
 "Ice King","Psychopath","Pyromancer","The Thing","Undead","Vampire","Zombie"]

@@ -5,6 +5,7 @@ from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
 import random
 import roles_n_rules.role_data as roles
+import config
 
 def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
@@ -108,6 +109,8 @@ def start_game():
                 user_role = chosen_roles[i]
 
                 db_set(user_id,'role',user_role)
+                db_set(user_id,'fakerole',user_role)
+                db_set(user_id,'channel',config.game_log)
 
                 if user_role in pos.personal_secrets:
                     answer.create_sc(user_id,user_role)
@@ -124,3 +127,7 @@ def start_game():
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
                     answer.add_to_sc(user_id,"Undead")
+            
+            return answer
+    
+    answer.respond("Timeout reached! Your distribution is too crazy!",True)

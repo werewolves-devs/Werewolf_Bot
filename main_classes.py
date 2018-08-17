@@ -252,7 +252,7 @@ class ChannelCreate:
         self.members = members
         self.settlers = settlers
         self.secret = secret
-        if owner not in members:
+        if owner not in members and owner != 0:
             self.members.append((owner))
 
 class ChannelChange:
