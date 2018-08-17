@@ -1,4 +1,4 @@
-ascii = '''
+splash = '''
 
 888       888                                                  888  .d888       888888b.            888
 888   o   888                                                  888 d88P"        888  "88b           888
@@ -33,7 +33,7 @@ splashes = [
 "What are cogs?",
 "This is MY project. You\'re just freeloaders.",
 "You've got three weeks to fix EVERYTHING.",
-"No-one agrees? Too bad! Myy idea it is.",
+"No-one agrees? Too bad! My idea it is.",
 "The next version will be written in Java only!"
 ]
 
@@ -43,7 +43,7 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator
+from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ww_head import process
@@ -54,6 +54,20 @@ import management.db as db
 
 client = discord.Client()
 
+def get_role(server_roles, target_id):
+    for each in server_roles:
+       if each.id == target_id:
+           return each
+    return None
+
+async def remove_all_game_roles(member):
+    for role in member.roles:
+        if role.id == config.frozen_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.dead_participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.suspended:
+            await member.remove_roles(role, reason="Updating CC permissions")
 
 # Whenever a message is sent.
 @client.event
@@ -66,18 +80,23 @@ async def on_message(message):
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
-    # Check if the message author has the Game Master role
     isGameMaster = False
-    if message.guild == gamelog_channel.guild:
-        if game_master in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
-            isGameMaster = True
-
     isAdmin = False
-    if message.guild == gamelog_channel.guild:
-        if administrator in [y.id for y in message.channel.guild.get_member(message.author.id).roles]:
-            isAdmin = True
+    isPeasant = False
+    try:
+        if message.guild == gamelog_channel.guild:
+            role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
 
-    result = process(message,isGameMaster,isAdmin)
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and message.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    result = process(message,isGameMaster,isAdmin,isPeasant)
 
     temp_msg = []
 
@@ -193,36 +212,43 @@ async def on_message(message):
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
-            # element.number - type of setting to set to:
-                # 0 - no access     (no view, no type)
-                # 1 - access        (view + type)
-                # 2 - frozen        (view, no type)
-                # 3 - abducted      (no view, no type)
-                # 4 - dead          (dead role?)
-
-            # 0 -> read = False
-            # 1 -> read = True
-            # 2 -> give frozen (if they don't have it yet)
-            # 3 -> read = False
-            # 4 -> give dead role + remove participant role
+            # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
             user = client.get_user(element.victim)
+            main_guild = botspam_channel.guild
+            member = main_guild.get_member(element.victim)
+            await remove_all_game_roles(member)
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 2:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
             elif element.number == 3:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 4:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+            elif element.number == 5:
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+            elif element.number == 6:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+            elif element.number == 7:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+            elif element.number == 8:
+                await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
             else:
                 await msg.channel.send('Something went wrong! Please contact a Game Master.')
                 return
-            # Reminder: Add some different welcome messages
-            await msg.channel.send('Welcome to the channel, <@{}>!'.format(element.victim))
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
@@ -232,14 +258,10 @@ async def on_message(message):
             # element.owner - owner of the channel;
             # element.members - members of the channel
             # element.settlers - members for whom this shall become their home channel
-            #
-            # @Participant      - no view + type
-            # @dead Participant - view + no type
-            # @everyone         - no view + no type
+            # element.secret - boolean if the channel is a secret channel
 
-            # All you need to do is create a channel where only the channel owner has access.
-            # The other members are given access through another Mailbox.
-            # You could make the work easier if you also posted a cc channel message already over here.
+            if element.secret:
+                element.owner = client.user.id
 
             if ' ' not in element.name:
 
@@ -272,10 +294,11 @@ async def on_message(message):
                             deadies.append(member)
                         else:
                             viewers.append(member)
+                    elif db_get(user,'role') == 'Suspended':
+                        pass
                     else:
                         deadies.append(member)
-
-                intro_msg = creation_messages.cc_intro([v.id for v in viewers])
+                    
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
@@ -295,22 +318,35 @@ async def on_message(message):
                     }
                 }
 
-                # Create a new category if needed
-                if db.get_category() == None:
-                    category = await main_guild.create_category('CC part {}'.format(db.count_categories()), reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
-                    db.add_category(category.id)
+                if not element.secret:
+                    intro_msg = creation_messages.cc_intro([v.id for v in viewers])
+                    reason_msg = 'CC requested by ' + message.author.name
+                    title = "s{}_cc_{}".format(config.season,element.name)
+                    category_name = 'S{} CCs PART {}'.format(config.season,db.count_categories(element.secret) + 1)
                 else:
-                    category = main_guild.get_channel(db.get_category())
+                    intro_msg = creation_messages.secret_intro(element.name,[v.id for v in viewers])
+                    reason_msg = 'Secret {} channel created.'.format(element.name)
+                    title = "s{}_{}".format(config.season,element.name)
+                    category_name = 'S{} Secret Channels Part {}'.format(config.season,db.count_categories(element.secret) + 1)
+
+                # Create a new category if needed
+                if db.get_category(element.secret) == None:
+                    category = await main_guild.create_category(category_name, reason='It seems like we couldn\'t use our previous category! Don\'t worry, I just created a new one.')
+                    db.add_category(category.id,element.secret)
+                else:
+                    category = main_guild.get_channel(db.get_category(element.secret))
 
                 try:
                     # Create the text channel
-                    reason_msg = 'CC requested by ' + message.author.name
                     channel = await main_guild.create_text_channel(
-                        name="s{}_{}".format(config.season,element.name),
+                        name=title,
                         category=category,
                         overwrites=default_permissions,
                         reason=reason_msg)
-                    db.add_channel(channel.id,element.owner)
+                    db.add_channel(channel.id,element.owner,element.secret)
+                    if element.secret:
+                        db.add_secret_channel(channel.id,element.name)
+
                     await channel.send(intro_msg)
 
                     # Set all access rules in the database
@@ -419,10 +455,10 @@ async def on_ready():
 
     await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
-print(ascii)
+print(splash)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-    client.run(config.TOKEN)
+    client.run(config.WW_TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')

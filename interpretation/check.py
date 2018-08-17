@@ -1,4 +1,4 @@
-from config import ww_prefix as prefix
+import config
 from emoji import UNICODE_EMOJI
 from management.db import emoji_to_player, isParticipant
 from management.position import roles_list
@@ -115,6 +115,13 @@ def roles(message,amount= -1,delete_duplicates = False):
             if message.content[i:].lower().startswith(role.lower()):
                 role_table.append(role)
 
+    # Remove overlapping role names
+    for role in role_table:
+        if role == 'White Werewolf':
+            role_table.remove('Werewolf')
+        if role == 'Priestess':
+            role_table.remove('Priest')
+
     if delete_duplicates == True:
         role_table = list(set(role_table))
 
@@ -137,7 +144,7 @@ def check_for_int(s):
         return False
 
 # Checks if an input requests a given command
-def is_command(message,commandlist,help=False):
+def is_command(message,commandlist,help=False,prefix=config.ww_prefix):
     """Check if the message starts with the given command or its aliases.
 
     Keyword arguments:
@@ -149,5 +156,7 @@ def is_command(message,commandlist,help=False):
         if message.content.startswith(prefix + command) and help == False:
             return True
         if message.content.startswith(prefix + 'help ' + command) and help == True:
+            return True
+        if message.content.startswith('?' + command) and help == True:
             return True
     return False

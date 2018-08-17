@@ -152,7 +152,7 @@ It seemed <@{0}>, <@{1}>, <@{2}>, <@{3}> and <@{4}> were breaking a new record w
     if amount == 5:
         msg = '''\
 <@{3}> was trying to drink his misery away, and as they drunkenly walked home from the tavern, <@{3}> fell into a wall - or so it seemed.\
-The wall turned out to be a (magical?) curtain that looked like a wall, and <@{3}> just walked in on <@{2}>, <@{0}>, <@{4}> \
+The wall turned out to be a (magical?) curtain that looked like a wall, and <@{3}> just walked in on <@{2}>, <@{0}>, <@{4}> and <@{1}>, \
 who were about to have a conversation! They couldn\'t resist keeping <@{3}> in - else they'd speak their mind for *sure*.\
  '''.format(list[0],list[1],list[2],list[3],list[4])
 
@@ -163,3 +163,11 @@ who were about to have a conversation! They couldn\'t resist keeping <@{3}> in -
         return 'Look, look, over @here! A new **conspiracy channel** has been created!'
 
     return msgtable[randium.randint(0,len(msgtable)-1)]
+
+def secret_intro(role,members):
+    if role == 'Assassin':
+        msg = '**Hello there, {}!**\n\nThis town has been corrupted, and you can feel it! '
+        msg += 'Luckily, you will put it out of its misery soon, for you shall kill all the evil ones!'
+    else:
+        msg = 'That is strange! Your role doesn\'t exist in my logs.... or not yet, at least.'
+    return msg

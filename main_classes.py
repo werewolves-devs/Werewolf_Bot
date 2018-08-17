@@ -1,3 +1,4 @@
+from management.db import db_get, db_set, channel_change_all, channel_get
 from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
@@ -98,13 +99,41 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[]):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
+        return self
+        
+    def create_sc(self,user_id,role):
+        """Create a new secret channel for a given user."""
+        new_role = ''
+        for i in range(len(role)):
+            if role[i] == ' ':
+                new_role += '_'
+            else:
+                new_role += role[i] 
+        self.create_cc(new_role,0,[user_id],[user_id],True)
+        return self
+    def add_to_sc(self,user_id,role):
+        """Add a user to a yet to be made secret channel."""
+        new_role = ''
+        for i in range(len(role)):
+            if role[i] == ' ':
+                new_role += '_'
+            else:
+                new_role += role[i]
+        for channel in self.newchannels:
+            if channel.secret and channel.name == new_role:
+                if user_id not in channel.members:
+                    channel.members.append(user_id)
+                if user_id not in channel.settlers:
+                    channel.settlers.append(user_id)
+                return self
+        self.create_sc(user_id,new_role)
         return self
 
     def new_poll(self,channel_id,purpose,user_id = 0,description = ''):
@@ -115,6 +144,90 @@ class Mailbox:
     def delete_category(self, channel_id):
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
+
+    
+    # Commands that change one's cc status
+    def freeze(self,user_id):
+        """Freeze a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'frozen',1)
+        self.spam("<@{}> was frozen.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,2):
+            self.edit_cc(channel_id,user_id,2)
+        return self
+    
+    def unfreeze(self,user_id):
+        """Unfreeze a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'frozen',0)
+        self.spam("<@{}> is no longer frozen.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,2,1):
+            self.edit_cc(channel_id,user_id,1)
+        return self
+    
+    def abduct(self,user_id):
+        """Abduct a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'abducted',1)
+        self.spam("<@{}> has been abducted.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,3):
+            self.edit_cc(channel_id,user_id,3)
+        for channel_id in channel_change_all(user_id,5,6):
+            self.edit_cc(channel_id,user_id,6)
+        return self
+    
+    def unabduct(self,user_id):
+        """Unabduct a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'abducted',0)
+        self.spam("<@{}> is no longer abducted.".format(user_id))
+    
+        for channel_id in channel_change_all(user_id,3,1):
+            self.edit_cc(channel_id,user_id,1)
+        for channel_id in channel_change_all(user_id,6,5):
+            self.edit_cc(channel_id,user_id,5)
+        for channel_id in channel_change_all(user_id,7,4):
+            self.edit_cc(channel_id,user_id,4)
+        return self
+    
+    def suspend(self,user_id):
+        """Suspend a user.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        db_set(user_id,'role','Suspended')
+        self.spam("<@{}> has been suspended.".format(user_id))
+
+        for channel_id in channel_change_all(user_id,1,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,2,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,3,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,4,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,5,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,6,8):
+            self.edit_cc(channel_id,user_id,8)
+        for channel_id in channel_change_all(user_id,7,8):
+            self.edit_cc(channel_id,user_id,8) 
+        return self     
+
+    def mute(self,user_id,channel_id):
+        """Mute a user. Users cannot be muted in channels they do not take part in, or channels they are frozen in.  
+        This function alters the Mailbox, so 'add' and react commands may not work as intended."""
+        self.spam("<@{}> has been muted in <#{}>".format(user_id,channel_id))
+
+        channel_settings = int(channel_get(channel_id,user_id))
+
+        if channel_settings == 1:
+            self.edit_cc(channel_id,user_id,5)
+        if channel_settings == 3:
+            self.edit_cc(channel_id,user_id,6)
+        return self
+        
 
 # Class used to send messages through the mailbox
 class Message:
@@ -133,12 +246,13 @@ class Message:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[]):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
-        if owner not in members:
+        self.secret = secret
+        if owner not in members and owner != 0:
             self.members.append((owner))
 
 class ChannelChange:
