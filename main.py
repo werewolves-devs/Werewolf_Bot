@@ -347,6 +347,12 @@ async def on_message(message):
                     if element.secret:
                         db.add_secret_channel(channel.id,element.name)
 
+                        # If the channel is meant for an amulet holder, assign the amulet holder.
+                        if element.name == 'Amulet_Holder':
+                            for member in viewers:
+                                if db_get(member.id,'role') == 'Amulet Holder':
+                                    db_set(member.id,'amulet',channel.id)
+
                     await channel.send(intro_msg)
 
                     # Set all access rules in the database

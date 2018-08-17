@@ -206,7 +206,7 @@ def positionof(column):
         return 17
     if column == "sleepingover":
         return 18
-    if column == "amulets":
+    if column == "lastwords":
         return 19
     if column == "abducted":
         return 20
@@ -214,6 +214,8 @@ def positionof(column):
         return 21
     if column == 'horseman':
         return 22
+    if column == 'amulet':
+        return 23
 
     raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
 
