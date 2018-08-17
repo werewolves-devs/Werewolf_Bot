@@ -49,7 +49,7 @@ def pay():
             answer_table.append(chosen)
 
         # Force Dog to become Innocent
-        if user_role == "Dog":
+        if user_role == "Dog" and db_get(user_id,'uses') > 0:
             db_set(user_id,'role',"Innocent")
             answer.msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
             answer.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
@@ -135,6 +135,8 @@ def start_game():
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
                     answer.add_to_sc(user_id,"Undead")
+                if user_role == "Witch":
+                    db_set(user_id,'uses',3)
             
             # Reset the day timer
             dy.reset_day()

@@ -43,6 +43,8 @@ def valid_distribution(role_table,just_checking=False):
     counter_claimspace_village = 0
     counter_claimspace_wolf = 0
 
+    counter_horsemen = 0
+
     for role in role_table:
         if role in villager_team:
             hasVillage = 1
@@ -57,13 +59,42 @@ def valid_distribution(role_table,just_checking=False):
             counter_claimspace_village += 1
         if role in claimspace_wolf:
             counter_claimspace_wolf += 1
+        if role == 'Horseman':
+            counter_horsemen += 1
     
     # If only one category is available, do not accept the distribution.
     if (hasVillage + hasWolf + hasSolo) < 2:
         return False
+
+    # Special conditions
+    if counter_horsemen not in [0,4]:
+        return False
+    if counter_horsemen == 4 and len(role_table) < 20:
+        return False
+    if "Cult Member" in role_table and "Cult Leader" not in role_table:
+        return False
+    if "Demon" in role_table and "Devil" not in role_table:
+        return False
+    if "Undead" in role_table and "Vampire" not in role_table:
+        return False
+    if "Innkeeper" in role_table and "Ice King" not in role_table:
+        return False
+    if "Priestess" in role_table and ("Cursed Civilian" not in role_table and "Sacred Wolf" not in role_table and "Curse Caster" not in role_table):
+        return False
+    if "Robin Jackson" in role_table and "Jack Robinson" not in role_table:
+        return False
+    if "Jack Robinson" in role_table and "Robing Jackson" not in role_table:
+        return False
+    if "Butcher" in role_table and "Bloody Butcher" not in role_table:
+        return False
+    if "Bloody Butcher" in role_table and "Butcher" not in role_table:
+        return False
+    if "Fortune Apprentice" in role_table and "Fortune Teller" not in role_table:
+        return False
+
     if just_checking:
         return True
-    
+
     # Normalizing the values.
     # Note that the function would've already returned False
     # if the list was empty. We cannot divide by zero here.
