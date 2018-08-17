@@ -38,5 +38,5 @@ def view_roles():
     rows = c.fetchall()
     result = []
     for row in rows:
-        result.append(Choice(role=row['role'], amount=row['amount']))
+        result.append(Choice(role=row[0], amount=row[1]))
     return result
