@@ -101,6 +101,7 @@ def start_game():
 
         if pos.valid_distribution(chosen_roles,True) == True:
 
+
             # Assign the roles to all users.
             user_list = db.player_list()
 
@@ -137,6 +138,20 @@ def start_game():
                     answer.add_to_sc(user_id,"Undead")
                 if user_role == "Witch":
                     db_set(user_id,'uses',3)
+            
+            # If the four horsemen are part of the game, assign numbers to all players.
+            if "Horseman" in chosen_roles:
+                nothorse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') != 'Horseman']
+                horse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') == 'Horseman']
+
+                nothorse_table.shuffle()
+                horse_table.shuffle()
+
+                for i in range(4):
+                    db_set(horse_table[i],'horseman',i+1)
+
+                for i in range(16):
+                    db_set(nothorse_table[i],'horseman',(i%4)+1)
             
             # Reset the day timer
             dy.reset_day()
