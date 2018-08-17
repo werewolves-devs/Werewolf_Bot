@@ -12,6 +12,7 @@ def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
+    answer_table = []
     answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
@@ -41,18 +42,17 @@ def pay():
             chosen = False
             attempts = 0
 
-            while not chosen and attempts < 100:
+            while not chosen and attempts < 1000:
                 forced_victim = random.choice(db.player_list(True,True))
                 chosen = cupid_kiss(user_id,forced_victim,False)
             
-            answer.append(chosen)
+            answer_table.append(chosen)
 
         # Force Dog to become Innocent
         if user_role == "Dog":
             db_set(user_id,'role',"Innocent")
-            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
-            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
-            answer.append(response)
+            answer.msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
+            answer.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
 
         # Remove hooker effects
         db_set(user_id,'sleepingover',0)
@@ -63,9 +63,8 @@ def pay():
         # Force Look-Alike to become Innocent
         if user_role == "Look-Alike":
             db_set(user_id,'role',"Innocent")
-            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
-            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
-            answer.append(response)
+            answer.msg("You haven't chosen a role! That's why you have now become an **Innocent**!",db_get(user_id,'channel'))
+            answer.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
 
         # Remove tanner disguises
         db_set(user_id,'fakerole',user_role)
