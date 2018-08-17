@@ -53,6 +53,10 @@ def next_day():
     """Set the game's current day one step forward."""
     return jset("day",day_number()+1)
 
+def reset_day():
+    """Reset the day number to start the game."""
+    return jset("day",-1)
+
 def get_mayor():
     """Get the id of the town's current mayor"""
     return jget("Mayor")

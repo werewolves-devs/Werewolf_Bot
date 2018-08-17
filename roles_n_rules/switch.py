@@ -5,16 +5,16 @@ from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
 import random
 import roles_n_rules.role_data as roles
+import story_time.powerup as power
 import config
 
 def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
-    answer = [Mailbox(True)]
+    answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
-        dy.next_day()
 
         # Remove potential night uses
         for i in range(len(roles.night_users)):
@@ -137,6 +137,10 @@ def start_game():
                 if user_role == "Vampire":
                     answer.add_to_sc(user_id,"Undead")
             
+            # Reset the day timer
+            dy.reset_day()
+            dy.set_stage('Night')
+
             return answer
     
     answer.respond("Timeout reached! Your distribution is too crazy!",True)
