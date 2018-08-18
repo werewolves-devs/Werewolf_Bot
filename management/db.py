@@ -390,6 +390,7 @@ def amulets(user_id):
     for channel_id in get_secret_channels('Amulet_Holder'):
         if int(channel_get(channel_id,user_id)) in [1,2,3]:
             amulet_channels.append(int(channel_id))
+    return amulet_channels
 
 def has_amulet(user_id):
     """Returns boolean whether the user has an amulet or not."""
