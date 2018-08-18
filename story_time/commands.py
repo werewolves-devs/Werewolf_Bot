@@ -79,7 +79,7 @@ def cc_welcome(victim_id):
     msg = "<@{}> finally arrived. It's about time.".format(victim_id)
     msg_table.append(msg)
 
-    msg = "Introducing <@{}>! Our newest arrival! Well how do you do?".format(victim_id)
+    msg = "Introducing <@{}>! Our newest arrival! Welcome!".format(victim_id)
     msg_table.append(msg)
 
     return msg_table[random.randint(0,len(msg_table) - 1)]
