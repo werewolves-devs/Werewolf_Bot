@@ -680,18 +680,20 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 msg = "**Usage:** Threaten a player.\n\n`" + prefix + "threaten <player>`\n\n"
                 msg += "**Example:** `" + prefix + "threaten @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by the Raven."
-                return [Mailbox().respond(msg,True)]return todo()
+                return [Mailbox().respond(msg,True)]
             if user_role == "Raven" and user_undead == 0:
                 help_msg += "`" + prefix + "threaten` - Threaten a player. (Raven only)\n"
 
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO
+                # TODO             
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
-                # TODO
-                return todo()
+                msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent <player>`\n\n"
+                msg += "**Example:** `" + prefix + "prevent @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. 
+                msg += "This command can only be used by the Royal Knight"
+                return [Mailbox().respond(msg,True)]
             if user_role == "Royal Knight":
                 help_msg += "`" + prefix + "prevent` - Prevent the public lynch from happening. (Royal Knight only)\n"
 
