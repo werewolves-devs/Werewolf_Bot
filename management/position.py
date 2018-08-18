@@ -83,7 +83,7 @@ def valid_distribution(role_table,just_checking=False):
         return False
     if "Robin Jackson" in role_table and "Jack Robinson" not in role_table:
         return False
-    if "Jack Robinson" in role_table and "Robing Jackson" not in role_table:
+    if "Jack Robinson" in role_table and "Robin Jackson" not in role_table:
         return False
     if "Butcher" in role_table and "Bloody Butcher" not in role_table:
         return False
