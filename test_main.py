@@ -152,6 +152,8 @@ def test_amulets():
   db.set_user_in_channel(12,1,1)
   db.set_user_in_channel(12,3,1)
 
+  assert db.get_secret_channels('Amulet_Holder') == [10,11]
+
   assert db.amulets(1) == [10]
   assert db.amulets(2) == [10,11]
   assert db.amulets(3) == []
