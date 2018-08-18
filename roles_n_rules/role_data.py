@@ -47,11 +47,31 @@ def death():
 
             # Standard night wolf kill
             if role in ["Werewolf","Lone Wolf","White Werewolf"]:
-                # TODO
-                pass
+                if victim_role == 'Cursed Civilian':
+                    answer.dm("The curse that went around you, had been a little itchy lately... and it kept getting worse! ",victim_id)
+                    answer.dm_add("It got worse and worse, and you couldn't help but notice how hair started growing everywhere!\n")
+                    answer.dm_add("Last night, you were waking up by the grunts of a what sounded like a wolf! ")
+                    answer.dm_add("You thought your days were over, but the wolf did not attack. Instead, ")
+                    answer.dm_add("the wolf watched as your nails grew longer, your ears became spiky and your smell ")
+                    answer.dm_add("slowly improved... and you looked just like one of the silhouettes in the shadow, ")
+                    answer.dm_add("waiting for you to join them in the beautiful night's sky...\n")
+                    answer.dm_add("**You have been visited by wolves last night, and your curse made you turn ")
+                    answer.dm_add("into a werewolf. Devour all villagers and win the game!**")
+
+                    db_set(victim_id,'role','Werewolf')
+                    answer.log("The **Cursed Civilian** <@{}> has turned into a **Werewolf**!".format(victim_id))
+
+                    for channel_id in db.get_secret_channels('Werewolf'):
+                        answer.edit_cc(channel_id,victim_id,1)
+                        answer.msg("**ARRROOOO!\nWelcome, <@{}>!**".format(victim_id),channel_id)
+                        answer.msg_add("Last night, the **cursed civilian** <@{}> was attacked by wolves, ")
+                        answer.msg_add("and has now become a **werewolf**! Please, welcome this new member ")
+                        answer.msg_add("of the wolf pack!")
+                else:
+                    answer = death_by_night(answer,victim_id,role)
 
             # Instant kill
-            if role in ["Barber","Cupid","Executioner","Huntress","Devil","Zombie"]:
+            if role in ["Barber","Cupid","Executioner","Huntress","Devil","Zombie","Macho"]:
                 # TODO
                 pass
 
@@ -67,8 +87,11 @@ def death():
 
             # Horseman kill
             if role in ["Horseman"]:
-                # TODO
-                pass
+                if role == "Horseman":
+                    number = db_get(victim_id,'horseman')
+                    for horsedude_id in db.player_list():
+                        if db_get(horsedude_id,'horseman') == number:
+                            db_set(horsedude_id,'horseman',0)
 
             # Pyromancer ignite
             if role in ["Pyromancer"]:
@@ -80,8 +103,13 @@ def death():
                 # TODO
                 pass
 
+            # Turn someone into an infected wolf
+            if role in ["Infected Wolf"]:
+                # TODO
+                pass
+
             # Turn someone into a fortune teller
-            if role in ["Fortune Teller",]:
+            if role in ["Fortune Teller"]:
                 if int(db_get(victim_id,'undead')) == 1:
                     answer.msg("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),db_get(victim_id,'channel'))
                     answer.msg_add("They were a great inspiration to you... ")
@@ -108,19 +136,81 @@ def death():
 def death_by_night(answer,user_id,role):
     """Kills a user during the night according to a standard procedure."""
 
+    if int(db_get(user_id,'frozen')) == 1:
+        return answer.log("<@{}> was frozen and couldn't get killed by the **{}**.".format(user_id,role))
+    if int(db_get(user_id,'abducted')) == 1:
+        return answer.log("<@{}> couldn't get attacked because they were **abducted**.".format(user_id))
+
     user_role = db_get(user_id,'role')
 
     if user_role in ['Sacred Wolf']:
         return answer.log('The **Sacred Wolf** <@{}> was protected from death.'.format(user_id))
     
-    # Check if user has an amulet
-    # TODO
+    if db.has_amulet(user_id):
+        return answer.log("<@{}> was protected from the **{}** by their amulet.".format(user_id,role))
 
     souls = db_get(user_id,'souls')
     if souls > 0:
         db_set(user_id,'souls',souls-1)
-        answer.log('<@{}> lost a soul, but survived an attack.')
-    
-    # TODO
+        return answer.log('<@{}> lost a soul, but survived an attack.')
 
-    return answer
+    # Save the dude if they're demonized
+    if int(db_get(user_id,'demonized')) == 1:
+        if user_role not in ["Exorcist","Devil","Demon","Horseman","The Thing","Undead","Vampire","Zombie"]:
+
+            db_set(user_id,'undead',1)
+            answer.dm("Last night, you didn't feel to well and decided to go out, to take a walk. ",user_id)
+            answer.dm_add("As soon as you stepped out the door, you felt like it was a bad idea - and it was!\n")
+            answer.dm_add("The last thing you can remember is the sound of someone approaching you from behind, ")
+            answer.dm_add("the sound of a skull cracking open, and then - **NOTHING**.\n\n")
+            answer.dm_add("Is this the end?\n\n")
+            answer.dm_add("It doesn't appear so. You wake up in a graveyard. A few cold and grim silhouettes ")
+            answer.dm_add("stand in front of you. You are surrounded, but it feels more... welcoming. ")
+            answer.dm_add("And then the truth arrives.\n")
+            answer.dm_add("The **{}** you once were, is dead. Their soul could not rest, and that is you. ")
+            answer.dm_add("The remainders of something that wasn't ready to die.\n")
+            answer.dm_add("**You have become Undead. Murder everyone that isn't an undead or a vampire.")
+
+            for channel_id in db.get_secret_channels('Undead'):
+                answer.edit_cc(channel_id,user_id,1)
+                answer.msg("Last night, <@{}>, a **{}** has died! Please welcome them in the realm of the Undead!",channel_id)
+
+            if user_role not in pos.pretenders:
+                db_set(user_id,'role','Undead')
+                answer.dm_add("**")
+            else:
+                answer.dm_add(" Your former teammates do not know you are Undead, so make use of this advantage.**")
+            
+            return answer
+
+    # If there's nothing to save this pool soul... well, just kill 'em already.
+    return suicide(user_id,answer)
+
+def suicide(user_id,answer):
+    """Kill a user. If there's nothing left, and you are ABSOLUTELY SURE the player dies, execute this function."""
+    db_set(user_id,'role','Dead')
+    db_set(user_id,'fakerole','Dead')
+    db_set(user_id,'horseman',0)
+    
+    # Change all channel settings
+    for channel_id in db.channel_change_all(user_id,1,4):
+        answer.edit_cc(channel_id,user_id,4)
+    for channel_id in db.channel_change_all(user_id,2,4):
+        answer.edit_cc(channel_id,user_id,4)
+    for channel_id in db.channel_change_all(user_id,5,4):
+        answer.edit_cc(channel_id,user_id,4)
+
+    for channel_id in db.channel_change_all(user_id,3,7):
+        answer.edit_cc(channel_id,user_id,7)
+    for channel_id in db.channel_change_all(user_id,6,7):
+        answer.edit_cc(channel_id,user_id,7)
+
+    if int(db_get(user_id,'abducted')) == 0:
+        db.insert_deadie(user_id)
+    
+    # Kill all standoffs, right here, on the spot.
+    # Yes, this is gonna become a recursive function! But don't worry!
+    # Look at the top of this function, I implemented an exit condition.
+    # Hold on, I need to reconsider how I'm gonna do this.
+
+    # Thinky Thonkie Thonk
