@@ -27,7 +27,8 @@ personal_secrets = ["Amulet Holder","Assassin","Aura Teller","Barber","Crowd See
 shared_secrets = ["Baker","Butcher","Cult Leader","Werewolf","Hell Hound","Demon","Flute Player",
 "Ice King","Psychopath","Pyromancer","The Thing","Undead","Vampire","Zombie"]
 
-
+pretenders = ["Baker","Butcher","Cult Leader","Cult Member","Werewolf","Bloody Butcher","Hell Hound",
+"Infected Wolf","Sacred Wolf","White Werewolf","Wolf's Cub","Flute Player","Ice King","Psychopath","Pyromancer"]
 
 
 

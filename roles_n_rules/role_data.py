@@ -8,6 +8,7 @@ night_users = [
 
 day_users = [[],["Barber","Royal Knight"],[],["Tanner"]]
 
+import management.position as pos
 import management.db as db
 from management.db import db_get, db_set
 from main_classes import Mailbox
