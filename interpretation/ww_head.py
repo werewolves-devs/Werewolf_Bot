@@ -677,8 +677,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['threaten', 'raven'], True) and user_role == "Raven":
-                # TODO
-                return todo()
+                msg = "**Usage:** Threaten a player.\n\n`" + prefix + "threaten <player>`\n\n"
+                msg += "**Example:** `" + prefix + "threaten @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Raven."
+                return [Mailbox().respond(msg,True)]return todo()
             if user_role == "Raven" and user_undead == 0:
                 help_msg += "`" + prefix + "threaten` - Threaten a player. (Raven only)\n"
 
