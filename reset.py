@@ -37,6 +37,7 @@ def reset(skip = False):
     c.execute("CREATE TABLE 'standoff' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'victim' TEXT NOT NULL, 'role' TEXT NOT NULL, 'murderer' TEXT NOT NULL);")
     c.execute("CREATE TABLE 'role-pool' ('role' TEXT PRIMARY KEY NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 0 )")
     c.execute("CREATE TABLE 'secret_channels' ('role' TEXT NOT NULL, `channel_id` INTEGER NOT NULL, PRIMARY KEY('channel_id'));")
+    c.execute("CREATE TABLE 'deadies' ('user_id' INTEGER NOT NULL PRIMARY KEY);")
     number = float(config.max_participants)/20
     if number > int(number):
         number += 1
