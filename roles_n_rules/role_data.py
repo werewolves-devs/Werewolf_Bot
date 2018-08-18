@@ -36,30 +36,37 @@ def death():
         if victim_role not in ['Dead','Spectator','Suspended',None,'Unknown']:
             # Standard day town kill
             if role in ["Innocent"]:
+                # TODO
                 pass
 
             # Standard night town kill
             if role in ["Assassin","Cult Leader","Witch"]:
+                # TODO
                 pass
 
             # Standard night wolf kill
             if role in ["Werewolf","Lone Wolf","White Werewolf"]:
+                # TODO
                 pass
 
             # Instant kill
             if role in ["Barber","Cupid","Executioner","Huntress","Devil","Zombie"]:
+                # TODO
                 pass
 
             # Add Priest test
             if role in ["Priest"]:
+                # TODO
                 pass
             
             # Devil's soul kill (not the wager!)
             if role in ["Demon"]:
+                # TODO
                 pass
 
             # Horseman kill
             if role in ["Horseman"]:
+                # TODO
                 pass
 
             # Pyromancer ignite
@@ -69,6 +76,7 @@ def death():
 
             # Abducted kill
             if role in ["The Thing"]:
+                # TODO
                 pass
 
             # Turn someone into a fortune teller
@@ -105,10 +113,13 @@ def death_by_night(answer,user_id,role):
         return answer.log('The **Sacred Wolf** <@{}> was protected from death.'.format(user_id))
     
     # Check if user has an amulet
+    # TODO
 
     souls = db_get(user_id,'souls')
     if souls > 0:
         db_set(user_id,'souls',souls-1)
         answer.log('<@{}> lost a soul, but survived an attack.')
     
+    # TODO
+
     return answer
