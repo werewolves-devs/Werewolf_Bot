@@ -243,7 +243,7 @@ async def on_message(message):
                 await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 7:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 8:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
                 await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
