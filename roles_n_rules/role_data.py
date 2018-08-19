@@ -19,7 +19,6 @@ def death():
     In this case it means emptying death-row. Let's see what you got in stock for us!"""
 
     answer = Mailbox()
-    deadies = []
     if lifepotion_in_play():
 
         return answer.log("At the end of the night, no deaths were found due to the witch's life potion.")
@@ -214,3 +213,36 @@ def suicide(user_id,answer):
     # Hold on, I need to reconsider how I'm gonna do this.
 
     # Thinky Thonkie Thonk
+
+next = '|            '
+success = '|---> '
+failure = '|\n'
+skull = '💀 '
+
+def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive=''):
+    """This functions attacks the given player with the given role.  
+    The effects are immediate, but they can be used in all scenarios, as only\
+    standoffs are executed during this attack."""
+    
+    user_role = db_get(user_id,'role')
+    answer.log_add(recursive + failure)
+
+    # End function if player is dead (exit condition for recursion)
+    if user_role in ['Dead','Spectator','Suspended',None,'Unknown']:
+        return answer.log_add(recursive + success + '<@{}> was already dead!\n'.format(user_id))
+    
+    # End if user is frozen.
+    if int(db_get(user_id,'frozen')) == 1:
+        return answer.log_add(recursive + success + '<@{}> was frozen.'.format(user_id))
+
+    if role == "The Thing":
+        # TODO: kill the player
+        return answer
+
+    # End if user is abducted.
+    if int(db_get(user_id,'abducted')) == 1:
+        return answer.log_add(recursive + success + '<@{}> was abucted.')
+
+    # Check if user has an amulet.
+    if db.has_amulet(user_id):
+        return answer.log_add(recursive + success + "<@{}> was protected by their amulet.")
