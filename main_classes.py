@@ -23,6 +23,10 @@ class Mailbox:
         return self
     def log_add(self,moar_content):
         """Add some text to the last gamelog message"""
+        if len(self.gamelog[-1].content) + len(moar_content) > 1950:
+            self.log(moar_content,self.gamelog[-1].temporary)
+            return self
+            
         self.gamelog[-1].add(moar_content)
         return self
     def log_react(self,emoji):
@@ -74,7 +78,13 @@ class Mailbox:
         return self
     def msg_add(self,moar_content):
         """Add some text to the last message"""
-        self.channel[-1].add(moar_content)
+        last_msg = self.channel[-1]
+
+        if len(last_msg.content) + len(moar_content) > 1950:
+            self.msg(moar_content,last_msg.destination)
+            return self
+
+        last_msg.add(moar_content)
         return self
     def msg_react(self,emoji):
         """Add a reaction to the last message"""
