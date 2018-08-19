@@ -6,7 +6,7 @@ def story_time(victims):
 
     # Story written by TROPICALCYCLONEALERT
     if amount == 1:
-    msg = '''A wispy wind billowed throughout the night. '\
+        msg = '''A wispy wind billowed throughout the night. '\
 Dawn was quickly approaching, and only the slightest amount of townsfolk were coming around. \
 As the sun rose over the distant horizon, the first villagers ventured out of the safety of their homes.  
 Soon enough, a dog began to bark. Its owner quickly came over to calm it down. The dog did not stop, \
@@ -22,7 +22,7 @@ The corpse was revealed to be of one {0}.'''.format(victims[0])
     
     # Story written by Kudels
     if amount == 3:
-    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+        msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
 The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
 adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
 A corpse was leaning towards the doorframe. \
@@ -33,7 +33,7 @@ Will this just be the appetiser?'''.format(victims[0],victims[1],victims[2])
     
     # Story written by Kudels
     if amount == 4:
-    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+        msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
 The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
 adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
 A corpse was leaning towards the doorframe. \
@@ -44,7 +44,7 @@ Will this just be the appetiser?'''.format(victims[0],victims[1],victims[2],vict
 
     # Story written by Kudels
     if amount == 5:
-    msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
+        msg = '''Loud seaguls bellowed at dawn, waking the townsfolk to an eerie atmosphere. \
 The gray clouded sky silhouetted carrion birds circling the town with loud cawing, \
 adding to the hellscape athmosphere. The first villager to open their doors discovered something horrific. \
 A corpse was leaning towards the doorframe. \

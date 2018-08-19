@@ -163,11 +163,3 @@ who were about to have a conversation! They couldn\'t resist keeping <@{3}> in -
         return 'Look, look, over @here! A new **conspiracy channel** has been created!'
 
     return msgtable[randium.randint(0,len(msgtable)-1)]
-
-def secret_intro(role,members):
-    if role == 'Assassin':
-        msg = '**Hello there, {}!**\n\nThis town has been corrupted, and you can feel it! '
-        msg += 'Luckily, you will put it out of its misery soon, for you shall kill all the evil ones!'
-    else:
-        msg = 'That is strange! Your role doesn\'t exist in my logs.... or not yet, at least.'
-    return msg

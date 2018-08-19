@@ -53,6 +53,10 @@ def next_day():
     """Set the game's current day one step forward."""
     return jset("day",day_number()+1)
 
+def reset_day():
+    """Reset the day number to start the game."""
+    return jset("day",-1)
+
 def get_mayor():
     """Get the id of the town's current mayor"""
     return jget("Mayor")
@@ -66,3 +70,17 @@ def set_mayor(user_id):
 def kill_mayor():
     """Remove the mayor from the dynamic config file. The town will now longer have a mayor.  """
     return set_mayor(0)
+
+def add_lifepotion():
+    """Brew a life potion, erasing all kills from the night"""
+    return jset("lifepotion",1)
+
+def reset_lifepotion():
+    """Get rid of the lifepotions."""
+    return jset("lifepotion",0)
+
+def lifepotion_in_play():
+    """Check if a witch has used a life potion to cancel all end effects."""
+    if jget("lifepotion") == 1:
+        return True
+    return False

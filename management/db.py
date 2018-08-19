@@ -384,6 +384,37 @@ def add_secret_channel(channel_id,role):
     c.execute("INSERT INTO 'secret_channels' ('role','channel_id') VALUES (?,?);",(role,channel_id))
     conn.commit()
 
+def amulets(user_id):
+    """Display a list of amulets that the given user owns."""
+    amulet_channels = []
+    for channel_id in get_secret_channels('Amulet_Holder'):
+        if int(channel_get(channel_id,user_id)) in [1,2,3]:
+            amulet_channels.append(int(channel_id))
+    return amulet_channels
+
+def has_amulet(user_id):
+    """Returns boolean whether the user has an amulet or not."""
+    if amulets(user_id) != []:
+        return True
+    return False
+
+def insert_deadie(user_id):
+    """Add a new deadie to the list. This list will be evaluated for the storytime."""
+    c.execute("SELECT * FROM 'deadies' WHERE 'user_id' =?",(user_id))
+    if c.fetchall == []:
+        c.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);",(user_id,))
+    conn.commit()
+
+def get_deadies():
+    """Gain the list of deadies from the database."""
+    c.execute("SELECT * FROM 'deadies'")
+    return [buddy[0] for buddy in c.fetchall()]
+
+def delete_deadies():
+    """Remove all deadies from the database."""
+    c.execute("DELETE FROM 'deadies'")
+    conn.commit()
+
 # Add a new participant to the database
 def signup(user_id,name,emoji):
     c.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id,name,emoji))
