@@ -729,8 +729,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cast', 'corrupt', 'curse'], True) and user_role == "Curse Caster":
-                # TODO
-                return todo()
+                msg = "**Usage:** Cast a curse on a player.\n\n`" + prefix + "curse <player>`\n\n"
+                msg += "**Example:** `" + prefix + "curse @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Curse Caster."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Curse Caster" and user_undead == 0:
                 help_msg += "`" + prefix + "curse` - Curse a player. (Curse Caster only)\n"
 
@@ -740,8 +742,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cough', 'infect', 'sneeze', 'turn'], True) and user_role == "Infected Wolf":
-                # TODO
-                return todo()
+                msg = "**Usage:** Turn a player into a Wolf.\n\n`" + prefix + "infect <player>`\n\n"
+                msg += "**Example:** `" + prefix + "infect @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Infected Wolf."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Infected Wolf" and user_undead == 0:
                 help_msg += "`" + prefix + "infect` - Infect a player. (Imfected Wolf only)\n"
 
