@@ -13,6 +13,7 @@ import management.db as db
 from management.db import db_get, db_set
 from main_classes import Mailbox
 from management.dynamic import lifepotion_in_play
+from story_time.barber_kills import barber_kill_story
 
 def death():
     """What is death?  
@@ -219,7 +220,7 @@ success = '|---> '
 failure = '|\n'
 skull = '💀 '
 
-def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive=''):
+def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     """This functions attacks the given player with the given role.  
     The effects are immediate, but they can be used in all scenarios, as only\
     standoffs are executed during this attack."""
@@ -227,22 +228,105 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive=''):
     user_role = db_get(user_id,'role')
     answer.log_add(recursive + failure)
 
+    demonized = False
+    if int(db_get(user_id,'demonized')) == 1:
+        demonized = True
+    
+    undead = False
+    if int(db_get(user_id,'undead')) == 1 or user_role == 'Undead':
+        undead = True
+
     # End function if player is dead (exit condition for recursion)
     if user_role in ['Dead','Spectator','Suspended',None,'Unknown']:
-        return answer.log_add(recursive + success + '<@{}> was already dead!\n'.format(user_id))
+        return answer.log_add(recursive + success + '<@{}> was already dead!'.format(user_id))
     
+    if role == 'Cupid':
+        answer.log_add(recursive + success + skull + '<@{}> committed suicide.')
+        answer = instant_death(user_id, answer, recursive+next)
+        if int(db_get(user_id,'abducted')) != int(db_get(murderer,'abducted')):
+            answer.dm("Abducted or not, you know your lover has deceased! ",user_id)
+            answer.dm_add("You couldn't handle the pain, and that's why you decided to put an end to it.\n")
+            answer.dm_add("Your story ends here.")
+        elif int(db_get(user_id,'frozen')) == 1:
+            answer.dm("Even though your heart has become cold from the ice surrounding you, ",user_id)
+            answer.dm_add("but it got even colder when you saw the dead body of <@{}> being carried away.\n".format(murderer))
+            answer.dm_add("It was at this moment where the ice got even colder...")
+        else:
+            answer.dm("You couldn't bear the sight of your lover, <@{}>, ".format(murderer),user_id)
+            answer.dm_add("lying dead in your arms. This is why you have decided to end it all!\n")
+            answer.dm_add("Let\'s just hope this isn\'t like Romeo and Juliet...")
+        answer.dm_add("**Your lover <@{}> has died. In response, you have committed suicide.**")
+        return answer
+
+    if role == 'Fortune Teller':
+        if not undead:
+            answer.dm("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),db_get(user_id,'channel'))
+            answer.dm_add("They were a great inspiration to you, and that's why ")
+            answer.dm_add("you've decided to get in their footsteps!\n")
+            answer.dm_add("**You have turned into a Fortune Teller. Find and ")
+            answer.dm_add("eliminate all werewolves, solo players and other enemies!**")
+            answer.log_add(recursive + success + '<@{}> became a fortune teller.')
+        else:
+            answer.dm("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),user_id)
+            answer.dm_add("They were a great inspiration to you... ")
+            answer.dm_add("back when you were alive, at least. Now, your undead heart is as cold as it has ever been, ")
+            answer.dm_add("and nothing will happen to you.\n")
+            answer.dm_add("**The rules have changed. You will remain Undead.**")
+            answer.log_add(recursive + success + '<@{}> failed to become a fortune teller.')
+            db_set(user_id,'role','Fortune Teller')
+        return answer
+
     # End if user is frozen.
     if int(db_get(user_id,'frozen')) == 1:
-        return answer.log_add(recursive + success + '<@{}> was frozen.'.format(user_id))
+        return answer.log_add(recursive + success + '<@{}> was frozen and thus protected.'.format(user_id))
 
-    if role == "The Thing":
-        # TODO: kill the player
+    # Let all zombies kill all other zombies.
+    if role == "Zombie":
+        answer.log_add(recursive + success + skull + '<@{}> has decayed.'.format(user_id))
+        answer = instant_death(user_id, answer, recursive+next)
         return answer
+
+    # Kill abducted players (or The Thing himself)
+    if role == "The Thing":
+        answer.log_add(recursive + success + skull + '<@{}> was killed.'.format(user_id))
+        # TODO: kill the player (BUT NOT THROUGH THE SUICIDE FUNCTION)
+        return answer
+
+    # End if user is immortal.
+    if user_role == "Immortal":
+        answer.log_add(recursive + success + '<@{}> is immortal.'.format(user_id))
 
     # End if user is abducted.
     if int(db_get(user_id,'abducted')) == 1:
-        return answer.log_add(recursive + success + '<@{}> was abucted.')
+        return answer.log_add(recursive + success + '<@{}> was abucted and thus protected.')
+    
+    if role == "Executioner":
+        answer.log_add(recursive + success + skull + '<@{}> was executed.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+    
+    # Kill whoever stands in the barber's way!
+    if role == "Barber":
+        answer.log_add(recursive + success + skull + '<@{}> was cut to death.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer.story(barber_kill_story(murderer,user_id))
 
     # Check if user has an amulet.
     if db.has_amulet(user_id):
         return answer.log_add(recursive + success + "<@{}> was protected by their amulet.")
+    
+    # Kill assassinations
+    if role == 'Assassin' and not demonized:
+        answer.log_add(recursive + success + skull + '<@{}> was assassinated.'.format(user_id))
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+    if role == 'Cult Leader' and not demonized:
+        answer.log_add(recursive + success + skull + '<@{}> was killed by the cult.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+
+def instant_death(user_id,answer=Mailbox().log(''),recursive=''):
+    """Eliminate the given user."""
+
+    # TODO
+    return answer
