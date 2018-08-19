@@ -690,8 +690,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO             
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
-                msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent <player>`\n\n"
-                msg += "**Example:** `" + prefix + "prevent @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
+                msg += "**Example:** `" + prefix + "prevent`. "
                 msg += "This command can only be used by the Royal Knight."
                 return [Mailbox().respond(msg,True)]
             if user_role == "Royal Knight":
@@ -703,8 +703,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['heal', 'life', 'save'], True) and user_role == "Witch":
-                msg = "**Usage:** Use potion of life.\n\n`" + prefix + "save <player>`\n\n"
-                msg += "**Example:** `" + prefix + "save @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg = "**Usage:** Use potion of life.\n\n`" + prefix + "save`\n\n"
+                msg += "**Example:** `" + prefix + "save`. "
                 msg += "This command can only be used by the Witch."
                 return [Mailbox().respond(msg,True)]
             if user_role == "Witch" and user_undead == 0:
