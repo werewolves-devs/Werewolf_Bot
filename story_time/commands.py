@@ -21,6 +21,9 @@ def kill_acceptance(victim_id):
     msg = "<@{}> better prepare themselves, for you will visit them tonight!".format(victim_id)
     msg_table.append(msg)
 
+    msg = "An unexpected visitor will be seeing <@{}> tonight...".format(victim_id)
+    msg_table.append(msg)
+
     return msg_table[random.randint(0,len(msg_table)-1)]
 
 def cc_goodbye(victim_id):
@@ -71,6 +74,12 @@ def cc_welcome(victim_id):
     msg_table.append(msg)
 
     msg = "Looks like <@{}> wants to join the party. Well here they are.".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "<@{}> finally arrived. It's about time.".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Introducing <@{}>! Our newest arrival! Welcome!".format(victim_id)
     msg_table.append(msg)
 
     return msg_table[random.randint(0,len(msg_table) - 1)]
