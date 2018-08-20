@@ -235,6 +235,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     undead = False
     if int(db_get(user_id,'undead')) == 1 or user_role == 'Undead':
         undead = True
+        demonized = False
 
     # End function if player is dead (exit condition for recursion)
     if user_role in ['Dead','Spectator','Suspended',None,'Unknown']:
@@ -299,12 +300,25 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     # End if user is abducted.
     if int(db_get(user_id,'abducted')) == 1:
         return answer.log_add(recursive + success + '<@{}> was abucted and thus protected.')
+
+    # End if the user sleeps with another.
+    if role == "Hooker" and not demonized:
+        answer.log_add(recursive + success + skull + '<@{}> was hooked.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
     
+    # End if player dies in someone else's place.
     if role == "Executioner":
         answer.log_add(recursive + success + skull + '<@{}> was executed.')
         answer = instant_death(user_id, answer, recursive+next)
         return answer
     
+    # End if player dies in someone else's place.
+    if role == "Huntress":
+        answer.log_add(recursive + success + skull + '<@{}> was shot.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+
     # Kill whoever stands in the barber's way!
     if role == "Barber":
         answer.log_add(recursive + success + skull + '<@{}> was cut to death.')
@@ -324,6 +338,55 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
         answer.log_add(recursive + success + skull + '<@{}> was killed by the cult.')
         answer = instant_death(user_id, answer, recursive+next)
         return answer
+    if role == 'Priest' and not demonized:
+        if user_role in pos.wolf_team:
+            answer.log_add(recursive + success + skull + '<@{}> was holified.'.format(user_id))
+            answer = instant_death(user_id, answer, recursive+next)
+            return answer
+    if role == 'Witch' and not demonized:
+        answer.log_add(recursive + success + skull + '<@{}> was poisoned.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+    
+    # Kill wolf attacked
+    if role in ['Werewolf','Lone Wolf','White Werewolf']:
+        if user_role == 'Runner':
+            answer.log_add(recursive + success + '<@{}> outran a wolf attack.')
+            answer.dm('You. Are. EXHAUSTED.\n',user_id)
+            answer.dm_add('Last night may have been the worst night of your life! ')
+            answer.dm_add('You\'re still alive, however. And that\'s what counts. ')
+            answer.dm_add('Let\'s hope that, whatever those creatures were, won\'t attack again tomorrow night!\n')
+            answer.dm_add('**Last night, you have been attacked by a wolf. You have become a regular Innocent.**')
+            db_set(user_id,'role','Innocent')
+            return answer
+        if user_role == 'Cursed Civilian':
+            answer.dm("The curse that went around you, had been a little itchy lately... and it kept getting worse! ",user_id)
+            answer.dm_add("It got worse and worse, and you couldn't help but notice how hair started growing everywhere!\n")
+            answer.dm_add("Last night, you were waking up by the grunts of a what sounded like a wolf! ")
+            answer.dm_add("You thought your days were over, but the wolf did not attack. Instead, ")
+            answer.dm_add("the wolf watched as your nails grew longer, your ears became spiky and your smell ")
+            answer.dm_add("slowly improved... and you looked just like one of the silhouettes in the shadow, ")
+            answer.dm_add("waiting for you to join them in the beautiful night's sky...\n")
+            answer.dm_add("**You have been visited by wolves last night, and your curse made you turn ")
+            answer.dm_add("into a werewolf. Devour all villagers and win the game!**")
+
+            db_set(user_id,'role','Werewolf')
+            answer.log_add(recursive + success + '<@{}> has turned into a Werewolf!')
+
+            for channel_id in db.get_secret_channels('Werewolf'):
+                answer.edit_cc(channel_id,user_id,1)
+                answer.msg("**ARRROOOO!\nWelcome, <@{}>!**".format(user_id),channel_id)
+                answer.msg_add("Last night, the **cursed civilian** <@{}> was attacked by wolves, ")
+                answer.msg_add("and has now become a **werewolf**! Please, welcome this new member ")
+                answer.msg_add("of the wolf pack!")
+            return answer
+        
+        answer.log_add(recursive + success + skull + '<@{}> was eaten by a werewolf.')
+        answer = instant_death(user_id, answer, recursive+next)
+        return answer
+
+    # TODO
+    return answer
 
 def instant_death(user_id,answer=Mailbox().log(''),recursive=''):
     """Eliminate the given user."""
