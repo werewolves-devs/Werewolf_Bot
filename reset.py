@@ -24,6 +24,7 @@ def reset(skip = False):
     c.execute("DROP TABLE IF EXISTS 'standoff'")
     c.execute("DROP TABLE IF EXISTS 'role-pool'")
     c.execute("DROP TABLE IF EXISTS 'secret_channels'")
+    c.execute("DROP TABLE IF EXISTS 'deadies'")
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new game....')
