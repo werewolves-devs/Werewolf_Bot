@@ -2,6 +2,7 @@
 from discord import Embed
 
 import interpretation.check as check
+import roles_n_rules.functions as func
 from config import max_cc_per_user, season, universal_prefix as unip
 from config import ww_prefix as prefix
 from interpretation.check import is_command
