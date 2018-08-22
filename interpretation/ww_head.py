@@ -203,7 +203,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             choice_emoji = ""
 
             if not target:
-                return [Mailbox("Target not found! Please provide us with a user!",True)]
+                return [Mailbox().respond("Target not found! Please provide us with a user!",True)]
 
             user_id = target[0]
 

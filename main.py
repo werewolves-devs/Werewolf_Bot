@@ -43,7 +43,6 @@ import asyncio
 
 # Import config data
 import story_time.cc_creation as creation_messages
-import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
