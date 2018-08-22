@@ -3,7 +3,6 @@
 from config import max_channels_per_category, game_log
 from management.position import positionof
 from main_classes import Mailbox
-import roles_n_rules.switch as switch
 import interpretation.check as check
 import management.db as db
 import reset
