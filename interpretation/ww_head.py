@@ -226,6 +226,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                         special_tags += "[Threatened] "
                     if int(db_get(user, 'undead')) == 1:
                         special_tags += '[Undead] '
+                    if int(db_get(user, 'votes')) == 0:
+                        special_tags += '[Silenced] '
                     if special_tags == "":
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
