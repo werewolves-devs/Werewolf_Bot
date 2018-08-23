@@ -6,6 +6,7 @@ from roles_n_rules.functions import cupid_kiss
 import random
 import roles_n_rules.role_data as roles
 import story_time.powerup as power
+import story_time.morning as morning
 import config
 
 def pay():
@@ -22,19 +23,6 @@ def pay():
             if user_role in roles.night_users[i]:
                 if i > 0:
                     db_set(user_id,'uses',0)
-                break
-
-        # Give potential day uses
-        for i in range(len(roles.day_users)):
-            if user_role in roles.day_users[i]:
-                # Give one-time users their one-time power
-                if i == 0:
-                    if dy.day_number() == 0:
-                        db_set(user_id,'uses',1)
-                    break
-                
-                db_set(user_id,'uses',i)
-                answer.msg(power.power(user_role),db_get(user_id,'channel'))
                 break
 
         # Force Cupid to fall in love
@@ -71,6 +59,36 @@ def pay():
         
         # Remove zombie tag
         db_set(user_id,'bitten',0)
+
+    return answer
+
+def day():
+    """Start the second part of the day.  
+    The function assumes all polls have been evaluated, and that looking after attacks can begin.  
+    The function returns a Mailbox."""
+    threat = db.get_kill()
+    answer = Mailbox()
+
+    while threat != None:
+
+        answer = roles.attack(threat[1],threat[2],threat[3],answer.log("**Results from night attacks:**\n"))
+        threat = db.get_kill()
+    
+    for player in db.player_list(True):
+        # Give potential day uses
+        for i in range(len(roles.day_users)):
+            if user_role in roles.day_users[i]:
+                # Give one-time users their one-time power
+                if i == 0:
+                    if dy.day_number() == 0:
+                        db_set(user_id,'uses',1)
+                    break
+                
+                db_set(user_id,'uses',i)
+                answer.msg(power.power(user_role),db_get(user_id,'channel'))
+                break
+    
+    answer.story(morning.story_time(db.get_deadies()))
 
     return answer
 
