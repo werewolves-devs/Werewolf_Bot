@@ -408,7 +408,7 @@ def insert_deadie(user_id):
 def get_deadies():
     """Gain the list of deadies from the database."""
     c.execute("SELECT * FROM 'deadies'")
-    return [buddy[0] for buddy in c.fetchall()]
+    return [int(buddy[0]) for buddy in c.fetchall()]
 
 def delete_deadies():
     """Remove all deadies from the database."""
