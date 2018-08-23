@@ -162,6 +162,25 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "day` - Force the day to start.\n"
 
+        '''donate'''
+        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
+        # It will not be used very often in practice, but it'll get the active players relaxed.
+        # They all start hysterically panicking when you start talking about finite amounts.
+        if is_command(message,['donate','give_cc','more_cc']):
+            target = check.users(message,1,True,True)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+            number = check.numbers(message,1)
+            if not number:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
+
+            ccs_owned = int(db_get(target[0],'ccs'))
+            db_set(target[0],'ccs',ccs_owned-number)
+            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
+        if is_command(message,['donate','give_cc','more_cc'],True):
+            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
+        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
+
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
@@ -326,25 +345,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "Please do not abuse this command to create empty channels without a purpose. Abuse will be noticed and dealt with accordingly."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "cc` - Create a new conspiracy channel.\n"
-
-        '''donate'''
-        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
-        # It will not be used very often in practice, but it'll get the active players relaxed.
-        # They all start hysterically panicking when you start talking about finite amounts.
-        if is_command(message,['donate','give_cc','more_cc']):
-            target = check.users(message,1,True,True)
-            if not target:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
-            number = check.numbers(message,1)
-            if not number:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
-
-            ccs_owned = int(db_get(target[0],'ccs'))
-            db_set(target[0],'ccs',ccs_owned-number)
-            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
-        if is_command(message,['donate','give_cc','more_cc'],True):
-            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
-        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
 
         '''info'''
         # This command allows users to view information about a conspiracy channel.
