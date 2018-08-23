@@ -108,11 +108,11 @@ def disguise(user_id,victim_id,role):
     return answer
 
 def nightly_kill(user_id,victim_id):
-    """This function adds a kill to the kill queue based on the user's role.
-    This function is applicable for roles like the assassin, the lone wolf, the priest, the thing and the white werewolf.
+    """This function adds a kill to the kill queue based on the user's role.  
+    This function is applicable for roles like the assassin, the lone wolf, the priest, the thing and the white werewolf.  
     NOTICE: This function is meant for people who kill solo! Teams should receive a poll.
     Evaluating whether the kill should actually be applied isn't needed, as this is evaluated at the start of the day.
-    The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
+    The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.  
     The function returns a Mailbox.
 
     user_id -> the player who will initiate the attack
@@ -206,8 +206,8 @@ def ignite(user_id):
         return answer.msg("Okay! All powdered players will die tomorrow.",user_channel)
 
     # Ignite all living players.
-    for user in db.player_list():
-        if db.isParticipant(user):
+    for user in db.player_list(True,True):
+        if db.isParticipant(user) and user_role != 'Pyromancer':
             db.add_kill(int(user),'Pyromancer',user_id)
 
     answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
@@ -515,6 +515,9 @@ def enchant(user_id,victim_id):
         answer.dm("You're an Undead, so you can't actually enchant anyone... but this will help you keep up your cover!",user_id)
         answer.log("The **Undead** <@{}> has pretended to enchant <@{}>.".format(user_id,victim_id))
     else:
+        for channel_id in db.get_secret_channels('Flute_Victims'):
+            answer.edit_cc(channel_id,victim_id,1)
+            answer.msg("<@{}> has been enchanted! Please welcome them to the circle of the enchanted ones.".format(victim_id),channel_id)
         answer.log("The **Flute Player** <@{}> has enchanted <@{}>.".format(user_id,victim_id))
         db_set(victim_id,'enchanted',1)
 
