@@ -76,6 +76,7 @@ def day():
     
     for player in db.player_list(True):
         # Give potential day uses
+        user_role = db_get(player,'role')
         for i in range(len(roles.day_users)):
             if user_role in roles.day_users[i]:
                 # Give one-time users their one-time power
@@ -183,3 +184,4 @@ def start_game():
             return answer
     
     answer.respond("Timeout reached! Your distribution is too crazy!",True)
+    return answer

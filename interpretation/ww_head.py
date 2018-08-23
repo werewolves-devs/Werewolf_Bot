@@ -175,7 +175,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
 
             ccs_owned = int(db_get(target[0],'ccs'))
-            db_set(target[0],'ccs',ccs_owned-number)
+            db_set(target[0],'ccs',ccs_owned-number[0])
             return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
         if is_command(message,['donate','give_cc','more_cc'],True):
             return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
