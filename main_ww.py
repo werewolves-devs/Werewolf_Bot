@@ -414,6 +414,7 @@ async def on_message(message):
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)
+                        emoji_table = []
                         msg = ''
                     else:
                         msg += '\n'

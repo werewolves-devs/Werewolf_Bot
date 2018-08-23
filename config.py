@@ -11,7 +11,7 @@ activity_hours = 72
 season = "1"
 
 ww_prefix = '!'
-act_prefix = '-'
+ghost_prefix = '$'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
