@@ -42,7 +42,7 @@ def test_database():
   assert db.get_columns() == []
   assert db.poll_list() == []
   db.signup(1,'Randium003',u':smirk:')
-  assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0, 0)
+  assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0, 0, 0)
   assert db.db_get(1,'channel') == game_log
   assert db.isParticipant(1) == False
   assert db.isParticipant(1,True) == True
@@ -130,4 +130,33 @@ def test_secrets():
   assert db.get_secret_channels('Assassin') == [1,2]
   db.add_secret_channel(4,'Assassin')
   assert db.get_secret_channels('Assassin') == [1,2,4]
+  reset.reset(True)
+
+def test_amulets():
+  reset.reset(True)
+  db.signup(1,'Alice',':hugging:')
+  db.signup(2,'Bob',':smirk:')
+  db.signup(3,'Charlie',':orange_book:')
+
+  db.add_category(100,True)
+  db.add_channel(10,1,True)
+  db.add_channel(11,2,True)
+  db.add_channel(12,1,True)
+
+  db.add_secret_channel(10,'Amulet_Holder')
+  db.add_secret_channel(11,'Amulet_Holder')
+
+  db.set_user_in_channel(10,1,1)
+  db.set_user_in_channel(10,2,3)
+  db.set_user_in_channel(11,2,1)
+  db.set_user_in_channel(12,1,1)
+  db.set_user_in_channel(12,3,1)
+
+  assert db.get_secret_channels('Amulet_Holder') == [10,11]
+
+  assert db.amulets(1) == [10]
+  assert db.amulets(2) == [10,11]
+  assert db.amulets(3) == []
+  assert db.has_amulet(1) == True
+  assert db.has_amulet(3) == False
   reset.reset(True)

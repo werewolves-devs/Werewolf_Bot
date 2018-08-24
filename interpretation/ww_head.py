@@ -12,6 +12,8 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
+import roles_n_rules.switch as switch
+import management.db as db
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -25,6 +27,28 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
+    '''day'''
+    if is_command(message, ['day']):
+        return [switch.day(),Mailbox().respond("Dayyyyyy")]
+
+    '''standoff'''
+    if is_command(message,['stand']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_standoff(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+
+    '''tokill'''
+    if is_command(message,['tokill']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_kill(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
 
     '''evaluate'''
     if is_command(message, ['eval']):
@@ -162,6 +186,25 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "day` - Force the day to start.\n"
 
+        '''donate'''
+        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
+        # It will not be used very often in practice, but it'll get the active players relaxed.
+        # They all start hysterically panicking when you start talking about finite amounts.
+        if is_command(message,['donate','give_cc','more_cc']):
+            target = check.users(message,1,True,True)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+            number = check.numbers(message,1)
+            if not number:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
+
+            ccs_owned = int(db_get(target[0],'ccs'))
+            db_set(target[0],'ccs',ccs_owned-number[0])
+            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
+        if is_command(message,['donate','give_cc','more_cc'],True):
+            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
+        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
+
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
@@ -226,6 +269,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                         special_tags += "[Threatened] "
                     if int(db_get(user, 'undead')) == 1:
                         special_tags += '[Undead] '
+                    if int(db_get(user, 'votes')) == 0:
+                        special_tags += '[Silenced] '
                     if special_tags == "":
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
@@ -324,25 +369,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "Please do not abuse this command to create empty channels without a purpose. Abuse will be noticed and dealt with accordingly."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "cc` - Create a new conspiracy channel.\n"
-
-        '''donate'''
-        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
-        # It will not be used very often in practice, but it'll get the active players relaxed.
-        # They all start hysterically panicking when you start talking about finite amounts.
-        if is_command(message,['donate','give_cc','more_cc']):
-            target = check.users(message,1,True,True)
-            if not target:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
-            number = check.numbers(message,1)
-            if not number:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
-
-            ccs_owned = int(db_get(target[0],'ccs'))
-            db_set(target[0],'ccs',ccs_owned-number)
-            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
-        if is_command(message,['donate','give_cc','more_cc'],True):
-            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
-        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
 
         '''info'''
         # This command allows users to view information about a conspiracy channel.
@@ -675,8 +701,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.purify(user_id,target[0])]
             if is_command(message, ['heal', 'light', 'purify', 'sacrify'], True) and user_role == "Priestess":
-                # TODO
-                return todo()
+                msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
+                msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Priestess."
+                return [Mailbox().respond(msg,True)]return todo()
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
@@ -686,19 +714,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['threaten', 'raven'], True) and user_role == "Raven":
-                # TODO
-                return todo()
+                msg = "**Usage:** Threaten a player.\n\n`" + prefix + "threaten <player>`\n\n"
+                msg += "**Example:** `" + prefix + "threaten @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Raven."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Raven" and user_undead == 0:
                 help_msg += "`" + prefix + "threaten` - Threaten a player. (Raven only)\n"
 
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO
+                # TODO             
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
-                # TODO
-                return todo()
+                msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
+                msg += "**Example:** `" + prefix + "prevent`. "
+                msg += "This command can only be used by the Royal Knight."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Royal Knight":
                 help_msg += "`" + prefix + "prevent` - Prevent the public lynch from happening. (Royal Knight only)\n"
 
@@ -708,8 +740,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['heal', 'life', 'save'], True) and user_role == "Witch":
-                # TODO
-                return todo()
+                msg = "**Usage:** Use potion of life.\n\n`" + prefix + "save`\n\n"
+                msg += "**Example:** `" + prefix + "save`. "
+                msg += "This command can only be used by the Witch."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Witch" and user_undead == 0:
                 help_msg += "`" + prefix + "life` - Brew life potion. (Witch only)\n"
 
@@ -719,8 +753,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['death', 'kill', 'murder', 'poison'], True) and user_role == "Witch":
-                # TODO
-                return todo()
+                msg = "**Usage:** Use potion of death.\n\n`" + prefix + "kill <player>`\n\n"
+                msg += "**Example:** `" + prefix + "kill @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Witch."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Witch" and user_undead == 0:
                 help_msg += "`" + prefix + "death` - Brew death potion. (Witch only)\n"
 
@@ -730,8 +766,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cast', 'corrupt', 'curse'], True) and user_role == "Curse Caster":
-                # TODO
-                return todo()
+                msg = "**Usage:** Cast a curse on a player.\n\n`" + prefix + "curse <player>`\n\n"
+                msg += "**Example:** `" + prefix + "curse @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Curse Caster."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Curse Caster" and user_undead == 0:
                 help_msg += "`" + prefix + "curse` - Curse a player. (Curse Caster only)\n"
 
@@ -741,8 +779,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cough', 'infect', 'sneeze', 'turn'], True) and user_role == "Infected Wolf":
-                # TODO
-                return todo()
+                msg = "**Usage:** Turn a player into a Wolf.\n\n`" + prefix + "infect <player>`\n\n"
+                msg += "**Example:** `" + prefix + "infect @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Infected Wolf."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Infected Wolf" and user_undead == 0:
                 help_msg += "`" + prefix + "infect` - Infect a player. (Imfected Wolf only)\n"
 
