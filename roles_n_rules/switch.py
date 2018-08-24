@@ -67,13 +67,13 @@ def day():
     The function assumes all polls have been evaluated, and that looking after attacks can begin.  
     The function returns a Mailbox."""
     threat = db.get_kill()
-    answer = Mailbox()
+    answer = Mailbox().log("**Results from night attacks:**")
 
     while threat != None:
 
-        answer = roles.attack(threat[1],threat[2],threat[3],answer.log("**Results from night attacks:**\n"))
+        answer = roles.attack(threat[1],threat[2],threat[3],answer)
         threat = db.get_kill()
-    
+
     for player in db.player_list(True):
         # Give potential day uses
         user_role = db_get(player,'role')
@@ -82,13 +82,13 @@ def day():
                 # Give one-time users their one-time power
                 if i == 0:
                     if dy.day_number() == 0:
-                        db_set(user_id,'uses',1)
+                        db_set(player,'uses',1)
                     break
-                
+
                 db_set(player,'uses',i)
                 answer.msg(power.power(user_role),db_get(player,'channel'))
                 break
-    
+
     answer.story(morning.story_time(db.get_deadies()))
 
     return answer

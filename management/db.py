@@ -46,7 +46,7 @@ def player_list(alive_only = False,available_only = False):
     if available_only == False:
         player_list = [player for player in player_list if db_get(player,'role') not in ['Spectator','Dead']]
 
-    return [player for player in player_list if int(db_get(player,'adbucted')) == 0 and int(db_get(player,'frozen')) == 0]
+    return [player for player in player_list if int(db_get(player,'abducted')) == 0 and int(db_get(player,'frozen')) == 0]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
@@ -400,7 +400,7 @@ def has_amulet(user_id):
 
 def insert_deadie(user_id):
     """Add a new deadie to the list. This list will be evaluated for the storytime."""
-    c.execute("SELECT * FROM 'deadies' WHERE 'user_id' =?",(user_id))
+    c.execute("SELECT * FROM 'deadies' WHERE 'user_id' =?",(user_id,))
     if c.fetchall == []:
         c.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);",(user_id,))
     conn.commit()
@@ -480,7 +480,6 @@ def get_freezers(user_id):
 
     user_id -> the id of the ice king"""
     c.execute("SELECT victim, role FROM freezers WHERE king =?",(user_id,))
-    print(user_id)
     return c.fetchall()
 
 def delete_freezer(user_id,victim_id):
@@ -515,7 +514,6 @@ def get_standoff(user_id):
 
     returntable = []
     for element in c.fetchall():
-        print(element)
         returntable.append([element[i] for i in range(4)])
 
     return returntable

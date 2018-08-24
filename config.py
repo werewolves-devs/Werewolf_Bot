@@ -21,7 +21,7 @@ database = 'game.db'
 max_channels_per_category = 50
 
 # List of specific channels
-welcome_channel = 477533423578382336
+welcome_channel = 446046437114118145
 game_log = 456880259636396034
 bot_spam = 482219246177222657
 story_time = 477533978547453972
