@@ -85,8 +85,8 @@ def day():
                         db_set(user_id,'uses',1)
                     break
                 
-                db_set(user_id,'uses',i)
-                answer.msg(power.power(user_role),db_get(user_id,'channel'))
+                db_set(player,'uses',i)
+                answer.msg(power.power(user_role),db_get(player,'channel'))
                 break
     
     answer.story(morning.story_time(db.get_deadies()))

@@ -73,4 +73,37 @@ def cc_welcome(victim_id):
     msg = "Looks like <@{}> wants to join the party. Well here they are.".format(victim_id)
     msg_table.append(msg)
 
+    msg = "Better late than never! Welcome to the club, <@{}>!".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Who let the dogs out? Ah, <@{}> did! No wonder they were late.".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Hmmm... does anyone smell any updog? Then you\'re probably a wolf! <@{}>, quick, come and get them!".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Oh, yeah. Almost forgotten that <@{}> needs to be in here too! Hey, hi, how ya doin'?".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Oh... do you really want me to add <@{}>?\nAre you *sure*?".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "**YES!** I was hoping you'd ask me to add <@{}>!".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Well, look who's here! My favourite Discord user! Hey there, <@{}>!".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Wait, you wanna add <@{}>, too? But what if you run out of food?\nOr.... *ARE* they the food?".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "What does the fox say?\n<@{0}> <@{0}> <@{0}> <@{0}> <@{0}> <@{0}>".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "Mmmm, it looks like a fun party in here! No doubt that <@{}> shall feel welcome in here.".format(victim_id)
+    msg_table.append(msg)
+
+    msg = "I can't pull a rabbit out of my hat, but I can get <@{0}> in here! Welcome, <@{0}>!".format(victim_id)
+    msg_table.append(msg)
+
     return msg_table[random.randint(0,len(msg_table) - 1)]
