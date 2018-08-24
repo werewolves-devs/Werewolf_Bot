@@ -12,6 +12,8 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
+import roles_n_rules.switch as switch
+import management.db as db
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -25,6 +27,28 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
+    '''day'''
+    if is_command(message, ['day']):
+        return [switch.day(),Mailbox().respond("Dayyyyyy")]
+
+    '''standoff'''
+    if is_command(message,['stand']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_standoff(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+
+    '''tokill'''
+    if is_command(message,['tokill']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_kill(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
 
     '''evaluate'''
     if is_command(message, ['eval']):
@@ -162,6 +186,25 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "day` - Force the day to start.\n"
 
+        '''donate'''
+        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
+        # It will not be used very often in practice, but it'll get the active players relaxed.
+        # They all start hysterically panicking when you start talking about finite amounts.
+        if is_command(message,['donate','give_cc','more_cc']):
+            target = check.users(message,1,True,True)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
+            number = check.numbers(message,1)
+            if not number:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
+
+            ccs_owned = int(db_get(target[0],'ccs'))
+            db_set(target[0],'ccs',ccs_owned-number[0])
+            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
+        if is_command(message,['donate','give_cc','more_cc'],True):
+            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
+        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
+
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
@@ -226,6 +269,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                         special_tags += "[Threatened] "
                     if int(db_get(user, 'undead')) == 1:
                         special_tags += '[Undead] '
+                    if int(db_get(user, 'votes')) == 0:
+                        special_tags += '[Silenced] '
                     if special_tags == "":
                         special_tags += "None"
                     embed = Embed(color=0xcd9e00, title='User Info')
@@ -324,25 +369,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "Please do not abuse this command to create empty channels without a purpose. Abuse will be noticed and dealt with accordingly."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "cc` - Create a new conspiracy channel.\n"
-
-        '''donate'''
-        # This command allows the Game Masters to give more active users a few extra conspiracy channels if they need them.
-        # It will not be used very often in practice, but it'll get the active players relaxed.
-        # They all start hysterically panicking when you start talking about finite amounts.
-        if is_command(message,['donate','give_cc','more_cc']):
-            target = check.users(message,1,True,True)
-            if not target:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
-            number = check.numbers(message,1)
-            if not number:
-                return [Mailbox().respond("**INVALID SYNTAX:**\nNo number provided.",True)]
-
-            ccs_owned = int(db_get(target[0],'ccs'))
-            db_set(target[0],'ccs',ccs_owned-number)
-            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
-        if is_command(message,['donate','give_cc','more_cc'],True):
-            return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
-        help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
 
         '''info'''
         # This command allows users to view information about a conspiracy channel.

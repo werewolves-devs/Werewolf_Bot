@@ -5,16 +5,18 @@ from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
 import random
 import roles_n_rules.role_data as roles
+import story_time.powerup as power
+import story_time.morning as morning
 import config
 
 def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
-    answer = [Mailbox(True)]
+    answer_table = []
+    answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
-        dy.next_day()
 
         # Remove potential night uses
         for i in range(len(roles.night_users)):
@@ -23,35 +25,22 @@ def pay():
                     db_set(user_id,'uses',0)
                 break
 
-        # Give potential day uses
-        for i in range(len(roles.day_users)):
-            if user_role in roles.day_users[i]:
-                # Give one-time users their one-time power
-                if i == 0:
-                    if dy.day_number() == 0:
-                        db_set(user_id,'uses',1)
-                    break
-                
-                db_set(user_id,'uses',i)
-                break
-
         # Force Cupid to fall in love
         if user_role == "Cupid" and db_get(user_id,'uses') > 0:
             chosen = False
             attempts = 0
 
-            while not chosen and attempts < 100:
+            while not chosen and attempts < 1000:
                 forced_victim = random.choice(db.player_list(True,True))
                 chosen = cupid_kiss(user_id,forced_victim,False)
             
-            answer.append(chosen)
+            answer_table.append(chosen)
 
         # Force Dog to become Innocent
-        if user_role == "Dog":
+        if user_role == "Dog" and db_get(user_id,'uses') > 0:
             db_set(user_id,'role',"Innocent")
-            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
-            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
-            answer.append(response)
+            answer.msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
+            answer.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
 
         # Remove hooker effects
         db_set(user_id,'sleepingover',0)
@@ -62,12 +51,47 @@ def pay():
         # Force Look-Alike to become Innocent
         if user_role == "Look-Alike":
             db_set(user_id,'role',"Innocent")
-            response = Mailbox().msg("You haven't chosen a role! That's why you have now become and **Innocent**!",db_get(user_id,'channel'))
-            response.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
-            answer.append(response)
+            answer.msg("You haven't chosen a role! That's why you have now become an **Innocent**!",db_get(user_id,'channel'))
+            answer.log("The **Dog** <@{}> didn't choose a role last night and turned into an **Innocent**!".format(user_id))
 
         # Remove tanner disguises
         db_set(user_id,'fakerole',user_role)
+        
+        # Remove zombie tag
+        db_set(user_id,'bitten',0)
+
+    return answer
+
+def day():
+    """Start the second part of the day.  
+    The function assumes all polls have been evaluated, and that looking after attacks can begin.  
+    The function returns a Mailbox."""
+    threat = db.get_kill()
+    answer = Mailbox().log("**Results from night attacks:**")
+
+    while threat != None:
+
+        answer = roles.attack(threat[1],threat[2],threat[3],answer)
+        threat = db.get_kill()
+
+    for player in db.player_list(True):
+        # Give potential day uses
+        user_role = db_get(player,'role')
+        for i in range(len(roles.day_users)):
+            if user_role in roles.day_users[i]:
+                # Give one-time users their one-time power
+                if i == 0:
+                    if dy.day_number() == 0:
+                        db_set(player,'uses',1)
+                    break
+
+                db_set(player,'uses',i)
+                answer.msg(power.power(user_role),db_get(player,'channel'))
+                break
+
+    answer.story(morning.story_time(db.get_deadies()))
+
+    return answer
 
 def start_game():
     """This function is triggered at the start of the game. If successful, the function returns a Mailbox.
@@ -100,6 +124,7 @@ def start_game():
         chosen_roles = random.sample(role_pool,len(db.player_list()))
 
         if pos.valid_distribution(chosen_roles,True) == True:
+
 
             # Assign the roles to all users.
             user_list = db.player_list()
@@ -135,7 +160,28 @@ def start_game():
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
                     answer.add_to_sc(user_id,"Undead")
+                if user_role == "Witch":
+                    db_set(user_id,'uses',3)
             
+            # If the four horsemen are part of the game, assign numbers to all players.
+            if "Horseman" in chosen_roles:
+                nothorse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') != 'Horseman']
+                horse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') == 'Horseman']
+
+                nothorse_table.shuffle()
+                horse_table.shuffle()
+
+                for i in range(4):
+                    db_set(horse_table[i],'horseman',i+1)
+
+                for i in range(16):
+                    db_set(nothorse_table[i],'horseman',(i%4)+1)
+            
+            # Reset the day timer
+            dy.reset_day()
+            dy.set_stage('Night')
+
             return answer
     
     answer.respond("Timeout reached! Your distribution is too crazy!",True)
+    return answer

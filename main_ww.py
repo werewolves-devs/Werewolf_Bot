@@ -101,6 +101,7 @@ async def on_message(message):
 
     result = process(message,isGameMaster,isAdmin,isPeasant)
 
+
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
 
@@ -267,6 +268,7 @@ async def on_message(message):
             if db.isParticipant(element.victim,True,True):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
+
         # New channels are created here.
         for element in mailbox.newchannels:
             # element.name - name of the channel;
@@ -399,6 +401,7 @@ async def on_message(message):
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
 
+
         # Polls are created here.
         for element in mailbox.polls:
             # element.channel
@@ -425,7 +428,7 @@ async def on_message(message):
                         emoji_table.append(user[1])
 
                     if i % 20 == 19:
-                        msg = await client.get_channel(element.channel).send(msg)
+                        msg = await client.get_channel(int(element.channel)).send(msg)
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)
@@ -441,6 +444,7 @@ async def on_message(message):
                 msg_table.append(msg)
             db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
+
 
         # Categories are deleted here.
         for element in mailbox.deletecategories:

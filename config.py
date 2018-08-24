@@ -11,7 +11,7 @@ activity_hours = 72
 season = "1"
 
 ww_prefix = '!'
-act_prefix = '-'
+ghost_prefix = '$'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
@@ -21,9 +21,9 @@ database = 'game.db'
 max_channels_per_category = 50
 
 # List of specific channels
-welcome_channel = 477533423578382336
+welcome_channel = 446046437114118145
 game_log = 456880259636396034
-bot_spam = 477533423578382336
+bot_spam = 482219246177222657
 story_time = 477533978547453972
 
 # List of specific roles
