@@ -71,6 +71,20 @@ def kill_mayor():
     """Remove the mayor from the dynamic config file. The town will now longer have a mayor.  """
     return set_mayor(0)
 
+def get_reporter():
+    """Get the id of the town's current reporter"""
+    return int(jget("Reporter"))
+
+def set_reporter(user_id):
+    """Set the reporter to the given id  
+    
+    userid -> the id of the user that is to be set reporter"""
+    return jset("Reporter",user_id)
+
+def kill_reporter():
+    """Remove the reporter from the dynamic config file. The town will now longer have a reporter.  """
+    return set_reporter(0)
+
 def add_lifepotion():
     """Brew a life potion, erasing all kills from the night"""
     return jset("lifepotion",1)
