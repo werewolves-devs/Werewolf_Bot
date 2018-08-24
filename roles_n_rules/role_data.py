@@ -18,14 +18,14 @@ from story_time.barber_kills import barber_kill_story
 
 next = '|            '
 success = '|---> '
-failure = '|\n'
+failure = '|'
 skull = '💀 '
 
 def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     """This functions attacks the given player with the given role.  
     The effects are immediate, but they can be used in all scenarios, as only\
     standoffs are executed during this attack."""
-    
+
     # Prevent Pyromancer from causing way too long lines
     # No, I didn't add this during debugging.
     # Yes, that means I planned to design it this terribly.
@@ -35,21 +35,25 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     user_role = db_get(user_id,'role')
     answer.log_add(recursive + failure)
 
-    demonized = False
-    if int(db_get(user_id,'demonized')) == 1:
-        demonized = True
-    
-    undead = False
-    if int(db_get(user_id,'undead')) == 1 or user_role == 'Undead':
-        undead = True
+    try:
         demonized = False
+        if int(db_get(user_id,'demonized')) == 1:
+            demonized = True
+
+        undead = False
+        if int(db_get(user_id,'undead')) == 1 or user_role == 'Undead':
+            undead = True
+            demonized = False
+    except Exception:
+        demonized = False
+        undead = False
 
     # End function if player is dead (exit condition for recursion)
     if user_role in ['Dead','Spectator','Suspended',None,'Unknown']:
         return answer.log_add(recursive + success + '<@{}> was already dead!'.format(user_id))
-    
+
     if role == 'Cupid':
-        answer.log_add(recursive + success + skull + '<@{}> committed suicide.')
+        answer.log_add(recursive + success + skull + '<@{}> committed suicide.'.format(user_id))
         answer = instant_death(user_id, role, answer, recursive+next)
         if int(db_get(user_id,'abducted')) != int(db_get(murderer,'abducted')):
             answer.dm("Abducted or not, you know your lover has deceased! ",user_id)
@@ -63,7 +67,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
             answer.dm("You couldn't bear the sight of your lover, <@{}>, ".format(murderer),user_id)
             answer.dm_add("lying dead in your arms. This is why you have decided to end it all!\n")
             answer.dm_add("Let\'s just hope this isn\'t like Romeo and Juliet...")
-        answer.dm_add("**Your lover <@{}> has died. In response, you have committed suicide.**")
+        answer.dm_add("**Your lover, <@{}>, has died. In response, you have committed suicide.**".format(murderer))
         return answer
 
     if role == 'Fortune Teller':
