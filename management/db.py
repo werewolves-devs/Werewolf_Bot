@@ -526,6 +526,12 @@ def delete_standoff(standoff_id):
     c.execute("DELETE FROM 'standoff' WHERE id =?",(standoff_id,))
     conn.commit()
 
+def delete_hookers():
+    """Remove all hooker standoffs from the database."""
+    c.execute("DELETE FROM 'standoff' WHERE role =='Hooker'")
+    c.execute("UPDATE 'game' SET sleepingover =0")
+    conn.commit()
+
 def random_wolf():
     """Find and get a random wolf pack member"""
     wolfies = [user_id for user_id in player_list() if db_get(user_id,'role') in wolf_pack]
