@@ -52,6 +52,7 @@ from interpretation.ww_head import process
 from interpretation.polls import count_votes
 import config
 import management.db as db
+import management.dynamic as dy
 
 
 client = discord.Client()
@@ -135,23 +136,27 @@ async def on_message(message):
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
+                chosen_one = int(chosen_one)
 
                 if chosen_emoji != '' and chosen_one != None:
                     if poll.purpose == 'lynch':
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
-                        # TODO: give Mayor role and add data to dynamic.json
-                        pass
+                        dy.set_mayor(chosen_one)
+                        # TODO: give Mayor role
                     elif poll.purpose == 'Reporter':
-                        # TODO: give Reporter role and add data to dynamic.json
-                        pass
+                        dy.set_reporter(chosen_one)
+                        # TODO: give Reporter role
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
                         db.add_kill(chosen_one,'Cult Leader',db.random_cult())
                     elif poll.purpose == 'thing':
-                        # TODO: kill poor victim
-                        pass
+                        db.add_kill(chosen_one,'The Thing','')
+
+        for user_id in mailbox.demotions:
+            # user_id -> user that needs to lose reporter AND mayor role if it has either.
+            pass # TODO
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
