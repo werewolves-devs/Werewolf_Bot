@@ -12,6 +12,8 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
+import roles_n_rules.switch as switch
+import management.db as db
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -25,6 +27,28 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
+    '''day'''
+    if is_command(message, ['day']):
+        return [switch.day(),Mailbox().respond("Dayyyyyy")]
+
+    '''standoff'''
+    if is_command(message,['stand']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_standoff(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+
+    '''tokill'''
+    if is_command(message,['tokill']):
+        users = check.users(message,2,True)
+        role = check.roles(message)
+        if not users or not role:
+            return [Mailbox().respond("**NO**")]
+        db.add_kill(users[0],role[0],users[1])
+        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
 
     '''evaluate'''
     if is_command(message, ['eval']):
