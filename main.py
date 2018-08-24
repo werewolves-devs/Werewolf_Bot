@@ -44,6 +44,7 @@ import asyncio
 # Import config data
 # Imports go (folder name).(file name)
 import story_time.cc_creation as creation_messages
+import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
 from config import ww_prefix as prefix
 from management.db import db_set, db_get
@@ -256,7 +257,7 @@ async def on_message(message):
                 await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 7:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 8:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
                 await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
@@ -285,7 +286,7 @@ async def on_message(message):
                     element.members.append(element.owner)
                 for buddy in element.settlers:
                     if buddy not in element.members:
-                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem,
+                        msg = """**Warning:** I'm adding settlers to a channel!\nThis is should not be a problem, \
                         but it does at least indicate a flaw in the bot's code. Please, report this to the Game Masters!"""
                         await client.get_channel(message.channel).send(msg)
                         element.members.append(buddy)
@@ -338,7 +339,7 @@ async def on_message(message):
                     title = "s{}_cc_{}".format(config.season,element.name)
                     category_name = 'S{} CCs PART {}'.format(config.season,db.count_categories(element.secret) + 1)
                 else:
-                    intro_msg = creation_messages.secret_intro(element.name,[v.id for v in viewers])
+                    intro_msg = secret_messages.creation(element.name,[v.id for v in viewers])
                     reason_msg = 'Secret {} channel created.'.format(element.name)
                     title = "s{}_{}".format(config.season,element.name)
                     category_name = 'S{} Secret Channels Part {}'.format(config.season,db.count_categories(element.secret) + 1)
@@ -360,6 +361,12 @@ async def on_message(message):
                     db.add_channel(channel.id,element.owner,element.secret)
                     if element.secret:
                         db.add_secret_channel(channel.id,element.name)
+
+                        # If the channel is meant for an amulet holder, assign the amulet holder.
+                        if element.name == 'Amulet_Holder':
+                            for member in viewers:
+                                if db_get(member.id,'role') == 'Amulet Holder':
+                                    db_set(member.id,'amulet',channel.id)
 
                     await channel.send(intro_msg)
 
@@ -422,6 +429,7 @@ async def on_message(message):
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)
+                        emoji_table = []
                         msg = ''
                     else:
                         msg += '\n'
