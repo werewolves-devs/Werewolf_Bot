@@ -46,7 +46,7 @@ def player_list(alive_only = False,available_only = False):
     if available_only == False:
         player_list = [player for player in player_list if db_get(player,'role') not in ['Spectator','Dead']]
 
-    return [player for player in player_list if int(db_get(player,'adbucted')) == 0 and int(db_get(player,'frozen')) == 0]
+    return [player for player in player_list if int(db_get(player,'abducted')) == 0 and int(db_get(player,'frozen')) == 0]
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
