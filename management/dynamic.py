@@ -59,7 +59,7 @@ def reset_day():
 
 def get_mayor():
     """Get the id of the town's current mayor"""
-    return jget("Mayor")
+    return int(jget("Mayor"))
 
 def set_mayor(user_id):
     """Set the mayor to the given id  

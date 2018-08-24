@@ -10,6 +10,7 @@ day_users = [[],["Barber","Royal Knight"],[],["Tanner"]]
 
 import management.position as pos
 import management.db as db
+import management.dynamic as dy
 from config import universal_prefix as unip
 from management.db import db_get, db_set
 from main_classes import Mailbox
@@ -286,6 +287,15 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
 def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
     """Eliminate the given user."""
+
+    # If the user was reporter or mayor, get rid of that.
+    if dy.get_mayor() == user_id:
+        dy.kill_mayor()
+        answer.remove_proms(user_id)
+    if dy.get_reporter() == user_id:
+        dy.kill_reporter()
+        answer.remove_proms(user_id)
+
 
     # Change all channel settings
     for channel_id in db.channel_change_all(user_id,1,4):

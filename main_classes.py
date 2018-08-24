@@ -14,6 +14,7 @@ class Mailbox:
         self.oldchannels = []      # Edit existing channel
         self.polls = []            # Create new polls
         self.deletecategories = [] # Delete categories and channels they contain
+        self.demotions = []        # Remove Mayor + Reporter role
 
         self.evaluate_polls = evaluate_polls
 
@@ -237,6 +238,14 @@ class Mailbox:
         if channel_settings == 3:
             self.edit_cc(channel_id,user_id,6)
         return self
+    
+    def remove_proms(self,user_id):
+        """Remove the Mayor and Reporter role from the given user.  
+        
+        Keyword arguments:  
+        user_id -> the user who must lose the roles"""
+        self.demotions.append(int(user_id))
+
         
 
 # Class used to send messages through the mailbox

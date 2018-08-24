@@ -34,3 +34,6 @@ dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
 peasant = 0 # TODO
+
+mayor = 0 # TODO
+reporter = 0 # TODO
