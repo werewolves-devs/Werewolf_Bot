@@ -98,3 +98,7 @@ def lifepotion_in_play():
     if jget("lifepotion") == 1:
         return True
     return False
+
+def voting_booth():
+    """Return the voting booth's channel."""
+    return jget("voting_booth")
