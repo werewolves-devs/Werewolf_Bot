@@ -25,16 +25,16 @@ splashes = [
 'Always use a database. What\'s a JSON?',
 'Powered by Electricity',
 'Who still writes docs in 2018?',
-"First normal form? What does that mean?",
-"By using a relational database but with nonrelational practices we get the worst of both worlds!",
-"I haven\'t paid attention or read any comments, therefor it\'s impossible to understand!",
-"Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.",
-"I don\'t wanna explain, just Google it.",
-"What are cogs?",
-"This is MY project. You\'re just freeloaders.",
-"You've got three weeks to fix EVERYTHING.",
-"No-one agrees? Too bad! My idea it is.",
-"The next version will be written in Java only!"
+'First normal form? What does that mean?',
+'By using a relational database with nonrelational practices we get the worst of both worlds!',
+'I haven\'t paid attention or read any comments, therefore it\'s impossible to understand!',
+'Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.',
+'I don\'t wanna explain, just Google it.',
+'What are cogs?',
+'This is MY project. You\'re just freeloaders.',
+'You\'ve got three weeks to fix EVERYTHING.',
+'No-one agrees? Too bad! My idea it is.',
+'The next version will be written in Java only!'
 ]
 
 import discord
@@ -42,6 +42,7 @@ import random
 import asyncio
 
 # Import config data
+# Imports go (folder name).(file name)
 import story_time.cc_creation as creation_messages
 import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
@@ -81,6 +82,7 @@ async def on_message(message):
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
+    #check role of sender
     isGameMaster = False
     isAdmin = False
     isPeasant = False
@@ -99,10 +101,13 @@ async def on_message(message):
 
     result = process(message,isGameMaster,isAdmin,isPeasant)
 
+
+    # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
 
     for mailbox in result:
 
+        # If a Mailbox says so, all existing polls will be evaluated.
         if mailbox.evaluate_polls == True:
             for poll in db.get_all_polls():
                 # poll.msg_table -> list of message ids
@@ -148,7 +153,8 @@ async def on_message(message):
                         # TODO: kill poor victim
                         pass
 
-
+        #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
+        # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
@@ -156,6 +162,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the botspam, this is where it's sent.
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
             for emoji in element.reactions:
@@ -163,6 +170,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the storytime (in-game announcements) channel, this is where it's sent.
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
@@ -170,6 +178,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages are sent here if they are a direct message to the one sending a command.
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
@@ -177,7 +186,10 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages that are destined for a specific channel, are sent here.
         for element in mailbox.channel:
+
+            # The following code is sent if the message is an embed.
             if element.embed:
                 if element.destination == "spam":
                     msg = await botspam_channel.send(embed=element.content)
@@ -191,6 +203,7 @@ async def on_message(message):
                         await msg.add_reaction(emoji)
                     if element.temporary == True:
                         temp_msg.append(msg)
+            # The following code is sent if the message is a regular message.
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
@@ -198,6 +211,7 @@ async def on_message(message):
                 if element.temporary == True:
                     temp_msg.append(msg)
 
+        # DMs are sent here.
         for element in mailbox.player:
             member = client.get_user(element.destination)
             if member == None:
@@ -210,6 +224,7 @@ async def on_message(message):
                 if element.temporary == True:
                     temp_msg.append(msg)
 
+        # Settings of existing channels are altered here.
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
@@ -254,6 +269,7 @@ async def on_message(message):
                 db.set_user_in_channel(element.channel,element.victim,element.number)
 
 
+        # New channels are created here.
         for element in mailbox.newchannels:
             # element.name - name of the channel;
             # element.owner - owner of the channel;
@@ -385,6 +401,8 @@ async def on_message(message):
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
 
+
+        # Polls are created here.
         for element in mailbox.polls:
             # element.channel
             # element.purpose
@@ -410,7 +428,7 @@ async def on_message(message):
                         emoji_table.append(user[1])
 
                     if i % 20 == 19:
-                        msg = await client.get_channel(element.channel).send(msg)
+                        msg = await client.get_channel(int(element.channel)).send(msg)
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)
@@ -427,11 +445,13 @@ async def on_message(message):
             db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
+
+        # Categories are deleted here.
         for element in mailbox.deletecategories:
             id = element.channel
             category = client.get_channel(id)
             if category != None:
-                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irreversibly delete all channels contained within the specified category. Please use with discretion.')
                 await bot_message.add_reaction('👍')
                 def check(reaction, user):
                     return user == message.author and str(reaction.emoji) == '👍'
@@ -448,7 +468,7 @@ async def on_message(message):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
-    # Delete all temporary messages after "five" seconds.
+    # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
         await msg.delete()

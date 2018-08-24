@@ -4,7 +4,7 @@ def story_text(purpose):
     msg_table = []
 
     # All existing poll purposes
-    # 
+    #
     # wolf
     # cult
     # thing
@@ -82,7 +82,7 @@ def story_text(purpose):
 
         msg = "\"I've seen it! I've seen that... thing! Look, over there! Throw some rocks at it!\""
         msg_table.append(msg)
-    
+
     if purpose == 'lynch':
         msg = "Last night was a terrific night! Some didn\'t sleep well, while others didn\'t sleep at all! Someone must pay for this!"
         msg_table.append(msg)
@@ -92,5 +92,8 @@ def story_text(purpose):
 
         msg = "The town decided to have a brutal public execution at the end of the day! Everything\'s prepared and all ready, now we just need to choose a victim."
         msg_table.append(msg)
-    
+
+        msg = "The town had enough of whatever\'s happening. It\'s time we find the guilty person."
+        msg_table.append(msg)
+        
     return msg_table[random.randint(0,len(msg_table)-1)]

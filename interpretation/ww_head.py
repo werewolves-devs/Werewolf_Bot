@@ -75,7 +75,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     # =============================================================
     if isPeasant == True:
         if is_command(message,['warn'],False,unip):
-            # Warn the user that they've been active for a while.
+            # Warn the user that they've been inactive for a while.
             answer = Mailbox().story("Hey there, <@{}>! You have been idling for about 48 hours now!\n".format(message.mentions[0].id))
             return [answer.story_add("Please let us hear from you within 24 hours, or you will be disqualified for idling out.")]
 
@@ -644,8 +644,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.executioner(user_id,target[0])]
             if is_command(message, ['hunt', 'shoot'], True) and user_role == "Huntress":
-                # TODO
-                return todo()
+                msg = "**Usage:** Choose a player as a death target.\n\n`" + prefix + "hunt <player>`\n\n"
+                msg += "**Example:** `" + prefix + "hunt @Randium#6521`\nThe command is compatible with user emojis as a replacement for mentions. "
+                msg += "This command can only be used by the Huntress."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Huntress" and user_undead == 0:
                 help_msg += "`" + prefix + "hunt` - Choose player as death target. (Huntress only)\n"
 
@@ -669,8 +671,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['copy', 'imitate', 'mirror', 'resemble'], True) and user_role == "Look-Alike":
-                # TODO
-                return todo()
+                msg = "**Usage:** Copy a players role.\n\n`" + prefix + "copy <player>`\n\n"
+                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. " 
+                msg += "This command can only be used by Look-Alike's."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Look-Alike":
                 help_msg += "`" + prefix + "copy` - Imitate another player. (Look-Alike only)\n"
 
@@ -682,8 +686,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.nightly_kill(user_id,target[0])]
             if is_command(message, ['holify', 'sacrify', 'water'], True) and user_role == "Priest":
-                # TODO
-                return todo()
+                msg = "**Usage:** Throw Holy water on a player.\n\n`" + prefix + "holify <player>`\n\n"
+                msg += "**Example:** `" + prefix + "holify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Priest."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Priest" and user_undead == 0:
                 help_msg += "`" + prefix + "holify` - Holify a player. (Priest only)\n"
 
@@ -695,8 +701,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                     return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 return [func.purify(user_id,target[0])]
             if is_command(message, ['heal', 'light', 'purify', 'sacrify'], True) and user_role == "Priestess":
-                # TODO
-                return todo()
+                msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
+                msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Priestess."
+                return [Mailbox().respond(msg,True)]return todo()
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
@@ -706,19 +714,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['threaten', 'raven'], True) and user_role == "Raven":
-                # TODO
-                return todo()
+                msg = "**Usage:** Threaten a player.\n\n`" + prefix + "threaten <player>`\n\n"
+                msg += "**Example:** `" + prefix + "threaten @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Raven."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Raven" and user_undead == 0:
                 help_msg += "`" + prefix + "threaten` - Threaten a player. (Raven only)\n"
 
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO
+                # TODO             
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
-                # TODO
-                return todo()
+                msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
+                msg += "**Example:** `" + prefix + "prevent`. "
+                msg += "This command can only be used by the Royal Knight."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Royal Knight":
                 help_msg += "`" + prefix + "prevent` - Prevent the public lynch from happening. (Royal Knight only)\n"
 
@@ -728,8 +740,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['heal', 'life', 'save'], True) and user_role == "Witch":
-                # TODO
-                return todo()
+                msg = "**Usage:** Use potion of life.\n\n`" + prefix + "save`\n\n"
+                msg += "**Example:** `" + prefix + "save`. "
+                msg += "This command can only be used by the Witch."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Witch" and user_undead == 0:
                 help_msg += "`" + prefix + "life` - Brew life potion. (Witch only)\n"
 
@@ -739,8 +753,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['death', 'kill', 'murder', 'poison'], True) and user_role == "Witch":
-                # TODO
-                return todo()
+                msg = "**Usage:** Use potion of death.\n\n`" + prefix + "kill <player>`\n\n"
+                msg += "**Example:** `" + prefix + "kill @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Witch."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Witch" and user_undead == 0:
                 help_msg += "`" + prefix + "death` - Brew death potion. (Witch only)\n"
 
@@ -750,8 +766,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cast', 'corrupt', 'curse'], True) and user_role == "Curse Caster":
-                # TODO
-                return todo()
+                msg = "**Usage:** Cast a curse on a player.\n\n`" + prefix + "curse <player>`\n\n"
+                msg += "**Example:** `" + prefix + "curse @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Curse Caster."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Curse Caster" and user_undead == 0:
                 help_msg += "`" + prefix + "curse` - Curse a player. (Curse Caster only)\n"
 
@@ -761,8 +779,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             if is_command(message, ['cough', 'infect', 'sneeze', 'turn'], True) and user_role == "Infected Wolf":
-                # TODO
-                return todo()
+                msg = "**Usage:** Turn a player into a Wolf.\n\n`" + prefix + "infect <player>`\n\n"
+                msg += "**Example:** `" + prefix + "infect @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
+                msg += "This command can only be used by the Infected Wolf."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Infected Wolf" and user_undead == 0:
                 help_msg += "`" + prefix + "infect` - Infect a player. (Imfected Wolf only)\n"
 
