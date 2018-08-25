@@ -17,7 +17,7 @@ def pay():
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
 
-    answer_table = [Mailbox(True)]
+    answer_table = [Mailbox(True).log("```Day {}```".format(dy.day_number() + 1))]
     answer = Mailbox()
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
@@ -120,7 +120,7 @@ def pight():
     if dy.get_stage() == "Night":
         return [Mailbox().respond("Whaddaya mean, `{}pight`? It already **is** night, bud.".format(config.universal_prefix))]
 
-    answer = Mailbox(True)
+    answer = Mailbox(True).log("```Night {}```".format(dy.day_number()))
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -276,7 +276,7 @@ def start_game():
             dy.reset_day()
             dy.set_stage('Night')
 
-            return answer
+            return answer.respond("Very well! The game will start tomorrow morning.")
     
     answer.respond("Timeout reached! Your distribution is too crazy!",True)
     return answer

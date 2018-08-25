@@ -159,6 +159,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             role = check.roles(message)
             if not role:
                 return [Mailbox().respond("**INVALID SYNTAX:** No role provided.\n\nPlease give us a role to add.")]
+            setup.add_role(role[0],amount[0])
+            return [Mailbox().respond("You have successfully added the **{}** role {} times to the game pool!".format(role[0],amount[0]))]
         if is_command(message, ['addrole'], True):
             msg = "**Usage:** Add a role to the game pool\n\n`" + prefix + "addrole <role>`\n\n**Example:** `" + prefix + "addrole Innocent`"
             msg += "\nThe command accepts multiple roles. This command can only be used by Game Masters."
