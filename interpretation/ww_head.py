@@ -29,45 +29,45 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg = "**List of commands:**\n"
 
-    '''day'''
-    if is_command(message, ['day']):
-        return [switch.day(),Mailbox().respond("Dayyyyyy")]
-
-    '''standoff'''
-    if is_command(message,['stand']):
-        users = check.users(message,2,True)
-        role = check.roles(message)
-        if not users or not role:
-            return [Mailbox().respond("**NO**")]
-        db.add_standoff(users[0],role[0],users[1])
-        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
-
-    '''tokill'''
-    if is_command(message,['tokill']):
-        users = check.users(message,2,True)
-        role = check.roles(message)
-        if not users or not role:
-            return [Mailbox().respond("**NO**")]
-        db.add_kill(users[0],role[0],users[1])
-        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
-
-    '''evaluate'''
-    if is_command(message, ['eval']):
-        return [Mailbox(True)]
-
-    '''testpoll'''
-    if is_command(message,['poll','testpoll']):
-        return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
-
-    '''dist'''
-    if is_command(message,['dist','checkdist','check_dist']):
-        roles = check.roles(message)
-        if not roles:
-            return [Mailbox().respond("You gotta provide some roles, bud!",True)]
-        judgment = valid_distribution(roles)
-        if not judgment:
-            return [Mailbox().respond("Sorry, that's an invalid role distribution!",True)]
-        return [Mailbox().respond(judgment,True)]
+#    '''day'''
+#    if is_command(message, ['day']):
+#        return [switch.day(),Mailbox().respond("Dayyyyyy")]
+#
+#    '''standoff'''
+#    if is_command(message,['stand']):
+#        users = check.users(message,2,True)
+#        role = check.roles(message)
+#        if not users or not role:
+#            return [Mailbox().respond("**NO**")]
+#        db.add_standoff(users[0],role[0],users[1])
+#        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+#
+#    '''tokill'''
+#    if is_command(message,['tokill']):
+#        users = check.users(message,2,True)
+#        role = check.roles(message)
+#        if not users or not role:
+#            return [Mailbox().respond("**NO**")]
+#        db.add_kill(users[0],role[0],users[1])
+#        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+#
+#    '''evaluate'''
+#    if is_command(message, ['eval']):
+#        return [Mailbox(True)]
+#
+#    '''testpoll'''
+#    if is_command(message,['poll','testpoll']):
+#        return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
+#
+#    '''dist'''
+#    if is_command(message,['dist','checkdist','check_dist']):
+#        roles = check.roles(message)
+#        if not roles:
+#            return [Mailbox().respond("You gotta provide some roles, bud!",True)]
+#        judgment = valid_distribution(roles)
+#        if not judgment:
+#            return [Mailbox().respond("Sorry, that's an invalid role distribution!",True)]
+#        return [Mailbox().respond(judgment,True)]
 
     # =============================================================
     #
