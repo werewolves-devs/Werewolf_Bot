@@ -148,6 +148,26 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     if int(db_get(user_id,'abducted')) == 1:
         return answer.log_add(recursive + success + '<@{}> was abucted and thus protected.'.format(user_id))
 
+    # Kill lynch!
+    if role == "Innocent":
+        replacements = [standoff for standoff in db.get_standoff(user_id) if standoff[2] == 'Executioner']
+
+        if replacements == []:
+            answer.log_add(recursive + success + skull + '<@{}> was killed by an angry mob.'.format(user_id))
+            answer = instant_death(user_id, role, answer, recursive+next)
+            
+        else:
+            answer.log_add(recursive + success + '<@{}> escaped death as the Executioner.')
+            
+            if user_role == 'Executioner':
+                db_set(user_id,'role','Innocent')
+
+            for standoff in replacements:
+                db.delete_standoff(standoff[0])
+                answer = instant_death(standoff[1], standoff[2], answer, recursive+next)
+
+        return answer
+
     # Kill whoever stands in the barber's way!
     if role == "Barber":
         answer.log_add(recursive + success + skull + '<@{}> was cut to death.'.format(user_id))
