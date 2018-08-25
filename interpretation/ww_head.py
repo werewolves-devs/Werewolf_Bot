@@ -82,23 +82,15 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['idle'],False,unip):
             # Kill the inactive user
             answer = Mailbox().story("<@{}> has been killed due to inactivity.".format(message.mentions[0].id))
-            return [answer]
-
-        if is_command(message,['pay'],False,unip):
-            # Initiate the first round of starting the day.
-            return [Mailbox(True)]
+            return [attack(message.mentions[0].id,'Inactive','',answer.log(""))]
 
         if is_command(message,['day'],False,unip):
-            # Initiate the second round of starting the day.
-            pass
-
-        if is_command(message,['pight',False,unip]):
-            # Initiate the first round of starting the night.
-            return [Mailbox(True)]
+            # Initiate the day.
+            return switch.pay()
 
         if is_command(message,['night'],False,unip):
-            # Initiate the second round of starting the night.
-            pass
+            # Initiate the night.
+            return switch.pight()
 
     # =============================================================
     #

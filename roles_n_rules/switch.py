@@ -14,8 +14,8 @@ def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
-    answer_table = []
-    answer = Mailbox(True)
+    answer_table = [Mailbox(True)]
+    answer = Mailbox()
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -61,7 +61,8 @@ def pay():
         # Remove zombie tag
         db_set(user_id,'bitten',0)
 
-    return answer
+    answer_table.append(answer).append(day())
+    return answer_table
 
 def day():
     """Start the second part of the day.  
@@ -128,7 +129,7 @@ def pight():
         if user_role == "Idiot ":
             db_set(user_id,'votes',0)
         
-    return answer
+    return [answer,night()]
 
 def night():
     """Start the second part of the day.  
