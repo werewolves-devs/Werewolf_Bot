@@ -102,3 +102,16 @@ def lifepotion_in_play():
 def voting_booth():
     """Return the voting booth's channel."""
     return jget("voting_booth")
+
+def get_signup():
+    """Return the stage at which the signups are taking place."""
+    return jget("signing_up")
+
+def set_signup(value):
+    """Change the signup stage.  
+    
+    Key values:  
+    0 -> signups closed  
+    1 -> signups for game  
+    2 -> spectator enrollment"""
+    return jset("signing_up",int(value))

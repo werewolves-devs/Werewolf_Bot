@@ -3,7 +3,7 @@ from discord import Embed
 
 import interpretation.check as check
 import roles_n_rules.functions as func
-from config import max_cc_per_user, season, universal_prefix as unip
+from config import max_cc_per_user, season, universal_prefix as unip, max_participants
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
@@ -14,7 +14,8 @@ from story_time.commands import cc_goodbye, cc_welcome
 from roles_n_rules.role_data import attack
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
-import management.db as db
+from management import db, dynamic as dy
+import management.setup as setup
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -282,8 +283,15 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # This command is started when a new game can be started.
         # Make sure the bot has reset itself beforehand.
         if is_command(message, ['open_signup']):
-            # TODO
-            return todo()
+            if dy.get_signup() == 0:
+                dy.set_signup(1)
+                answer = Mailbox().story("Alright, @everyone! Who's excited for a new game? I am.\n")
+                answer.story_add("This time, up to {} players can sign up. Be quick!".format(max_participants))
+                return [answer.spam('<@{}> has opened the signups.'.format(user_id))]
+            if dy.get_signup() == 1:
+                return [Mailbox().respond('Don\'t worry, bud! The signups are already open.')]
+            if dy.get_signup() == 2:
+                return [Mailbox().respond('I\'m sorry, but you can\'t open sign ups if there\'s already a game going.')]
         if is_command(message, ['open_signup'], True):
             msg = "**Usage:** Allow users to sign up for a new game.\n\n`" + prefix + "open_signup`\n\n"
             msg += "This command can only be used by Game Masters."
@@ -1057,6 +1065,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
     if is_command(message, ['signup']):
+        if dy.get_signup() == 0:
+            return [Mailbox().respond("I am sorry, but you currently cannot sign up yet! Ask Game Masters to open the signups.", True)]
+
+        if dy.get_signup() == 1 and len(db.player_list()) >= max_participants:
+            return [Mailbox().respond("I am terribly sorry! We have closed the signups because the game's full!\nPlease try again later or contact the Game Masters.")]
+
         emojis = check.emojis(message)
         choice_emoji = ""
 
@@ -1080,13 +1094,18 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id, choice_emoji))]
 
         if choice_emoji == "":
-            if len(choice_emoji) == 1:
+            if len(emojis) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.", True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",
                                       True)]
         signup(user_id, message.author.name, choice_emoji)
         reaction = Mailbox().respond("You have successfully signed up with the {} emoji!".format(choice_emoji))
-        return [reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))]
+
+        if dy.get_signup() == 1:
+            reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
+        else:
+            reaction.spam("<@{}> has started to spectate.".format(user_id))
+        return [reaction]
     if is_command(message, ['signup'], True):
         msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
         return [Mailbox().respond(msg, True)]
