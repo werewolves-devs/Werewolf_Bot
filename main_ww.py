@@ -223,11 +223,18 @@ async def on_message(message):
                 await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
                 await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(message.author.id,element.destination))
             else:
-                msg = await member.send(element.content)
-                for emoji in element.reactions:
-                    await msg.add_reaction(emoji)
-                if element.temporary == True:
-                    temp_msg.append(msg)
+                try:
+                    msg = await member.send(element.content)
+                    for emoji in element.reactions:
+                        await msg.add_reaction(emoji)
+                    if element.temporary == True:
+                        temp_msg.append(msg)
+                except discord.errors.Forbidden:
+                    botspam_channel.send('I wasn\'t allowed to send a DM to <@{}>! Here\'s the content:'.format(member.id))
+                    botspam_channel.send(element.content)
+                except Exception:
+                    botspam_channel.send('I failed to send a DM to <@{}>! Could somebody send this, please?'.format(member.id))
+                    botspam_channel.send(element.content)
 
         # Settings of existing channels are altered here.
         for element in mailbox.oldchannels:
