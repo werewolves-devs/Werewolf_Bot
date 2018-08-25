@@ -14,6 +14,9 @@ def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
+
     answer_table = [Mailbox(True)]
     answer = Mailbox()
     for user_id in db.player_list():
@@ -71,6 +74,9 @@ def day():
     threat = db.get_kill()
     answer = Mailbox().log("**Results from night attacks:**")
 
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Sure, man. Whatever.")]
+
     while threat != None:
 
         answer = roles.attack(threat[1],threat[2],threat[3],answer)
@@ -111,6 +117,9 @@ def pight():
     """This function takes care of all properties that need to happen in the first wave of the end of the day.
     The function returns a Mailbox."""
 
+    if dy.get_stage() == "Night":
+        return [Mailbox().respond("Whaddaya mean, `{}pight`? It already **is** night, bud.".format(config.universal_prefix))]
+
     answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
@@ -137,6 +146,9 @@ def night():
     The function returns a Mailbox."""
     threat = db.get_kill()
     answer = Mailbox().log("**Results from night attacks:**")
+
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Sure, man. Whatever.")]
 
     while threat != None:
 
