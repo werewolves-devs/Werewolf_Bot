@@ -323,19 +323,19 @@ def dog_follow(user_id,role):
     db_set(user_id,'uses',uses - 1)
 
     answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
-    answer.log("The **Dog** <@{}> has chosen to become a")
+    answer.log("The **Dog** <@{}> has chosen to become a".format(user_id))
 
     if role == 'Innocent':
         answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
     if role == 'Cursed Civilian':
         answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
     if role == 'Werewolf':
-        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_channel)
+        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_id)
         for channel_id in db.get_secret_channels("Werewolf"):
             answer.edit_cc(channel_id,user_id,1)
             if int(db_get(user_id,'frozen')) == 1:
                 answer.edit_cc(channel_id,user_id,2)
-            answer.msg("**ARRROOOO!\nWelcome, <@{}>, to the wolf pack!** <@{}>, a **Dog**, has chosen to turn themselves into a Werewolf! Give them a warm welcome.",channel_id)
+            answer.msg("**ARRROOOO!\nWelcome, <@{0}>, to the wolf pack!** <@{0}>, a **Dog**, has chosen to turn themselves into a Werewolf! Give them a warm welcome.".format(user_id),channel_id)
 
     db_set(user_id,'role',role)
     return answer
