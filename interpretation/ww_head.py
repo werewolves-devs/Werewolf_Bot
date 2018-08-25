@@ -144,8 +144,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # If the list is greater than the amount of participants, some random roles will be left out.
         # The game cannot start as long as this list is incomplete.
         if is_command(message, ['addrole']):
-            # TODO
-            return todo()
+            amount = check.numbers(message)
+            if not amount:
+                amount = [1]
+            role = check.roles(message)
+            if not role:
+                return [Mailbox().respond("**INVALID SYNTAX:** No role provided.\n\nPlease give us a role to add.")]
         if is_command(message, ['addrole'], True):
             msg = "**Usage:** Add a role to the game pool\n\n`" + prefix + "addrole <role>`\n\n**Example:** `" + prefix + "addrole Innocent`"
             msg += "\nThe command accepts multiple roles. This command can only be used by Game Masters."
