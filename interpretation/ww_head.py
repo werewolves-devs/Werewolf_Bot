@@ -11,6 +11,7 @@ from management.position import valid_distribution
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
+from roles_n_rules.role_data import attack
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 import management.db as db
@@ -745,7 +746,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
                 msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by the Priestess."
-                return [Mailbox().respond(msg,True)]return todo()
+                return [Mailbox().respond(msg,True)]
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
