@@ -130,7 +130,7 @@ async def on_message(message):
                             if db.isParticipant(person.id):
                                 user_table.append([person.id,emoji.emoji])
 
-                log, result, chosen_emoji = count_votes(user_table,poll.purpose)
+                log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
                 await gamelog_channel.send(log)
                 await poll_channel.send(result)
