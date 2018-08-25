@@ -61,7 +61,7 @@ def pay():
         # Remove zombie tag
         db_set(user_id,'bitten',0)
 
-    answer_table.append(answer).append(day())
+    answer_table.append(answer)
     return answer_table
 
 def day():
@@ -129,7 +129,7 @@ def pight():
         if user_role == "Idiot ":
             db_set(user_id,'votes',0)
         
-    return [answer,night()]
+    return [answer]
 
 def night():
     """Start the second part of the day.  

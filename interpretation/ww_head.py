@@ -85,13 +85,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             answer = Mailbox().story("<@{}> has been killed due to inactivity.".format(message.mentions[0].id))
             return [attack(message.mentions[0].id,'Inactive','',answer.log(""))]
 
-        if is_command(message,['day'],False,unip):
+        if is_command(message,['pay'],False,unip):
             # Initiate the day.
             return switch.pay()
+        
+        if is_command(message,['day'],False,unip):
+            # Initiate the second part of the day
+            return [switch.day()]
 
-        if is_command(message,['night'],False,unip):
+        if is_command(message,['pight'],False,unip):
             # Initiate the night.
             return switch.pight()
+
+        if is_command(message,['night'],False,unip):
+            # Initiate the second part of the night.
+            return [switch.night()]
 
     # =============================================================
     #

@@ -39,8 +39,9 @@ async def check_time():
             # Give the day signal
             if str(time.hour) == "8":
                 print('Another day has started!')
-                await client.get_channel(bot_spam).send(prefix + "day")
+                await client.get_channel(bot_spam).send(prefix + "pay")
                 await asyncio.sleep(45)
+                await client.get_channel(bot_spam).send(prefix + "day")
 
 
             # Give the night signal
@@ -48,6 +49,7 @@ async def check_time():
                 print('Another night has begun!')
                 await client.get_channel(bot_spam).send(prefix + "night")
                 await asyncio.sleep(45)
+                await client.get_channel(bot_spam).send(prefix + "day")
 
             await asyncio.sleep(45)
 
