@@ -243,6 +243,9 @@ def start_game():
                 if user_role == "Witch":
                     db_set(user_id,'uses',3)
             
+            answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
+            answer.story('I know, I know. That looks ugly as hell.')
+
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:
                 nothorse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') != 'Horseman']

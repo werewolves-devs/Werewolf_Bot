@@ -127,8 +127,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "delete_category` - Delete a category.\n"
-    elif is_command(message, ['delete_category']):
+
+        '''start'''
+        # This command is used to start a game.
+        if is_command(message, ['start']):
+            return [switch.start_game()]
+        if is_command(message, ['start'], True):
+            return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
+    elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+
 
     # =============================================================
     #
