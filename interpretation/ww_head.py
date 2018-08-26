@@ -744,7 +744,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return todo()
             if is_command(message, ['copy', 'imitate', 'mirror', 'resemble'], True) and user_role == "Look-Alike":
                 msg = "**Usage:** Copy a players role.\n\n`" + prefix + "copy <player>`\n\n"
-                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. " 
+                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by Look-Alike's."
                 return [Mailbox().respond(msg,True)]
             if user_role == "Look-Alike":
@@ -796,7 +796,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO             
+                # TODO
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
                 msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
