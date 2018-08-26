@@ -219,11 +219,14 @@ async def on_message(message):
 
         # DMs are sent here.
         for element in mailbox.player:
-            member = client.get_user(element.destination)
+            member = client.get_user(int(element.destination))
+            main_guild = botspam_channel.guild
+            if member == None:
+                member = main_guild.get_member(int(element.destination))
             if member == None:
                 await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
                 await botspam_channel.send(
-                    "<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(
+                    "<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `client.get_user`.".format(
                         message.author.id, element.destination))
             else:
                 try:
