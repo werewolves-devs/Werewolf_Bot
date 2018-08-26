@@ -1,4 +1,4 @@
-from management.db import db_get, db_set, channel_change_all, channel_get
+from management.db import db_get, db_set, channel_change_all, channel_get, get_secret_channels
 from config import game_log
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
@@ -163,8 +163,11 @@ class Mailbox:
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'frozen',1)
         self.spam("<@{}> was frozen.".format(user_id))
+        to_freeze = channel_change_all(user_id,1,2)
 
-        for channel_id in channel_change_all(user_id,1,2):
+        for channel_id in get_secret_channels('Frozen_Realm'):
+            self.edit_cc(channel_id,user_id,1)
+        for channel_id in to_freeze:
             self.edit_cc(channel_id,user_id,2)
         return self
     
@@ -174,7 +177,11 @@ class Mailbox:
         db_set(user_id,'frozen',0)
         self.spam("<@{}> is no longer frozen.".format(user_id))
 
-        for channel_id in channel_change_all(user_id,2,1):
+        to_unfreeze = channel_change_all(user_id,2,1)
+
+        for channel_id in get_secret_channels('Frozen_Realm'):
+            self.edit_cc(channel_id,user_id,0)
+        for channel_id in to_unfreeze:
             self.edit_cc(channel_id,user_id,1)
         return self
     
@@ -188,6 +195,8 @@ class Mailbox:
             self.edit_cc(channel_id,user_id,3)
         for channel_id in channel_change_all(user_id,5,6):
             self.edit_cc(channel_id,user_id,6)
+        for channel_id in get_secret_channels('Swamp'):
+            self.edit_cc(channel_id,user_id,1)
         return self
     
     def unabduct(self,user_id):
