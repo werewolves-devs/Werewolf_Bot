@@ -1,7 +1,8 @@
 # Discord API / Login settings
-WW_TOKEN = "yo_mommas_token"
-TM_TOKEN = "yo_poppas_token"
+import os
 
+WW_TOKEN = os.environ['TOKEN']
+TM_TOKEN = "yo_poppas_token"
 
 # Rules 'n' settings
 max_channels_per_category = 50
@@ -32,8 +33,8 @@ game_master = 456884637638328332
 participant = 456881451745411089
 dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
-suspended = 0 # TODO
-peasant = 0 # TODO
+suspended = 0  # TODO
+peasant = 0  # TODO
 
-mayor = 0 # TODO
-reporter = 0 # TODO
+mayor = 0  # TODO
+reporter = 0  # TODO
