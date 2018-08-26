@@ -19,3 +19,32 @@ def add_token(token,user_id):
     c.execute("INSERT INTO 'tokens' ('token','owner') VALUES ('?',?)",(token,user_id))
     conn.commit()
     return True
+
+def add_source1(token,source):
+    """Register source 1 and add it to the token.  
+    
+    Keyword arguments:  
+    token -> the opt's token"""
+    c.execute("UPDATE 'tokens' SET 'source1' =? WHERE 'token' =?",(source,token))
+    conn.commit()
+    
+def add_source2(token,source):
+    """Register source 2 and add it to the token.  
+    
+    Keyword arguments:  
+    token -> the opt's token"""
+    c.execute("UPDATE 'tokens' SET 'source2' =? WHERE 'token' =?",(source,token))
+    conn.commit()
+
+def add_options(token,choice1,choice2,choice3):
+    """Register the three options into the database.  
+
+    Keyword arguments:  
+    token -> the choices' token  
+    choice1 -> option 1  
+    choice2 -> option 2  
+    choice3 -> option 3"""
+    c.execute("UPDATE 'tokens' SET 'opt1' =? WHERE 'token' =?",(choice1,token))
+    c.execute("UPDATE 'tokens' SET 'opt2' =? WHERE 'token' =?",(choice2,token))
+    c.execute("UPDATE 'tokens' SET 'opt3' =? WHERE 'token' =?",(choice3,token))
+    conn.commit()

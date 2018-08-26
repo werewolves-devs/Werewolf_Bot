@@ -18,4 +18,4 @@ def delete_token(token):
     token -> the token that needs to be made invalid."""
 
     # To be filled in by BenTechy66
-    return
+    return '4GdrR4^Y7uyyR'
