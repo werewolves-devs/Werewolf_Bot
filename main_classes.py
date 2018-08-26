@@ -18,6 +18,19 @@ class Mailbox:
 
         self.evaluate_polls = evaluate_polls
 
+    # ------------------------------
+    # Commands for easier management
+    # ------------------------------
+    def __len__(self):
+        length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
+        length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
+        length += len(self.polls) + len(self.deletecategories) + len(self.demotions)
+    
+    def __repr__(self):
+        return "<MAILBOX --\n    |gamelog={}\n    |botspam={}\n    |story={}\n    |answer={}\n    |channel={}\n    |player={}\n    |newchannels={}\n    |oldchannels={}\n    |polls={}\n    |deletecategories={}\n    |demotions={}\n    |\n    |evaluate_polls={}\n>".format(self.gamelog,self.botspam,self.storytime,self.answer,self.channel,self.player,self.newchannels,self.oldchannels,self.polls,self.deletecategories,self.demotions,self.evaluate_polls)
+
+    # ------------------------------
+
     def log(self,content,temporary = False,reactions = []):
         """Send a message to the gamelog channel."""
         self.gamelog.append(Message(content,temporary,'',reactions))
@@ -272,6 +285,12 @@ class Message:
         self.reactions.append(emoji)
         return self
 
+    def __repr__(self):
+        temp_content = self.content[0:min(20,len(self.content))]
+        if len(self.content) > 20:
+            temp_content += '...'
+        return "<Message:\n        |content={}\n        |temporary={}\n        |destination={}\n        |reactions={}\n        |embed={}\n    >".format(self.content,self.temporary,self.destination,self.reactions,self.embed)
+
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
     def __init__(self,name,owner,members=[],settlers=[],secret=False):
@@ -283,6 +302,9 @@ class ChannelCreate:
         if owner not in members and owner != 0:
             self.members.append((owner))
 
+    def __repr__(self):
+        return "<ChannelCreate:\n        |name={}\n        |owner={}\n        |members={}\n        |settlers={}\n        |secret={}\n    >".format(self.name,self.owner,self.members,self.settlers,self.secret)
+
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
@@ -292,12 +314,19 @@ class ChannelChange:
         self.victim = victim
         self.number = number
 
+    def __repr__(self):
+        return "<ChannelChange:\n        |channel={}\n        |victim={}\n        |number={}\n    >".format(self.channel,self.victim,self.number)
+
 class CategoryDelete:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
     # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
     def __init__(self,channel):
         self.channel = channel
+
+    def __repr__(self):
+        return "<CategoryDelete:\n        |channel={}\n    >".format(self.channel)
+    
 
 class PollRequest:
     def __init__(self,channel_id,purpose,user_id,description):
@@ -309,6 +338,13 @@ class PollRequest:
             self.description = description[0:512]
         else:
             self.description = description
+    
+    def __repr__(self):
+        temp_desc = self.description[0:min(20,len(self.description))]
+        if len(self.description) > 20:
+            temp_desc += '...'
+        return "<PollRequest:\n        |channel={}\n        |purpose={}\n        |user={}\n        |desc=\'{}\'\n    >".format(self.channel,self.purpose,self.user_id,temp_desc)
+    
 
 class PollToEvaluate:
     def __init__(self,database_tuple):
@@ -317,3 +353,19 @@ class PollToEvaluate:
         self.channel = database_tuple[3]
 
         self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
+    
+    def __repr__(self):
+        return "<PollToEvaluate:\n        |purpose={}\n        |blamed=\'{}\'\n        |channel={}\n        |msg_table={}\n    >".format(self.purpose,self.blamed,self.channel,self.msg_table)
+
+if __name__ == "__main__":
+    print(PollToEvaluate(['lynch','','12345','1','2','3']))
+    print("{}".format(PollToEvaluate(['lynch','','12345','1','2','3'])))
+    print(str(PollToEvaluate(['lynch','','12345','1','2','3'])))
+
+    print(PollRequest(100,'Mayor',1234,"It was a hairy night in Tumble Town. Oh, btw, we need a Mayor."))
+
+    answer = Mailbox().log("Hi there!")
+    answer.log("This is a test!\n")
+    answer.log_add("Woohoo!")
+    answer.edit_cc(123124312,123423523,3)
+    print(answer)
