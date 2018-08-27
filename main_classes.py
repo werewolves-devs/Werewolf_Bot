@@ -35,9 +35,9 @@ class Mailbox:
         self.gamelog[-1].react(emoji)
         return self
 
-    def shop(self, destination):
+    def shop(self, destination, shop_config = ''):
         """Add a shop"""
-        self.shops.append(Shop(destination))
+        self.shops.append(Shop(destination, shop_config))
         return self
 
     def spam(self,content,temporary = False,reactions = []):
@@ -261,8 +261,9 @@ class Message:
         return self
 
 class Shop:
-    def __init__(self, destination):
+    def __init__(self, destination, shop_config = ''):
         self.destination = destination
+        self.shop_config = shop_config
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
