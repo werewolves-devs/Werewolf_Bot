@@ -29,6 +29,10 @@ client = discord.Client()
 
 shops = []
 
+def get_shop_config():
+    with open('shop.json') as f:
+        return json.load(f) # Load shop config file
+
 async def instantiate_shop(shop_config, channel):
     # Creates a new shop instance
     embed = discord.Embed(title="Shop (Page 1/1)", description=shop_config["shop_description"], color=0x00ff00)
@@ -50,13 +54,10 @@ async def find_item_from_key(column, query):
 
 @client.event
 async def on_reaction_add(reaction, user):
-    with open('shop.json') as f:
-        shop_config = json.load(f) # Load shop config file
-
     if user != client.user and reaction.message.id in shops:
         bought_item = await find_item_from_key("emoji", demojize(reaction.emoji))
         await reaction.message.remove_reaction(reaction.emoji, user)
-        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop_config["currency"]))
+        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], get_shop_config()["currency"]))
 
 # Whenever the bot regains his connection with the Discord API.
 @client.event
@@ -67,10 +68,7 @@ async def on_ready():
     # Send shop item message
     await client.get_channel(config.welcome_channel).send('Shop\'s open for business bois')
 
-    with open('shop.json') as f:
-        shop_config = json.load(f) # Load shop config file
-
-    await instantiate_shop(shop_config, config.shop_channel)
+    await instantiate_shop(get_shop_config(), config.shop_channel)
 
 print(splash)
 print(' --> "' + random.choice(splashes) + '"')
