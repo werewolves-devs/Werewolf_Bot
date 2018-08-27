@@ -33,11 +33,11 @@ def get_shop_config():
 
 async def instantiate_shop(shop_config, channel, client):
     # Creates a new shop instance
-    embed = discord.Embed(title="Shop (Page 1/1)", description=get_shop_config()["shop_description"], color=0x00ff00)
+    embed = discord.Embed(title="Shop (Page 1/1)", description=shop_config["shop_description"], color=0x00ff00)
     for item in get_shop_config()["items"]:
-        embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], get_shop_config()["currency"], item["description"]), inline=False) # Add item to shop
+        embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_config["currency"], item["description"]), inline=False) # Add item to shop
     message = await channel.send(embed=embed)
-    for item in get_shop_config()["items"]:
+    for item in shop_config["items"]:
         await message.add_reaction(emojize(item["emoji"], use_aliases=True)) # Add reactions to shop
     shops.append(message.id)
     return message # Return the message so we can use it later
