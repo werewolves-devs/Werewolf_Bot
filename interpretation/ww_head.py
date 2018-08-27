@@ -14,6 +14,7 @@ from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 import management.db as db
+import shop
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -991,6 +992,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
+
+    '''shop'''
+    # This command creates a new shop instance in the channel it was sent in
+    # Even though there really is no fucking reason to, this function returns a mailbox
+    if is_command(message, ['shop']):
+        return [Mailbox().shop(message.channel)]
 
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
