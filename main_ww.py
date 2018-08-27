@@ -70,6 +70,8 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
         if role.id == config.suspended:
             await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
 
 # Whenever a message is sent.
 @client.event
@@ -315,7 +317,7 @@ async def on_message(message):
                         pass
                     else:
                         deadies.append(member)
-                    
+
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
