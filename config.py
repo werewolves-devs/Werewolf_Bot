@@ -19,6 +19,7 @@ universal_prefix = "#!003-88-6521"
 dynamic_config = "dynamic.json"
 general_database = 'general.db'
 database = 'game.db'
+shop_file = 'shop.json'
 max_channels_per_category = 50
 
 # List of specific channels
