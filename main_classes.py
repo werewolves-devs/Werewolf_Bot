@@ -37,7 +37,7 @@ class Mailbox:
 
     def shop(self, destination):
         """Add a shop"""
-        self.shops.append(destination)
+        self.shops.append(Shop(destination))
         return self
 
     def spam(self,content,temporary = False,reactions = []):
@@ -259,6 +259,10 @@ class Message:
     def react(self,emoji):
         self.reactions.append(emoji)
         return self
+
+class Shop:
+    def __init__(self, destination):
+        self.destination = destination
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
