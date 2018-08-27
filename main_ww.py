@@ -73,6 +73,15 @@ async def remove_all_game_roles(member):
         if role.id == config.participant:
             await member.remove_roles(role, reason="Updating CC permissions")
 
+# Whenever a message is edited
+@client.event
+async def on_message_edit(before, after):
+    if before.author == client.user: # We don't want to respond to our own edits
+        return
+    if before.content == after.content: # Ensure it wasn't just a pin
+        return
+    await process_message(after)
+
 # Whenever a message is sent.
 @client.event
 async def on_message(message):
@@ -80,6 +89,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    await process_message(message)
+
+async def process_message(message):
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
