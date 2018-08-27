@@ -27,9 +27,26 @@ import config
 
 shops = []
 
+class Shop():
+    def __init__(self, message_id, config):
+        self.message_id = message_id
+        self.config = config
+
+def find_shop_by_id(id):
+    for shop in shops:
+        if shop.message_id == id:
+            return shop.config
+    return None
+
 def get_shop_config():
     with open('shop.json') as f:
         return json.load(f) # Load shop config file
+
+def is_shop(message_id):
+    for shop in shops:
+        if shop.message_id == message_id:
+            return True
+    return False
 
 async def instantiate_shop(shop_config, channel, client):
     # Creates a new shop instance
