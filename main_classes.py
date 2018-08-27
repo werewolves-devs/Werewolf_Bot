@@ -14,6 +14,7 @@ class Mailbox:
         self.oldchannels = []      # Edit existing channel
         self.polls = []            # Create new polls
         self.deletecategories = [] # Delete categories and channels they contain
+        self.shops = [] # Shops to be created
 
         self.evaluate_polls = evaluate_polls
 
@@ -26,12 +27,17 @@ class Mailbox:
         if len(self.gamelog[-1].content) + len(moar_content) > 1950:
             self.log(moar_content,self.gamelog[-1].temporary)
             return self
-            
+
         self.gamelog[-1].add(moar_content)
         return self
     def log_react(self,emoji):
         """Add a reaction to the last gamelog message"""
         self.gamelog[-1].react(emoji)
+        return self
+
+    def shop(self, destination):
+        """Add a shop"""
+        self.shops.append(destination)
         return self
 
     def spam(self,content,temporary = False,reactions = []):
@@ -117,7 +123,7 @@ class Mailbox:
         """Send an order to edit a channel"""
         self.oldchannels.append(ChannelChange(channel_id,user_id,number))
         return self
-        
+
     def create_sc(self,user_id,role):
         """Create a new secret channel for a given user."""
         new_role = ''
@@ -125,7 +131,7 @@ class Mailbox:
             if role[i] == ' ':
                 new_role += '_'
             else:
-                new_role += role[i] 
+                new_role += role[i]
         self.create_cc(new_role,0,[user_id],[user_id],True)
         return self
     def add_to_sc(self,user_id,role):
@@ -155,10 +161,10 @@ class Mailbox:
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
 
-    
+
     # Commands that change one's cc status
     def freeze(self,user_id):
-        """Freeze a user.  
+        """Freeze a user.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'frozen',1)
         self.spam("<@{}> was frozen.".format(user_id))
@@ -166,9 +172,9 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,1,2):
             self.edit_cc(channel_id,user_id,2)
         return self
-    
+
     def unfreeze(self,user_id):
-        """Unfreeze a user.  
+        """Unfreeze a user.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'frozen',0)
         self.spam("<@{}> is no longer frozen.".format(user_id))
@@ -176,9 +182,9 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,2,1):
             self.edit_cc(channel_id,user_id,1)
         return self
-    
+
     def abduct(self,user_id):
-        """Abduct a user.  
+        """Abduct a user.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'abducted',1)
         self.spam("<@{}> has been abducted.".format(user_id))
@@ -188,13 +194,13 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,5,6):
             self.edit_cc(channel_id,user_id,6)
         return self
-    
+
     def unabduct(self,user_id):
-        """Unabduct a user.  
+        """Unabduct a user.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'abducted',0)
         self.spam("<@{}> is no longer abducted.".format(user_id))
-    
+
         for channel_id in channel_change_all(user_id,3,1):
             self.edit_cc(channel_id,user_id,1)
         for channel_id in channel_change_all(user_id,6,5):
@@ -202,9 +208,9 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,7,4):
             self.edit_cc(channel_id,user_id,4)
         return self
-    
+
     def suspend(self,user_id):
-        """Suspend a user.  
+        """Suspend a user.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'role','Suspended')
         self.spam("<@{}> has been suspended.".format(user_id))
@@ -222,11 +228,11 @@ class Mailbox:
         for channel_id in channel_change_all(user_id,6,8):
             self.edit_cc(channel_id,user_id,8)
         for channel_id in channel_change_all(user_id,7,8):
-            self.edit_cc(channel_id,user_id,8) 
-        return self     
+            self.edit_cc(channel_id,user_id,8)
+        return self
 
     def mute(self,user_id,channel_id):
-        """Mute a user. Users cannot be muted in channels they do not take part in, or channels they are frozen in.  
+        """Mute a user. Users cannot be muted in channels they do not take part in, or channels they are frozen in.
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         self.spam("<@{}> has been muted in <#{}>".format(user_id,channel_id))
 
@@ -237,7 +243,7 @@ class Mailbox:
         if channel_settings == 3:
             self.edit_cc(channel_id,user_id,6)
         return self
-        
+
 
 # Class used to send messages through the mailbox
 class Message:
