@@ -33,6 +33,8 @@ def get_shop_config():
 
 async def instantiate_shop(shop_config, channel, client):
     # Creates a new shop instance
+    if shop_config == '':
+        shop_config = get_shop_config() # If no config specified, use default
     embed = discord.Embed(title="Shop (Page 1/1)", description=shop_config["shop_description"], color=0x00ff00)
     for item in get_shop_config()["items"]:
         embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_config["currency"], item["description"]), inline=False) # Add item to shop
