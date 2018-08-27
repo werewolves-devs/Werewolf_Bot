@@ -179,7 +179,7 @@ async def process_message(message):
                         pass
 
         for element in mailbox.shops:
-            await shop.instantiate_shop(shop.get_shop_config, element, client)
+            await shop.instantiate_shop(shop.get_shop_config(), element.destination, client)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
