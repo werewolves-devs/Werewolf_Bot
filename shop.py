@@ -1,4 +1,4 @@
-splash = '''
+'''
 
                     ███████╗██╗  ██╗ ██████╗ ██████╗     ██████╗  ██████╗ ████████╗
                     ██╔════╝██║  ██║██╔═══██╗██╔══██╗    ██╔══██╗██╔═══██╗╚══██╔══╝
@@ -10,11 +10,6 @@ splash = '''
                        - = https://github.com/werewolves-devs/werewolf_bot = -
 
 '''
-
-splashes = [
-'It\'s only selling your soul to the devil!',
-'They\'re cheap, honest!'
-]
 
 import discord
 import asyncio
