@@ -14,7 +14,6 @@ from story_time.commands import cc_goodbye, cc_welcome
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 import management.db as db
-import shop
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
