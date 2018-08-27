@@ -53,6 +53,8 @@ from interpretation.polls import count_votes
 import config
 import management.db as db
 import management.dynamic as dy
+import shop
+from emoji import demojize
 
 
 client = discord.Client()
@@ -71,6 +73,26 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
         if role.id == config.suspended:
             await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+
+@client.event
+#For shop
+async def on_reaction_add(reaction, user):
+    if user != client.user and shop.is_shop(reaction.message.id):
+        bought_item = await shop.find_item_from_key("emoji", demojize(reaction.emoji), reaction.message.id)
+        await reaction.message.remove_reaction(reaction.emoji, user)
+        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
+
+
+# Whenever a message is edited
+@client.event
+async def on_message_edit(before, after):
+    if before.author == client.user: # We don't want to respond to our own edits
+        return
+    if before.content == after.content: # Ensure it wasn't just a pin
+        return
+    await process_message(after)
 
 # Whenever a message is sent.
 @client.event
@@ -79,6 +101,9 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    await process_message(message)
+
+async def process_message(message):
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
@@ -157,6 +182,9 @@ async def on_message(message):
         for user_id in mailbox.demotions:
             # user_id -> user that needs to lose reporter AND mayor role if it has either.
             pass # TODO
+
+        for element in mailbox.shops:
+            await shop.instantiate_shop(element.shop_config, element.destination, client)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
@@ -332,7 +360,7 @@ async def on_message(message):
                         pass
                     else:
                         deadies.append(member)
-                    
+
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild

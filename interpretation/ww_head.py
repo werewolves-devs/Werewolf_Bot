@@ -1064,6 +1064,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
+    '''shop'''
+    # This command creates a new shop instance in the channel it was sent in
+    # Even though there really is no fucking reason to, this function returns a mailbox
+    if is_command(message, ['shop']):
+        return [Mailbox().shop(message.channel)]
+
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
     if is_command(message, ['signup']):
