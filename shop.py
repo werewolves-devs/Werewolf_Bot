@@ -58,13 +58,12 @@ async def instantiate_shop(shop_config, channel, client):
     message = await channel.send(embed=embed)
     for item in shop_config["items"]:
         await message.add_reaction(emojize(item["emoji"], use_aliases=True)) # Add reactions to shop
-    shops.append(message.id)
+    shops.append(Shop(message.id, shop_config))
     return message # Return the message so we can use it later
 
-async def find_item_from_key(column, query):
-    with open('shop.json') as f:
-        shop_config = json.load(f) # Load item file
-    for item in get_shop_config()["items"]:
+async def find_item_from_key(column, query, message_id):
+    shop_config = find_shop_by_id(message_id)
+    for item in shop_config["items"]:
         # print("Testing {} against {}".format(item[column], query)) # This is very useful when trying to find the full emoji name of something
         if item[column] == query:
             return item
