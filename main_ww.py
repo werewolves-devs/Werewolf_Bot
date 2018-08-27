@@ -52,6 +52,8 @@ from interpretation.ww_head import process
 from interpretation.polls import count_votes
 import config
 import management.db as db
+import shop
+from emoji import demojize
 
 
 client = discord.Client()
@@ -72,6 +74,15 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
         if role.id == config.participant:
             await member.remove_roles(role, reason="Updating CC permissions")
+
+@client.event
+#For shop
+async def on_reaction_add(reaction, user):
+    if user != client.user and reaction.message.id in shop.shops:
+        bought_item = await shop.find_item_from_key("emoji", demojize(reaction.emoji))
+        await reaction.message.remove_reaction(reaction.emoji, user)
+        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.get_shop_config()["currency"]))
+
 
 # Whenever a message is edited
 @client.event
@@ -166,6 +177,9 @@ async def process_message(message):
                     elif poll.purpose == 'thing':
                         # TODO: kill poor victim
                         pass
+
+        for element in mailbox.shops:
+            await shop.instantiate_shop(shop.get_shop_config, element, client)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
