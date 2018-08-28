@@ -181,8 +181,17 @@ async def process_message(message):
                         db.add_kill(chosen_one,'The Thing','')
 
         for user_id in mailbox.demotions:
-            # user_id -> user that needs to lose reporter AND mayor role if it has either.
-            pass # TODO
+            if user_id == message.author.id and message.guild == gamelog_channel.guild:
+                member = message.author
+            else:
+                member = gamelog_channel.guild.get_member(int(user_id))
+
+            if member != None:
+                for role in member.roles:
+                    if role.id == config.mayor:
+                        await member.remove_roles(role, reason="Demoting the Mayor")
+                    if role.id == config.reporter:
+                        await member.remove_roles(role, reason="Demoting the Reporter")
 
         # Create a new shop instance
         for element in mailbox.shops:
