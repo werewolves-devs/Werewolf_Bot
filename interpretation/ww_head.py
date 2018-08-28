@@ -1066,7 +1066,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     '''shop'''
     # This command creates a new shop instance in the channel it was sent in
-    # Even though there really is no fucking reason to, this function returns a mailbox
+    # This function returns a mailbox
     if is_command(message, ['shop']):
         return [Mailbox().shop(message.channel)]
 
