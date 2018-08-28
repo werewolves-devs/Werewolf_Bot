@@ -19,6 +19,7 @@ universal_prefix = "#!003-88-6521"
 dynamic_config = "dynamic.json"
 general_database = 'general.db'
 database = 'game.db'
+shop_file = 'shop.json'
 max_channels_per_category = 50
 
 # List of specific channels
@@ -36,3 +37,6 @@ dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
 peasant = 0 # TODO
+
+mayor = 0 # TODO
+reporter = 0 # TODO

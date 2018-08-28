@@ -65,5 +65,5 @@ async def find_item_from_key(column, query, message_id):
     shop_config = find_shop_by_id(message_id)
     for item in shop_config["items"]:
         # print("Testing {} against {}".format(item[column], query)) # This is very useful when trying to find the full emoji name of something
-        if item[column] == query:
+        if emojize(item[column]) == emojize(query):
             return item

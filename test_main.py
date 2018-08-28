@@ -112,12 +112,14 @@ def test_mexican():
   db.add_standoff(2,'Huntress',1)
   db.add_standoff(3,'Cupid',1)
   db.add_standoff(1,'Cupid',3)
-  print(db.get_standoff(3))
-  print(db.get_standoff(1))
   assert db.get_standoff(3) == [[3,'1','Cupid','3']]
   assert db.get_standoff(1) == [[1,'2','Huntress','1'],[2,'3','Cupid','1']]
   db.delete_standoff(2)
   assert db.get_standoff(1) == [[1,'2','Huntress','1']]
+  db.add_standoff(4,'Hooker',3)
+  assert db.get_standoff(3) == [[3,'1','Cupid','3'],[4,'4','Hooker','3']]
+  db.delete_hookers()
+  assert db.get_standoff(3) == [[3,'1','Cupid','3']]
   reset.reset(True)
 
 def test_secrets():
