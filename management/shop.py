@@ -27,6 +27,6 @@ def purge_shop(age):
 def is_shop(message_id):
     """Returns a boolean on whether a given message is a shop or not."""
     c.execute("SELECT * FROM 'shops' WHERE 'message' =?;",(message_id,))
-    if c.fetchall == []:
+    if c.fetchall() == []:
         return False
     return True
