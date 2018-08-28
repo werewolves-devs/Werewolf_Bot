@@ -55,7 +55,7 @@ import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
 import shop
-from emoji import emojize, demojize
+from emoji import emojize
 
 
 client = discord.Client()
@@ -81,7 +81,7 @@ async def remove_all_game_roles(member):
 #For shop
 async def on_reaction_add(reaction, user):
     if user != client.user and db_shop.is_shop(reaction.message.id):
-        bought_item = await shop.find_item_from_key("emoji", demojize(reaction.emoji), reaction.message.id)
+        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
         await reaction.message.remove_reaction(reaction.emoji, user)
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
 
@@ -423,6 +423,7 @@ async def process_message(message,result):
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                # TODO: Add read permissions for spectators if element.secret == False
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
                     game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),
