@@ -22,7 +22,7 @@ def hard_reset(skip = False):
     c.execute("DROP TABLE IF EXISTS 'offers'")
     c.execute("DROP TABLE IF EXISTS 'requests'")
     c.execute("DROP TABLE IF EXISTS 'tokens'")
-    c.execute("DROP TABKE IF EXISTS 'prizes'")
+    c.execute("DROP TABLE IF EXISTS 'prizes'")
     c.execute("DROP TABLE IF EXISTS 'shops'")
     if skip == False:
         print('Progress deleted!\n')
