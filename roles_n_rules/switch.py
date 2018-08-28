@@ -258,6 +258,9 @@ def start_game():
             answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
             answer.story('I know, I know. That looks ugly as hell.')
 
+            if "Flute Player" in chosen_roles:
+                answer.create_cc("Flute_Victims",0,[],[],True)
+
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:
                 nothorse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') != 'Horseman']

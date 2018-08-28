@@ -442,6 +442,13 @@ async def process_message(message,result):
                 frozones = []
                 abductees = []
                 deadies = []
+
+                # Add dead people & spectators to cc
+                if not element.secret:
+                    for user in [dead_buddy for dead_buddy in db.player_list() if dead_buddy not in db.player_list(True)]:
+                        element.members.append(user)
+
+                # Categorize all players
                 for user in element.members:
                     member = main_guild.get_member(user)
 
@@ -461,6 +468,11 @@ async def process_message(message,result):
                     else:
                         deadies.append(member)
 
+                # Delete any potential duplicates
+                viewers = list(set(viewers))
+                frozones = list(set(frozones))
+                abductees = list(set(abductees))
+                deadies = list(set(deadies))
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
@@ -607,6 +619,10 @@ async def process_message(message,result):
                     reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
                 except asyncio.TimeoutError:
                     await message.channel.send('Confirmation timed out.')
+                    try:
+                        await bot_message.delete()
+                    except Exception:
+                        pass
                 else:
                     await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
                     for channel in category.channels:
