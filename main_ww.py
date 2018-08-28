@@ -93,7 +93,25 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
-    await process_message(after)
+
+    #check role of sender
+    isGameMaster = False
+    isAdmin = False
+    isPeasant = False
+    try:
+        if after.guild == client.get_channel(int(config.game_log)).guild:
+            role_table = [y.id for y in after.guild.get_member(after.author.id).roles]
+
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and after.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
 # Whenever a message is sent.
 @client.event
@@ -102,19 +120,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    await process_message(message)
-
-async def process_message(message):
-    gamelog_channel = client.get_channel(int(config.game_log))
-    botspam_channel = client.get_channel(int(config.bot_spam))
-    storytime_channel = client.get_channel(int(config.story_time))
-
     #check role of sender
     isGameMaster = False
     isAdmin = False
     isPeasant = False
     try:
-        if message.guild == gamelog_channel.guild:
+        if message.guild == client.get_channel(int(config.game_log)).guild:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
 
             if game_master in role_table:
@@ -126,8 +137,15 @@ async def process_message(message):
     except Exception:
         pass
 
-    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
+async def process_message(message,result):
+    if db.isParticipant(message.author.id,True,True,True):
+        db_set(message.author.id,'activity',0)
+
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
