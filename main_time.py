@@ -1,6 +1,7 @@
 # This file controls a seperate bot, but for some reason Randium wants it in the same directory with the same config file specified (?)
 # Anyhow, here it is
 
+import management.dynamic as dy
 import management.db as db
 import discord
 import asyncio
@@ -8,6 +9,7 @@ import datetime
 
 # Import config data
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours
+from management.shop import age_shop
 
 client = discord.Client()
 
@@ -35,22 +37,29 @@ async def check_time():
                         await client.get_channel(bot_spam).send(prefix + "warn <@{}>".format(user))
                     elif activity >= activity_hours:
                         await client.get_channel(bot_spam).send(prefix + "idle <@{}>".format(user))
-
+        
+            # Set each shop's age one up.
+            age_shop()
 
             # Give the day signal
             if str(time.hour) == "8":
-                print('Another day has started!')
-                await client.get_channel(bot_spam).send(prefix + "pay")
-                await asyncio.sleep(45)
-                await client.get_channel(bot_spam).send(prefix + "day")
-
+                if dy.get_stage() != "NA":
+                    print('Another day has started!')
+                    await client.get_channel(bot_spam).send(prefix + "pay")
+                    await asyncio.sleep(45)
+                    await client.get_channel(bot_spam).send(prefix + "day")
+                else:
+                    await client.get_channel(bot_spam).send("Beep boop! Another day has begun!")
 
             # Give the night signal
             if str(time.hour) == "21":
-                print('Another night has begun!')
-                await client.get_channel(bot_spam).send(prefix + "pight")
-                await asyncio.sleep(45)
-                await client.get_channel(bot_spam).send(prefix + "night")
+                if dy.get_stage() != "NA":
+                    print('Another night has begun!')
+                    await client.get_channel(bot_spam).send(prefix + "pight")
+                    await asyncio.sleep(45)
+                    await client.get_channel(bot_spam).send(prefix + "night")
+                else:
+                    await client.get_channel(bot_spam).send("Beep boop! The night has started!")
 
             await asyncio.sleep(45)
 

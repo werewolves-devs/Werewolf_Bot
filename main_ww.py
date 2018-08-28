@@ -53,6 +53,9 @@ from interpretation.polls import count_votes
 import config
 import management.db as db
 import management.dynamic as dy
+import management.shop as db_shop
+import shop
+from emoji import emojize
 
 
 client = discord.Client()
@@ -71,6 +74,44 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
         if role.id == config.suspended:
             await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+
+@client.event
+#For shop
+async def on_reaction_add(reaction, user):
+    if user != client.user and db_shop.is_shop(reaction.message.id):
+        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
+        await reaction.message.remove_reaction(reaction.emoji, user)
+        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
+
+
+# Whenever a message is edited
+@client.event
+async def on_message_edit(before, after):
+    if before.author == client.user: # We don't want to respond to our own edits
+        return
+    if before.content == after.content: # Ensure it wasn't just a pin
+        return
+
+    #check role of sender
+    isGameMaster = False
+    isAdmin = False
+    isPeasant = False
+    try:
+        if after.guild == client.get_channel(int(config.game_log)).guild:
+            role_table = [y.id for y in after.guild.get_member(after.author.id).roles]
+
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and after.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
 # Whenever a message is sent.
 @client.event
@@ -79,16 +120,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    gamelog_channel = client.get_channel(int(config.game_log))
-    botspam_channel = client.get_channel(int(config.bot_spam))
-    storytime_channel = client.get_channel(int(config.story_time))
-
     #check role of sender
     isGameMaster = False
     isAdmin = False
     isPeasant = False
     try:
-        if message.guild == gamelog_channel.guild:
+        if message.guild == client.get_channel(int(config.game_log)).guild:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
 
             if game_master in role_table:
@@ -100,8 +137,15 @@ async def on_message(message):
     except Exception:
         pass
 
-    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
+async def process_message(message,result):
+    if db.isParticipant(message.author.id,True,True,True):
+        db_set(message.author.id,'activity',0)
+
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
@@ -155,8 +199,50 @@ async def on_message(message):
                         db.add_kill(chosen_one,'The Thing','')
 
         for user_id in mailbox.demotions:
-            # user_id -> user that needs to lose reporter AND mayor role if it has either.
-            pass # TODO
+            if user_id == message.author.id and message.guild == gamelog_channel.guild:
+                member = message.author
+            else:
+                member = gamelog_channel.guild.get_member(int(user_id))
+
+            if member != None:
+                for role in member.roles:
+                    if role.id == config.mayor:
+                        await member.remove_roles(role, reason="Demoting the Mayor")
+                    if role.id == config.reporter:
+                        await member.remove_roles(role, reason="Demoting the Reporter")
+
+        # Create a new shop instance
+        for element in mailbox.shops:
+            shop_data = db_shop.get_shop_config(element.shop_config)
+            i = 1
+            j = 0
+            emoji_table = []
+            page_amount = int(len(shop_data["items"])-1/20)+1
+
+
+            for item in shop_data["items"]:
+                if j % 20 == 0:
+                    embed = discord.Embed(title="Shop (Page {}/{})".format(i,page_amount), description=shop_data["shop_description"], color=0x00ff00)
+                
+                embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_data["currency"], item["description"]), inline=False) # Add item to shop
+                emoji_table.append(emojize(item["emoji"]))
+                j += 1
+                
+                if j % 20 == 0:
+                    i += 1
+                    response = await client.get_channel(int(element.destination)).send(embed=embed)
+                    # TODO: Add message to database.
+
+                    for item in emoji_table:
+                        await response.add_reaction(item)
+                    emoji_table = []
+
+            if j % 20 != 0:
+                response = await client.get_channel(int(element.destination)).send(embed=embed)
+                # TODO: Add message to database.
+
+                for item in emoji_table:
+                    await response.add_reaction(item)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
@@ -332,11 +418,12 @@ async def on_message(message):
                         pass
                     else:
                         deadies.append(member)
-                    
+
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                # TODO: Add read permissions for spectators if element.secret == False
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
                     game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),

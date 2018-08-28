@@ -1,5 +1,5 @@
 from management.db import db_get, db_set, channel_change_all, channel_get, get_secret_channels
-from config import game_log
+from config import game_log, shop_file
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
@@ -15,6 +15,7 @@ class Mailbox:
         self.polls = []            # Create new polls
         self.deletecategories = [] # Delete categories and channels they contain
         self.demotions = []        # Remove Mayor + Reporter role
+        self.shops = []            # Create shop
 
         self.evaluate_polls = evaluate_polls
 
@@ -27,7 +28,23 @@ class Mailbox:
         length += len(self.polls) + len(self.deletecategories) + len(self.demotions)
     
     def __repr__(self):
-        return "<MAILBOX --\n    |gamelog={}\n    |botspam={}\n    |story={}\n    |answer={}\n    |channel={}\n    |player={}\n    |newchannels={}\n    |oldchannels={}\n    |polls={}\n    |deletecategories={}\n    |demotions={}\n    |\n    |evaluate_polls={}\n>".format(self.gamelog,self.botspam,self.storytime,self.answer,self.channel,self.player,self.newchannels,self.oldchannels,self.polls,self.deletecategories,self.demotions,self.evaluate_polls)
+        answer = "<MAILBOX||"
+        if self.gamelog != []:          answer += "gamelog={}".format(self.gamelog)
+        if self.botspam != []:          answer += "|botspam={}".format(self.botspam)
+        if self.storytime != []:        answer += "|story={}".format(self.storytime)
+        if self.answer != []:           answer += "|answer={}".format(self.answer)
+        if self.channel != []:          answer += "|channel={}".format(self.channel)
+        if self.player != []:           answer += "|player={}".format(self.player)
+        if self.newchannels != []:      answer += "|newchannels={}".format(self.newchannels)
+        if self.oldchannels != []:      answer += "|oldchannels={}".format(self.oldchannels)
+        if self.polls != []:            answer += "|polls={}".format(self.polls)
+        if self.deletecategories != []: answer += "|deletecategories={}".format(self.deletecategories)
+        if self.demotions != []:        answer += "|demotions={}".format(self.demotions)
+        if self.shops != []:            answer += "|shops={}".format(self.shops)
+        answer += "|"
+        answer += "|evaluate_polls={}".format(self.evaluate_polls)
+        answer += ">"
+        return answer
 
     # ------------------------------
 
@@ -46,6 +63,11 @@ class Mailbox:
     def log_react(self,emoji):
         """Add a reaction to the last gamelog message"""
         self.gamelog[-1].react(emoji)
+        return self
+
+    def shop(self, destination, shop_config = ''):
+        """Add a shop"""
+        self.shops.append(Shop(destination, shop_config))
         return self
 
     def spam(self,content,temporary = False,reactions = []):
@@ -139,7 +161,7 @@ class Mailbox:
             if role[i] == ' ':
                 new_role += '_'
             else:
-                new_role += role[i] 
+                new_role += role[i]
         self.create_cc(new_role,0,[user_id],[user_id],True)
         return self
     def add_to_sc(self,user_id,role):
@@ -268,7 +290,6 @@ class Mailbox:
         user_id -> the user who must lose the roles"""
         self.demotions.append(int(user_id))
 
-        
 
 # Class used to send messages through the mailbox
 class Message:
@@ -284,12 +305,31 @@ class Message:
     def react(self,emoji):
         self.reactions.append(emoji)
         return self
-
     def __repr__(self):
         temp_content = self.content[0:min(20,len(self.content))]
         if len(self.content) > 20:
             temp_content += '...'
-        return "<Message:\n        |content={}\n        |temporary={}\n        |destination={}\n        |reactions={}\n        |embed={}\n    >".format(self.content,self.temporary,self.destination,self.reactions,self.embed)
+        answer = "<Message|"
+        if temp_content != "":      answer += "|content=\'{}\'".format(temp_content)
+        if self.destination != "":  answer += "|destination={}".format(self.destination)
+        if self.reactions != []:    answer += "|reactions={}".format(self.reactions)
+        answer += "|"
+        if self.temporary != False: answer += "|temporary={}".format(self.temporary)
+        if self.embed != False:     answer += "|embed={}".format(self.embed)
+        answer += ">"
+        return answer
+
+# Class for creating a shop embed
+class Shop:
+    def __init__(self, destination, shop_config = shop_file):
+        self.destination = destination
+        self.shop_config = shop_config
+    def __repr__(self):
+        answer = "<Shop|"
+        answer += "|destination={}".format(self.destination)
+        if self.shop_config != shop_file:   answer += "|shop_config={}".format(self.shop_config)
+        answer += ">"
+        return answer
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
@@ -303,7 +343,15 @@ class ChannelCreate:
             self.members.append((owner))
 
     def __repr__(self):
-        return "<ChannelCreate:\n        |name={}\n        |owner={}\n        |members={}\n        |settlers={}\n        |secret={}\n    >".format(self.name,self.owner,self.members,self.settlers,self.secret)
+        answer = "<ChannelCreate|"
+        answer += "|name={}".format(self.name)
+        answer += "|owner={}".format(self.owner)
+        if self.members != []:  answer += "|members={}".format(self.members)
+        if self.settlers != []: answer += "|settlers={}".format(self.settlers)
+        answer += "|"
+        answer += "|secret={}".format(self.secret)
+        answer += ">"
+        return answer
 
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
@@ -315,7 +363,7 @@ class ChannelChange:
         self.number = number
 
     def __repr__(self):
-        return "<ChannelChange:\n        |channel={}\n        |victim={}\n        |number={}\n    >".format(self.channel,self.victim,self.number)
+        return "<ChannelChange||channel={}|victim={}|number={}>".format(self.channel,self.victim,self.number)
 
 class CategoryDelete:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
@@ -325,7 +373,7 @@ class CategoryDelete:
         self.channel = channel
 
     def __repr__(self):
-        return "<CategoryDelete:\n        |channel={}\n    >".format(self.channel)
+        return "<CategoryDelete||channel={}>".format(self.channel)
     
 
 class PollRequest:
@@ -343,7 +391,7 @@ class PollRequest:
         temp_desc = self.description[0:min(20,len(self.description))]
         if len(self.description) > 20:
             temp_desc += '...'
-        return "<PollRequest:\n        |channel={}\n        |purpose={}\n        |user={}\n        |desc=\'{}\'\n    >".format(self.channel,self.purpose,self.user_id,temp_desc)
+        return "<PollRequest||channel={}|purpose={}|user={}|desc=\'{}\'>".format(self.channel,self.purpose,self.user_id,temp_desc)
     
 
 class PollToEvaluate:
@@ -355,7 +403,7 @@ class PollToEvaluate:
         self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
     
     def __repr__(self):
-        return "<PollToEvaluate:\n        |purpose={}\n        |blamed=\'{}\'\n        |channel={}\n        |msg_table={}\n    >".format(self.purpose,self.blamed,self.channel,self.msg_table)
+        return "<PollToEvaluate||purpose={}|blamed=\'{}\'|channel={}|msg_table={}>".format(self.purpose,self.blamed,self.channel,self.msg_table)
 
 if __name__ == "__main__":
     print(PollToEvaluate(['lynch','','12345','1','2','3']))
