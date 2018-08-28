@@ -53,8 +53,9 @@ from interpretation.polls import count_votes
 import config
 import management.db as db
 import management.dynamic as dy
+import management.shop as db_shop
 import shop
-from emoji import demojize
+from emoji import emojize, demojize
 
 
 client = discord.Client()
@@ -183,8 +184,38 @@ async def process_message(message):
             # user_id -> user that needs to lose reporter AND mayor role if it has either.
             pass # TODO
 
+        # Create a new shop instance
         for element in mailbox.shops:
-            await shop.instantiate_shop(element.shop_config, element.destination, client)
+            shop_data = db_shop.get_shop_config(element.shop_config)
+            i = 1
+            j = 0
+            emoji_table = []
+            page_amount = int(len(shop_data["items"])-1/20)+1
+
+
+            for item in shop_data["items"]:
+                if j % 20 == 0:
+                    embed = discord.Embed(title="Shop (Page {}/{})".format(i,page_amount), description=shop_data["shop_description"], color=0x00ff00)
+                
+                embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_data["currency"], item["description"]), inline=False) # Add item to shop
+                emoji_table.append(emojize(item["emoji"]))
+                j += 1
+                
+                if j % 20 == 0:
+                    i += 1
+                    response = await client.get_channel(int(element.destination)).send(embed=embed)
+                    # TODO: Add message to database.
+
+                    for item in emoji_table:
+                        await response.add_reaction(item)
+                    emoji_table = []
+
+            if j % 20 != 0:
+                response = await client.get_channel(int(element.destination)).send(embed=embed)
+                # TODO: Add message to database.
+
+                for item in emoji_table:
+                    await response.add_reaction(item)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
