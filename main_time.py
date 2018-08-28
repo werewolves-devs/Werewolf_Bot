@@ -8,6 +8,7 @@ import datetime
 
 # Import config data
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours
+from management.shop import age_shop
 
 client = discord.Client()
 
@@ -34,13 +35,14 @@ async def check_time():
                     await client.get_channel(bot_spam).send(prefix + "warn <@{}>".format(user))
                 elif activity >= activity_hours:
                     await client.get_channel(bot_spam).send(prefix + "idle <@{}>".format(user))
-
+        
+            # Set each shop's age one up.
+            age_shop()
 
             # Give the day signal
             if str(time.hour) == "8":
                 print('Another day has started!')
                 await client.get_channel(bot_spam).send(prefix + "pay")
-
                 await asyncio.sleep(45)
                 await client.get_channel(bot_spam).send(prefix + "day")
 
@@ -49,7 +51,6 @@ async def check_time():
             if str(time.hour) == "21":
                 print('Another night has begun!')
                 await client.get_channel(bot_spam).send(prefix + "pight")
-
                 await asyncio.sleep(45)
                 await client.get_channel(bot_spam).send(prefix + "night")
 

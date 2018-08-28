@@ -52,8 +52,10 @@ from interpretation.ww_head import process
 from interpretation.polls import count_votes
 import config
 import management.db as db
+import management.dynamic as dy
+import management.shop as db_shop
 import shop
-from emoji import demojize
+from emoji import emojize
 
 
 client = discord.Client()
@@ -78,8 +80,8 @@ async def remove_all_game_roles(member):
 @client.event
 #For shop
 async def on_reaction_add(reaction, user):
-    if user != client.user and shop.is_shop(reaction.message.id):
-        bought_item = await shop.find_item_from_key("emoji", demojize(reaction.emoji), reaction.message.id)
+    if user != client.user and db_shop.is_shop(reaction.message.id):
+        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
         await reaction.message.remove_reaction(reaction.emoji, user)
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
 
@@ -91,7 +93,25 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
-    await process_message(after)
+
+    #check role of sender
+    isGameMaster = False
+    isAdmin = False
+    isPeasant = False
+    try:
+        if after.guild == client.get_channel(int(config.game_log)).guild:
+            role_table = [y.id for y in after.guild.get_member(after.author.id).roles]
+
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and after.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
 # Whenever a message is sent.
 @client.event
@@ -100,19 +120,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    await process_message(message)
-
-async def process_message(message):
-    gamelog_channel = client.get_channel(int(config.game_log))
-    botspam_channel = client.get_channel(int(config.bot_spam))
-    storytime_channel = client.get_channel(int(config.story_time))
-
     #check role of sender
     isGameMaster = False
     isAdmin = False
     isPeasant = False
     try:
-        if message.guild == gamelog_channel.guild:
+        if message.guild == client.get_channel(int(config.game_log)).guild:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
 
             if game_master in role_table:
@@ -124,8 +137,15 @@ async def process_message(message):
     except Exception:
         pass
 
-    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
+async def process_message(message,result):
+    if db.isParticipant(message.author.id,True,True,True):
+        db_set(message.author.id,'activity',0)
+
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
@@ -154,32 +174,75 @@ async def process_message(message):
                             if db.isParticipant(person.id):
                                 user_table.append([person.id,emoji.emoji])
 
-                log, result, chosen_emoji = count_votes(user_table,poll.purpose)
+                log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
                 await gamelog_channel.send(log)
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
+                chosen_one = int(chosen_one)
 
                 if chosen_emoji != '' and chosen_one != None:
                     if poll.purpose == 'lynch':
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
-                        # TODO: give Mayor role and add data to dynamic.json
-                        pass
+                        dy.set_mayor(chosen_one)
+                        # TODO: give Mayor role
                     elif poll.purpose == 'Reporter':
-                        # TODO: give Reporter role and add data to dynamic.json
-                        pass
+                        dy.set_reporter(chosen_one)
+                        # TODO: give Reporter role
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
                         db.add_kill(chosen_one,'Cult Leader',db.random_cult())
                     elif poll.purpose == 'thing':
-                        # TODO: kill poor victim
-                        pass
+                        db.add_kill(chosen_one,'The Thing','')
 
+        for user_id in mailbox.demotions:
+            if user_id == message.author.id and message.guild == gamelog_channel.guild:
+                member = message.author
+            else:
+                member = gamelog_channel.guild.get_member(int(user_id))
+
+            if member != None:
+                for role in member.roles:
+                    if role.id == config.mayor:
+                        await member.remove_roles(role, reason="Demoting the Mayor")
+                    if role.id == config.reporter:
+                        await member.remove_roles(role, reason="Demoting the Reporter")
+
+        # Create a new shop instance
         for element in mailbox.shops:
-            await shop.instantiate_shop(element.shop_config, element.destination, client)
+            shop_data = db_shop.get_shop_config(element.shop_config)
+            i = 1
+            j = 0
+            emoji_table = []
+            page_amount = int(len(shop_data["items"])-1/20)+1
+
+
+            for item in shop_data["items"]:
+                if j % 20 == 0:
+                    embed = discord.Embed(title="Shop (Page {}/{})".format(i,page_amount), description=shop_data["shop_description"], color=0x00ff00)
+                
+                embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_data["currency"], item["description"]), inline=False) # Add item to shop
+                emoji_table.append(emojize(item["emoji"]))
+                j += 1
+                
+                if j % 20 == 0:
+                    i += 1
+                    response = await client.get_channel(int(element.destination)).send(embed=embed)
+                    # TODO: Add message to database.
+
+                    for item in emoji_table:
+                        await response.add_reaction(item)
+                    emoji_table = []
+
+            if j % 20 != 0:
+                response = await client.get_channel(int(element.destination)).send(embed=embed)
+                # TODO: Add message to database.
+
+                for item in emoji_table:
+                    await response.add_reaction(item)
 
         #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
@@ -241,16 +304,28 @@ async def process_message(message):
 
         # DMs are sent here.
         for element in mailbox.player:
-            member = client.get_user(element.destination)
+            member = client.get_user(int(element.destination))
+            main_guild = botspam_channel.guild
+            if member == None:
+                member = main_guild.get_member(int(element.destination))
             if member == None:
                 await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
-                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(message.author.id,element.destination))
+                await botspam_channel.send(
+                    "<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `client.get_user`.".format(
+                        message.author.id, element.destination))
             else:
-                msg = await member.send(element.content)
-                for emoji in element.reactions:
-                    await msg.add_reaction(emoji)
-                if element.temporary == True:
-                    temp_msg.append(msg)
+                try:
+                    msg = await member.send(element.content)
+                    for emoji in element.reactions:
+                        await msg.add_reaction(emoji)
+                    if element.temporary == True:
+                        temp_msg.append(msg)
+                except discord.errors.Forbidden:
+                    botspam_channel.send('I wasn\'t allowed to send a DM to <@{}>! Here\'s the content:'.format(member.id))
+                    botspam_channel.send(element.content)
+                except Exception:
+                    botspam_channel.send('I failed to send a DM to <@{}>! Could somebody send this, please?'.format(member.id))
+                    botspam_channel.send(element.content)
 
         # Settings of existing channels are altered here.
         for element in mailbox.oldchannels:
@@ -348,6 +423,7 @@ async def process_message(message):
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                # TODO: Add read permissions for spectators if element.secret == False
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
                     game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),

@@ -1,36 +1,50 @@
+import sqlite3
+import config
 import random
 
-# In this file, the Python program interacts with the box API
+conn = sqlite3.connect(config.general_database)
+c = conn.cursor()
 
-def create_hash(length=24):
-    hash_table = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-    , 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-    , '-', '_', '!', '#', '(', ')', '*', '<', '>', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+def add_token(token,user_id):
+    """Add a new token to the database.  
+      
+    Keyword arguments:  
+    token -> the given token  
+    user_id -> the user to whom the lootbox belongs"""
+
+    c.execute("SELECT * FROM 'tokens' WHERE 'token' =?",(token,))
+    if c.fetchall() != None:
+        return False
     
-    hash_found = False
-    attempts = 0
-
-    while not hash_found:
-        if attempts > 10000:
-            print('This is very unlikely, but it seems too many tokens have been created!')
-            print('Please try a higher number for the hash the length.')
-            return False
-
-        hash_value = ''
-        for i in range(length):
-            hash_value += random.choice(hash_table)
-        
-        # Make sure the value hasn't been produced before
-        # (Even though the odds are minimal)
-        if True:
-            pass
-            hash_found = True
-        attempts += 1
-
-    # Insert the given token into the API
-    pass #TODO
-
-    # Save the database
-    pass #TODO
-
+    c.execute("INSERT INTO 'tokens' ('token','owner') VALUES ('?',?)",(token,user_id))
+    conn.commit()
     return True
+
+def add_source1(token,source):
+    """Register source 1 and add it to the token.  
+    
+    Keyword arguments:  
+    token -> the opt's token"""
+    c.execute("UPDATE 'tokens' SET 'source1' =? WHERE 'token' =?",(source,token))
+    conn.commit()
+    
+def add_source2(token,source):
+    """Register source 2 and add it to the token.  
+    
+    Keyword arguments:  
+    token -> the opt's token"""
+    c.execute("UPDATE 'tokens' SET 'source2' =? WHERE 'token' =?",(source,token))
+    conn.commit()
+
+def add_options(token,choice1,choice2,choice3):
+    """Register the three options into the database.  
+
+    Keyword arguments:  
+    token -> the choices' token  
+    choice1 -> option 1  
+    choice2 -> option 2  
+    choice3 -> option 3"""
+    c.execute("UPDATE 'tokens' SET 'opt1' =? WHERE 'token' =?",(choice1,token))
+    c.execute("UPDATE 'tokens' SET 'opt2' =? WHERE 'token' =?",(choice2,token))
+    c.execute("UPDATE 'tokens' SET 'opt3' =? WHERE 'token' =?",(choice3,token))
+    conn.commit()
