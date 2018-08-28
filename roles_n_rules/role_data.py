@@ -27,6 +27,10 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     The effects are immediate, but they can be used in all scenarios, as only\
     standoffs are executed during this attack."""
 
+    if role == 'Inactive':
+        answer.log_add(recursive + success + skull + "<@{}> was killed due to inactivity.".format(user_id))
+        return instant_death(user_id, role, answer, recursive + next)
+
     # Prevent Pyromancer from causing way too long lines
     # No, I didn't add this during debugging.
     # Yes, that means I planned to design it this terribly.
