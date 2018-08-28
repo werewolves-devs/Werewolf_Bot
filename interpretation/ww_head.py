@@ -672,7 +672,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return todo()
             if is_command(message, ['copy', 'imitate', 'mirror', 'resemble'], True) and user_role == "Look-Alike":
                 msg = "**Usage:** Copy a players role.\n\n`" + prefix + "copy <player>`\n\n"
-                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. " 
+                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by Look-Alike's."
                 return [Mailbox().respond(msg,True)]
             if user_role == "Look-Alike":
@@ -704,7 +704,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
                 msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by the Priestess."
-                return [Mailbox().respond(msg,True)]return todo()
+                return [Mailbox().respond(msg,True)]
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
@@ -724,7 +724,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO             
+                # TODO
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
                 msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
@@ -991,6 +991,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
+
+    '''shop'''
+    # This command creates a new shop instance in the channel it was sent in
+    # This function returns a mailbox
+    if is_command(message, ['shop']):
+        return [Mailbox().shop(message.channel)]
 
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
