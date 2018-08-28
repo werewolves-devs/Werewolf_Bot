@@ -8,6 +8,7 @@ import datetime
 
 # Import config data
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours
+from management.shop import age_shop
 
 client = discord.Client()
 
@@ -34,7 +35,9 @@ async def check_time():
                     await client.get_channel(bot_spam).send(prefix + "warn <@{}>".format(user))
                 elif activity >= activity_hours:
                     await client.get_channel(bot_spam).send(prefix + "idle <@{}>".format(user))
-
+        
+            # Set each shop's age one up.
+            age_shop()
 
             # Give the day signal
             if str(time.hour) == "8":

@@ -80,7 +80,7 @@ async def remove_all_game_roles(member):
 @client.event
 #For shop
 async def on_reaction_add(reaction, user):
-    if user != client.user and shop.is_shop(reaction.message.id):
+    if user != client.user and db_shop.is_shop(reaction.message.id):
         bought_item = await shop.find_item_from_key("emoji", demojize(reaction.emoji), reaction.message.id)
         await reaction.message.remove_reaction(reaction.emoji, user)
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
