@@ -25,11 +25,12 @@ class Mailbox:
     def __len__(self):
         length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
         length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
-        length += len(self.polls) + len(self.deletecategories) + len(self.demotions)
+        length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
+        length += len(self.cleaners)
     
     def __repr__(self):
-        answer = "<MAILBOX||"
-        if self.gamelog != []:          answer += "gamelog={}".format(self.gamelog)
+        answer = "<MAILBOX|"
+        if self.gamelog != []:          answer += "|gamelog={}".format(self.gamelog)
         if self.botspam != []:          answer += "|botspam={}".format(self.botspam)
         if self.storytime != []:        answer += "|story={}".format(self.storytime)
         if self.answer != []:           answer += "|answer={}".format(self.answer)
@@ -41,6 +42,7 @@ class Mailbox:
         if self.deletecategories != []: answer += "|deletecategories={}".format(self.deletecategories)
         if self.demotions != []:        answer += "|demotions={}".format(self.demotions)
         if self.shops != []:            answer += "|shops={}".format(self.shops)
+        if self.cleaners != []:         answer += "|cleaners={}".format(self.cleaners)
         answer += "|"
         answer += "|evaluate_polls={}".format(self.evaluate_polls)
         answer += ">"
@@ -191,6 +193,10 @@ class Mailbox:
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
 
+    def cleanup(self,channel_id):
+        """Add a channel that needs to be erased from content."""
+        self.cleaners.append(channel_id)
+        return self
     
     # Commands that change one's cc status
     def freeze(self,user_id):

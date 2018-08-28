@@ -608,6 +608,20 @@ async def process_message(message,result):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
+        clean_time = len(mailbox.cleaners)
+        if clean_time > 0:
+            await botspam_channel.send("Cleaning up {} channels! This may take some time.".format(clean_time))
+
+        for channel in mailbox.cleaners:
+
+            trash_channel = client.get_channel(int(channel))
+
+            if trash_channel != None:
+                for message_id in db.empty_trash_channel(channel):
+                    message = await trash_channel.get_message(int(message_id))
+                    if message != None:
+                        await message.delete()
+
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
