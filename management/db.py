@@ -547,3 +547,30 @@ def random_cult():
         print('How is the random_cult() function called when there isn\'t a cult leader around? Strange!')
         return ''
     return culties[random.randint(0,len(culties)-1)]
+
+def add_trash_channel(channel_id):
+    """Add a new trash channel to the database."""
+    c.execute("SELECT * FROM 'trashy' WHERE 'channel' =?;",(channel_id,))
+    if c.fetchall() == []:
+        c.execute("INSERT INTO 'trashy'('channel') VALUES (?);",(channel_id,))
+        conn.commit()
+
+def add_trash_message(message_id,channel_id):
+    """Add a message to the trash bin. The function makes sure the channel's a trash channel.
+    If it's not, then the message isn't stored in the database."""
+
+    c.execute("SELECT * FROM 'trashy' WHERE 'channel' =?",(channel_id,))
+    if c.fetchall() != []:
+        c.execute("INSERT INTO 'trashcan'('message','channel') VALUES (?,?);",(message_id,channel_id))
+        conn.commit()
+
+def empty_trash_channel(channel_id):
+    """Remove all messages stored from a given channel.  
+    The function returns a list of message ids that were linked to the given channel id."""
+    c.execute("SELECT * FROM 'trashcan' WHERE 'channel' =?;",(channel_id))
+    message_table = [item[0] for item in c.fetchall()]
+
+    c.execute("DELETE FROM 'trashcan' WHERE 'channel' =?",(channel_id,))
+    conn.commit()
+
+    return message_table

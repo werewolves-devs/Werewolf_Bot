@@ -130,6 +130,9 @@ async def on_message_edit(before, after):
     if before.content == after.content: # Ensure it wasn't just a pin
         return
 
+    if before.id != after.id:
+        db.add_trash_message(after.id,after.channel.id)
+
     #check role of sender
     isGameMaster = False
     isAdmin = False
@@ -155,6 +158,9 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
+
+    # Add trash messages
+    db.add_trash_message(message.id,message.channel.id)
 
     #check role of sender
     isGameMaster = False
@@ -509,6 +515,8 @@ async def process_message(message,result):
                             for member in viewers:
                                 if db_get(member.id,'role') == 'Amulet Holder':
                                     db_set(member.id,'amulet',channel.id)
+                    if element.trashy:
+                        db.add_trash_channel(channel.id)
 
                     await channel.send(intro_msg)
 

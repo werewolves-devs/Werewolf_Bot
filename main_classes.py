@@ -16,6 +16,7 @@ class Mailbox:
         self.deletecategories = [] # Delete categories and channels they contain
         self.demotions = []        # Remove Mayor + Reporter role
         self.shops = []            # Create shop
+        self.cleaners = []         # Delete all trash messages from given channel
 
         self.evaluate_polls = evaluate_polls
 
@@ -147,9 +148,9 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False,trashy=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret,trashy))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
@@ -339,12 +340,13 @@ class Shop:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[],secret=False):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False,trashy=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
         self.secret = secret
+        self.trashy = trashy
         if owner not in members and owner != 0:
             self.members.append((owner))
 
@@ -355,7 +357,8 @@ class ChannelCreate:
         if self.members != []:  answer += "|members={}".format(self.members)
         if self.settlers != []: answer += "|settlers={}".format(self.settlers)
         answer += "|"
-        answer += "|secret={}".format(self.secret)
+        if self.secret == True: answer += "|secret={}".format(self.secret)
+        if self.trashy == True: answer += "|trashy={}".format(self.trashy)
         answer += ">"
         return answer
 
