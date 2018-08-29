@@ -111,7 +111,7 @@ async def on_reaction_add(reaction, user):
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
                 await reaction_confirm.message.clear_reactions()
-                quote_embed = discord.Embed(description=reaction.message.content)
+                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
                 quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
                 quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
                 await quote_channel.send(embed=quote_embed)
