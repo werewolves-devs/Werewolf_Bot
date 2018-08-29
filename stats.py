@@ -94,10 +94,12 @@ def get_stat(stat):
 
 def get_user_stat(user_id, stat):
     """Returns {user_id}'s {stat}"""
+    user_id = str(user_id)
     return get_stats()["users"][user_id][stat]
 
 def increment_user_stat(user_id, stat, value):
     """Returns {user_id}'s {stat}"""
+    user_id = str(user_id)
     stats = get_stats()
     if not user_id in stats["users"]:
         stats["users"][user_id] = {} # Initialise user ID
