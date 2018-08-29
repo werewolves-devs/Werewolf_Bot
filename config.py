@@ -28,7 +28,7 @@ game_log = 456880259636396034
 bot_spam = 482219246177222657
 story_time = 477533978547453972
 shop_channel = 482660799626608640
-quotes = 0 # TODO
+quotes = 484090767254749215
 
 # List of specific roles
 administrator = 446235596722012160
