@@ -16,6 +16,7 @@ class Mailbox:
         self.deletecategories = [] # Delete categories and channels they contain
         self.demotions = []        # Remove Mayor + Reporter role
         self.shops = []            # Create shop
+        self.cleaners = []         # Delete all trash messages from given channel
 
         self.evaluate_polls = evaluate_polls
 
@@ -25,11 +26,12 @@ class Mailbox:
     def __len__(self):
         length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
         length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
-        length += len(self.polls) + len(self.deletecategories) + len(self.demotions)
+        length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
+        length += len(self.cleaners)
     
     def __repr__(self):
-        answer = "<MAILBOX||"
-        if self.gamelog != []:          answer += "gamelog={}".format(self.gamelog)
+        answer = "<MAILBOX|"
+        if self.gamelog != []:          answer += "|gamelog={}".format(self.gamelog)
         if self.botspam != []:          answer += "|botspam={}".format(self.botspam)
         if self.storytime != []:        answer += "|story={}".format(self.storytime)
         if self.answer != []:           answer += "|answer={}".format(self.answer)
@@ -41,6 +43,7 @@ class Mailbox:
         if self.deletecategories != []: answer += "|deletecategories={}".format(self.deletecategories)
         if self.demotions != []:        answer += "|demotions={}".format(self.demotions)
         if self.shops != []:            answer += "|shops={}".format(self.shops)
+        if self.cleaners != []:         answer += "|cleaners={}".format(self.cleaners)
         answer += "|"
         answer += "|evaluate_polls={}".format(self.evaluate_polls)
         answer += ">"
@@ -145,9 +148,9 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False,trashy=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret,trashy))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
@@ -191,6 +194,10 @@ class Mailbox:
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
 
+    def cleanup(self,channel_id):
+        """Add a channel that needs to be erased from content."""
+        self.cleaners.append(channel_id)
+        return self
     
     # Commands that change one's cc status
     def freeze(self,user_id):
@@ -333,12 +340,13 @@ class Shop:
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[],secret=False):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False,trashy=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
         self.secret = secret
+        self.trashy = trashy
         if owner not in members and owner != 0:
             self.members.append((owner))
 
@@ -349,7 +357,8 @@ class ChannelCreate:
         if self.members != []:  answer += "|members={}".format(self.members)
         if self.settlers != []: answer += "|settlers={}".format(self.settlers)
         answer += "|"
-        answer += "|secret={}".format(self.secret)
+        if self.secret == True: answer += "|secret={}".format(self.secret)
+        if self.trashy == True: answer += "|trashy={}".format(self.trashy)
         answer += ">"
         return answer
 

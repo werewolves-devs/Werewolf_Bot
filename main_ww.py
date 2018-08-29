@@ -55,6 +55,7 @@ import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
 import shop
+import stats
 from emoji import emojize
 
 
@@ -77,13 +78,56 @@ async def remove_all_game_roles(member):
         if role.id == config.participant:
             await member.remove_roles(role, reason="Updating CC permissions")
 
+already_quoted = []
+
 @client.event
-#For shop
 async def on_reaction_add(reaction, user):
     if user != client.user and db_shop.is_shop(reaction.message.id):
+        # For shop
         bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
         await reaction.message.remove_reaction(reaction.emoji, user)
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
+    elif user != client.user and reaction.emoji == "⭐":
+        # For Quoting
+        stats.increment_stat("quotes_submitted", 1)
+        if reaction.message.id in already_quoted:
+            return
+        already_quoted.append(reaction.message.id)
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        quote_channel = client.get_channel(int(config.quotes))
+        request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
+        request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+        request_embed.set_footer(text="React with ✅ to accept or ❎ to deny.")
+        request = await botspam_channel.send(embed=request_embed)
+        await request.add_reaction("✅")
+        await request.add_reaction("❎")
+
+        def check(reaction, user):
+            return config.game_master in [y.id for y in user.roles] and reaction.message.id == request.id
+
+        try:
+            reaction_confirm, user = await client.wait_for('reaction_add', timeout=172800, check=check)
+        except asyncio.TimeoutError:
+            request_embed = discord.Embed(title="Quote Request [Timed Out]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+            request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+            await request.edit(embed=request_embed)
+            await reaction_confirm.message.clear_reactions()
+        else:
+            if reaction_confirm.emoji == "✅":
+                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
+                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+                await request.edit(embed=request_embed)
+                await reaction_confirm.message.clear_reactions()
+                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
+                quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
+                quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
+                await quote_channel.send(embed=quote_embed)
+            if reaction_confirm.emoji == "❎":
+                stats.increment_stat("quotes_denied", 1)
+                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+                await request.edit(embed=request_embed)
+                await reaction_confirm.message.clear_reactions()
 
 
 # Whenever a message is edited
@@ -93,6 +137,11 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
+    stats.increment_stat("messages_edited", 1)
+    stats.increment_user_stat(before.author.id, "messages_edited", 1)
+
+    if before.id != after.id:
+        db.add_trash_message(after.id,after.channel.id)
 
     #check role of sender
     isGameMaster = False
@@ -118,7 +167,13 @@ async def on_message_edit(before, after):
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
+        stats.increment_stat("bot_messages_sent", 1)
         return
+    stats.increment_stat("messages_sent", 1)
+    stats.increment_user_stat(message.author.id, "messages_sent", 1)
+
+    # Add trash messages
+    db.add_trash_message(message.id,message.channel.id)
 
     #check role of sender
     isGameMaster = False
@@ -140,6 +195,10 @@ async def on_message(message):
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
 async def process_message(message,result):
+    if "<@&{}>".format(config.game_master) in message.content:
+        stats.increment_stat("game_master_pings", 1)
+        stats.increment_user_stat(message.author.id, "game_master_pings", 1)
+
     if db.isParticipant(message.author.id,True,True,True):
         db_set(message.author.id,'activity',0)
 
@@ -223,11 +282,11 @@ async def process_message(message,result):
             for item in shop_data["items"]:
                 if j % 20 == 0:
                     embed = discord.Embed(title="Shop (Page {}/{})".format(i,page_amount), description=shop_data["shop_description"], color=0x00ff00)
-                
+
                 embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_data["currency"], item["description"]), inline=False) # Add item to shop
                 emoji_table.append(emojize(item["emoji"]))
                 j += 1
-                
+
                 if j % 20 == 0:
                     i += 1
                     response = await client.get_channel(int(element.destination)).send(embed=embed)
@@ -399,6 +458,13 @@ async def process_message(message,result):
                 frozones = []
                 abductees = []
                 deadies = []
+
+                # Add dead people & spectators to cc
+                if not element.secret:
+                    for user in [dead_buddy for dead_buddy in db.player_list() if dead_buddy not in db.player_list(True)]:
+                        element.members.append(user)
+
+                # Categorize all players
                 for user in element.members:
                     member = main_guild.get_member(user)
 
@@ -418,6 +484,11 @@ async def process_message(message,result):
                     else:
                         deadies.append(member)
 
+                # Delete any potential duplicates
+                viewers = list(set(viewers))
+                frozones = list(set(frozones))
+                abductees = list(set(abductees))
+                deadies = list(set(deadies))
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
@@ -472,6 +543,8 @@ async def process_message(message,result):
                             for member in viewers:
                                 if db_get(member.id,'role') == 'Amulet Holder':
                                     db_set(member.id,'amulet',channel.id)
+                    if element.trashy:
+                        db.add_trash_channel(channel.id)
 
                     await channel.send(intro_msg)
 
@@ -562,6 +635,10 @@ async def process_message(message,result):
                     reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
                 except asyncio.TimeoutError:
                     await message.channel.send('Confirmation timed out.')
+                    try:
+                        await bot_message.delete()
+                    except Exception:
+                        pass
                 else:
                     await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
                     for channel in category.channels:
@@ -570,6 +647,20 @@ async def process_message(message,result):
                     await message.channel.send('\n:thumbsup: Channels and category deleted')
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
+
+        clean_time = len(mailbox.cleaners)
+        if clean_time > 0:
+            await botspam_channel.send("Cleaning up {} channels! This may take some time.".format(clean_time))
+
+        for channel in mailbox.cleaners:
+
+            trash_channel = client.get_channel(int(channel))
+
+            if trash_channel != None:
+                for message_id in db.empty_trash_channel(channel):
+                    message = await trash_channel.get_message(int(message_id))
+                    if message != None:
+                        await message.delete()
 
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)

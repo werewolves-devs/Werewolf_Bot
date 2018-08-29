@@ -12,13 +12,13 @@ from management.db import isParticipant, personal_channel, db_get, db_set, signu
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
 from roles_n_rules.role_data import attack
+from communication.emoji import random_emoji
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 from management import db, dynamic as dy
 import management.setup as setup
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
-
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
@@ -89,7 +89,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['pay'],False,unip):
             # Initiate the day.
             return switch.pay()
-        
+
         if is_command(message,['day'],False,unip):
             # Initiate the second part of the day
             return [switch.day()]
@@ -1066,7 +1066,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     '''shop'''
     # This command creates a new shop instance in the channel it was sent in
-    # Even though there really is no fucking reason to, this function returns a mailbox
+    # This function returns a mailbox
     if is_command(message, ['shop']):
         return [Mailbox().shop(message.channel)]
 

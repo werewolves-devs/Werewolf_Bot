@@ -8,6 +8,60 @@ from main_classes import Mailbox
 from config import game_master
 from config import ww_prefix as prefix
 
+# --------------------------------------------------
+#
+#               WORKING ROLES
+#
+# --------------------------------------------------
+# The following roles have been tested thoroughly and are known to work.
+
+# Dog
+def dog_follow(user_id,role):
+    """This function allows the dog to choose a role to become.
+    The function assumes the player is a cupid and has provided a role, so make sure to have filtered this out already.
+    The role does not need to be Innocent, Cursed Civilian or Werewolf yet.
+    The function returns a Mailbox.
+
+    user_id -> the dog who chooses a role
+    role -> the role they'd like to be"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently cannot choose a role to become!",True)
+
+    user_channel = int(db_get(user_id,'channel'))
+
+    if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
+        return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
+
+    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
+    answer.log("The **Dog** <@{}> has chosen to become a".format(user_id))
+
+    if role == 'Innocent':
+        answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
+    if role == 'Cursed Civilian':
+        answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
+    if role == 'Werewolf':
+        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_id)
+        for channel_id in db.get_secret_channels("Werewolf"):
+            answer.edit_cc(channel_id,user_id,1)
+            if int(db_get(user_id,'frozen')) == 1:
+                answer.edit_cc(channel_id,user_id,2)
+            answer.msg("**ARRROOOO!\nWelcome, <@{0}>, to the wolf pack!** <@{0}>, a **Dog**, has chosen to turn themselves into a Werewolf! Give them a warm welcome.".format(user_id),channel_id)
+
+    db_set(user_id,'role',role)
+    return answer
+
+
+# --------------------------------------------------
+#
+#                  BETA ROLES
+#
+# --------------------------------------------------
+# The following roles are still under development, or require some more testing.
+
 # Fortune Teller
 def see(user_id,victim_id):
     """This function allows the user to see a given player of their choice.
@@ -140,7 +194,6 @@ def nightly_kill(user_id,victim_id):
     user_channel = int(db_get(user_id,'channel'))
 
     db_set(user_id,'uses',uses - 1)
-    # Add kill to the kill queue
     db.add_kill(victim_id,user_role,user_id)
 
     answer = Mailbox().msg(ctory.kill_acceptance(victim_id),user_channel)
@@ -301,44 +354,6 @@ def cupid_kiss(user_id,victim_id,voluntarily = True):
 
     return answer.msg_add("\nTogether, they will survive this town!")
 
-# Dog
-def dog_follow(user_id,role):
-    """This function allows the dog to choose a role to become.
-    The function assumes the player is a cupid and has provided a role, so make sure to have filtered this out already.
-    The role does not need to be Innocent, Cursed Civilian or Werewolf yet.
-    The function returns a Mailbox.
-
-    user_id -> the dog who chooses a role
-    role -> the role they'd like to be"""
-
-    uses = int(db_get(user_id,'uses'))
-    if uses < 1:
-        return Mailbox().respond("I am sorry! You currently cannot choose a role to become!",True)
-
-    user_channel = int(db_get(user_id,'channel'))
-
-    if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
-        return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
-
-    db_set(user_id,'uses',uses - 1)
-
-    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
-    answer.log("The **Dog** <@{}> has chosen to become a".format(user_id))
-
-    if role == 'Innocent':
-        answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
-    if role == 'Cursed Civilian':
-        answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
-    if role == 'Werewolf':
-        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_id)
-        for channel_id in db.get_secret_channels("Werewolf"):
-            answer.edit_cc(channel_id,user_id,1)
-            if int(db_get(user_id,'frozen')) == 1:
-                answer.edit_cc(channel_id,user_id,2)
-            answer.msg("**ARRROOOO!\nWelcome, <@{0}>, to the wolf pack!** <@{0}>, a **Dog**, has chosen to turn themselves into a Werewolf! Give them a warm welcome.".format(user_id),channel_id)
-
-    db_set(user_id,'role',role)
-    return answer
 
 # Executioner
 def executioner(user_id,victim_id):
