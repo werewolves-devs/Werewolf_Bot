@@ -17,6 +17,7 @@ import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 from management import db, dynamic as dy
 import management.setup as setup
+import stats
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
@@ -88,6 +89,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
         if is_command(message,['pay'],False,unip):
             # Initiate the day.
+            stats.next_day()
             return switch.pay()
 
         if is_command(message,['day'],False,unip):
@@ -483,7 +485,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 channel_display += letter
             embed.add_field(name='Channel Name', value=channel_display[3+len(season):])
             embed.add_field(name='Participants', value=member_text)
-            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
+            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.display_name)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message, ['info'], True):
             msg = "**Usage:** Gain information about a conspiracy channel.\n\n`" + prefix + "info`\n\n"
