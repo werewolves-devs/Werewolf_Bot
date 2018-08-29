@@ -216,7 +216,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
             ccs_owned = int(db_get(target[0],'ccs'))
             db_set(target[0],'ccs',ccs_owned-number[0])
-            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.")]
+            return [Mailbox().spam("<@{}> has received {} extra conspiracy channel slots.".format(target[0],number[0]))]
         if is_command(message,['donate','give_cc','more_cc'],True):
             return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
         help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
@@ -431,7 +431,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             answer = Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members)
             answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))
             if num_cc_owned + 1 >= max_cc_per_user:
-                answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n")
+                answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n".format(user_id))
                 answer.spam_add("Use `" + prefix + "donate` to give them more channels to create!")
             return [answer]
 
