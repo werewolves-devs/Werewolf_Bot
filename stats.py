@@ -55,3 +55,18 @@
                   "Violating your privacy since 2004™"
                              - The Zucc
 '''
+
+import json
+
+
+def write_stats(stats):
+    with open('stats.json', 'w') as outfile:
+        json.dump(stats, outfile)
+
+def reset_stats(confirm):
+    """Resets all stats, ever"""
+    if confirm:
+        stats = {}
+        write_stats(stats)
+        return True
+    return False
