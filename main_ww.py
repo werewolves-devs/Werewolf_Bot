@@ -140,6 +140,9 @@ async def on_message_edit(before, after):
     stats.increment_stat("messages_edited", 1)
     stats.increment_user_stat(before.author.id, "messages_edited", 1)
 
+    if before.id != after.id:
+        db.add_trash_message(after.id,after.channel.id)
+
     #check role of sender
     isGameMaster = False
     isAdmin = False
@@ -168,6 +171,9 @@ async def on_message(message):
         return
     stats.increment_stat("messages_sent", 1)
     stats.increment_user_stat(message.author.id, "messages_sent", 1)
+
+    # Add trash messages
+    db.add_trash_message(message.id,message.channel.id)
 
     #check role of sender
     isGameMaster = False
@@ -284,7 +290,7 @@ async def process_message(message,result):
                 if j % 20 == 0:
                     i += 1
                     response = await client.get_channel(int(element.destination)).send(embed=embed)
-                    # TODO: Add message to database.
+                    db_shop.add_shop(response.id)
 
                     for item in emoji_table:
                         await response.add_reaction(item)
@@ -292,12 +298,11 @@ async def process_message(message,result):
 
             if j % 20 != 0:
                 response = await client.get_channel(int(element.destination)).send(embed=embed)
-                # TODO: Add message to database.
+                db_shop.add_shop(response.id)
 
                 for item in emoji_table:
                     await response.add_reaction(item)
 
-        #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
@@ -453,6 +458,13 @@ async def process_message(message,result):
                 frozones = []
                 abductees = []
                 deadies = []
+
+                # Add dead people & spectators to cc
+                if not element.secret:
+                    for user in [dead_buddy for dead_buddy in db.player_list() if dead_buddy not in db.player_list(True)]:
+                        element.members.append(user)
+
+                # Categorize all players
                 for user in element.members:
                     member = main_guild.get_member(user)
 
@@ -472,6 +484,11 @@ async def process_message(message,result):
                     else:
                         deadies.append(member)
 
+                # Delete any potential duplicates
+                viewers = list(set(viewers))
+                frozones = list(set(frozones))
+                abductees = list(set(abductees))
+                deadies = list(set(deadies))
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
@@ -526,6 +543,8 @@ async def process_message(message,result):
                             for member in viewers:
                                 if db_get(member.id,'role') == 'Amulet Holder':
                                     db_set(member.id,'amulet',channel.id)
+                    if element.trashy:
+                        db.add_trash_channel(channel.id)
 
                     await channel.send(intro_msg)
 
@@ -616,6 +635,10 @@ async def process_message(message,result):
                     reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
                 except asyncio.TimeoutError:
                     await message.channel.send('Confirmation timed out.')
+                    try:
+                        await bot_message.delete()
+                    except Exception:
+                        pass
                 else:
                     await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
                     for channel in category.channels:
@@ -624,6 +647,20 @@ async def process_message(message,result):
                     await message.channel.send('\n:thumbsup: Channels and category deleted')
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
+
+        clean_time = len(mailbox.cleaners)
+        if clean_time > 0:
+            await botspam_channel.send("Cleaning up {} channels! This may take some time.".format(clean_time))
+
+        for channel in mailbox.cleaners:
+
+            trash_channel = client.get_channel(int(channel))
+
+            if trash_channel != None:
+                for message_id in db.empty_trash_channel(channel):
+                    message = await trash_channel.get_message(int(message_id))
+                    if message != None:
+                        await message.delete()
 
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
