@@ -398,7 +398,12 @@ async def process_message(message,result):
             await remove_all_game_roles(member)
             if element.number == 0:
                 await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                if db.isParticipant(member.id):
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif db.isParticipant(member.id,True,True):
+                    await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                elif db.isParticipant(member.id,True,True,True):
+                    await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
             elif element.number == 1:
                 await channel.set_permissions(user, read_messages=True, send_messages=True)
                 await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
@@ -410,7 +415,8 @@ async def process_message(message,result):
                 await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
             elif element.number == 4:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                if db.isParticipant(member.id,False,True):
+                    await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
             elif element.number == 5:
                 await channel.set_permissions(user, read_messages=True, send_messages=False)
                 await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
