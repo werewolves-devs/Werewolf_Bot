@@ -231,7 +231,7 @@ async def process_message(message,result):
                 if j % 20 == 0:
                     i += 1
                     response = await client.get_channel(int(element.destination)).send(embed=embed)
-                    # TODO: Add message to database.
+                    db_shop.add_shop(response.id)
 
                     for item in emoji_table:
                         await response.add_reaction(item)
@@ -239,12 +239,11 @@ async def process_message(message,result):
 
             if j % 20 != 0:
                 response = await client.get_channel(int(element.destination)).send(embed=embed)
-                # TODO: Add message to database.
+                db_shop.add_shop(response.id)
 
                 for item in emoji_table:
                     await response.add_reaction(item)
 
-        #From my readings, looks like this sends messages to channels based on content in the respective mailboxes
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
