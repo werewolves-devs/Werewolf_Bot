@@ -87,3 +87,7 @@ def increment_stat(stat, amount):
     except:
         stats[stat] = amount
     write_stats(stats)
+
+def get_stat(stat):
+    """Returns the value of {stat}"""
+    return get_stats()[stat]
