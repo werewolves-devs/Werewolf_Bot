@@ -55,6 +55,7 @@ import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
 import shop
+import stats
 from emoji import emojize
 
 
@@ -88,6 +89,7 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
     elif user != client.user and reaction.emoji == "⭐":
         # For Quoting
+        stats.increment_stat("quotes_submitted", 1)
         if reaction.message.id in already_quoted:
             return
         already_quoted.append(reaction.message.id)
@@ -121,6 +123,7 @@ async def on_reaction_add(reaction, user):
                 quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
                 await quote_channel.send(embed=quote_embed)
             if reaction_confirm.emoji == "❎":
+                stats.increment_stat("quotes_denied", 1)
                 request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
@@ -134,6 +137,8 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
+    stats.increment_stat("messages_edited", 1)
+    stats.increment_user_stat(before.author.id, "messages_edited", 1)
 
     #check role of sender
     isGameMaster = False
@@ -159,7 +164,10 @@ async def on_message_edit(before, after):
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
+        stats.increment_stat("bot_messages_sent", 1)
         return
+    stats.increment_stat("messages_sent", 1)
+    stats.increment_user_stat(message.author.id, "messages_sent", 1)
 
     #check role of sender
     isGameMaster = False
@@ -181,6 +189,10 @@ async def on_message(message):
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
 async def process_message(message,result):
+    if "<@&{}>".format(config.game_master) in message.content:
+        stats.increment_stat("game_master_pings", 1)
+        stats.increment_user_stat(message.author.id, "game_master_pings", 1)
+
     if db.isParticipant(message.author.id,True,True,True):
         db_set(message.author.id,'activity',0)
 
