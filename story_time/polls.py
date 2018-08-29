@@ -95,5 +95,13 @@ def story_text(purpose):
 
         msg = "The town had enough of whatever\'s happening. It\'s time we find the guilty person."
         msg_table.append(msg)
+    
+    if purpose == 'Mayor':
+        msg = "The town decided they had to elect a new Mayor. Yes, the last Mayor died quite recently... but you gotta move on, ya know?"
+        msg_table.append(msg)
+    
+    if purpose == 'Reporter':
+        msg = "The town couldn\'t hold its curiosity - it HAD to know the identities of the dead! That\'s why they decided to elect a Reporter!"
+        msg_table.append(msg)
         
     return msg_table[random.randint(0,len(msg_table)-1)]

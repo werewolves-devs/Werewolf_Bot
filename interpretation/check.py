@@ -153,10 +153,10 @@ def is_command(message,commandlist,help=False,prefix=config.ww_prefix):
     help -> when set to True, return True when the message starts with the prefix, then help, and then the command.
     """
     for command in commandlist:
-        if message.content.startswith(prefix + command) and help == False:
+        if message.content.lower().startswith(prefix + command.lower()) and help == False:
             return True
-        if message.content.startswith(prefix + 'help ' + command) and help == True:
+        if message.content.lower().startswith(prefix + 'help ' + command.lower()) and help == True:
             return True
-        if message.content.startswith('?' + command) and help == True:
+        if message.content.lower().startswith('?' + command.lower()) and help == True:
             return True
     return False

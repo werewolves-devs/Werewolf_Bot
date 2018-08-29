@@ -8,6 +8,61 @@ from main_classes import Mailbox
 from config import game_master
 from config import ww_prefix as prefix
 
+# --------------------------------------------------
+#
+#               WORKING ROLES
+#
+# --------------------------------------------------
+# The following roles have been tested thoroughly and are known to work.
+
+# Dog
+def dog_follow(user_id,role):
+    """This function allows the dog to choose a role to become.
+    The function assumes the player is a cupid and has provided a role, so make sure to have filtered this out already.
+    The role does not need to be Innocent, Cursed Civilian or Werewolf yet.
+    The function returns a Mailbox.
+
+    user_id -> the dog who chooses a role
+    role -> the role they'd like to be"""
+
+    uses = int(db_get(user_id,'uses'))
+    if uses < 1:
+        return Mailbox().respond("I am sorry! You currently cannot choose a role to become!",True)
+
+    user_channel = int(db_get(user_id,'channel'))
+
+    if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
+        return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
+
+    db_set(user_id,'uses',uses - 1)
+
+    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
+    answer.log("The **Dog** <@{}> has chosen to become a".format(user_id))
+
+    if role == 'Innocent':
+        answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
+    if role == 'Cursed Civilian':
+        answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
+    if role == 'Werewolf':
+        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_id)
+        for channel_id in db.get_secret_channels("Werewolf"):
+            answer.edit_cc(channel_id,user_id,1)
+            if int(db_get(user_id,'frozen')) == 1:
+                answer.edit_cc(channel_id,user_id,2)
+            answer.msg("**ARRROOOO!\nWelcome, <@{0}>, to the wolf pack!** <@{0}>, a **Dog**, has chosen to turn themselves into a Werewolf! Give them a warm welcome.".format(user_id),channel_id)
+
+    db_set(user_id,'role',role)
+    return answer
+
+
+# --------------------------------------------------
+#
+#                  BETA ROLES
+#
+# --------------------------------------------------
+# The following roles are still under development, or require some more testing.
+
+# Fortune Teller
 def see(user_id,victim_id):
     """This function allows the user to see a given player of their choice.
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
@@ -64,6 +119,7 @@ def see(user_id,victim_id):
 
     return answer.log("<@{}>, a **{}**, has seen the role of <@{}>, who had the role of the **{}**!".format(user_id,user_role,victim_id,victim_role))
 
+# Tanner
 def disguise(user_id,victim_id,role):
     """This fuction is taking the tanner's action of disguising people.
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
@@ -107,6 +163,7 @@ def disguise(user_id,victim_id,role):
         answer.log_add("\n...does that sound stupid? *Of course!* But how are they supposed to know?")
     return answer
 
+# Priest, White Werewolf
 def nightly_kill(user_id,victim_id):
     """This function adds a kill to the kill queue based on the user's role.  
     This function is applicable for roles like the assassin, the lone wolf, the priest, the thing and the white werewolf.  
@@ -121,26 +178,28 @@ def nightly_kill(user_id,victim_id):
     uses = int(db_get(user_id,'uses'))
     if uses < 1:
         return Mailbox().respond("I am sorry! You currently don't have this ability available!",True)
-    db_set(user_id,'uses',uses - 1)
 
     if user_id == victim_id:
         return Mailbox().respond("I am sorry, but you cannot attempt suicide!\nNot because it's not an option, no, just because we want to see you SUFFER!",True)
 
     # TODO: Prevent targeting of abducted/frozen players.
+    if int(db_get(user_id,'undead')) == 1 or db_get(user_id,'role') == 'Undead':
+        return Mailbox().respond("I am sorry! Now that you are Undead, you can no longer use this power.",True)
+    if int(db_get(victim_id,'abducted')) == 1:
+        return Mailbox().respond("You attempted to attack <@{}>... but they don't seem to be around in town! That is strange.".format(victim_id),True)
+    if int(db_get(user_id,'frozen')) == 1:
+        return Mailbox().respond("You wanted to pay a visit to <@{}>... but it seems they were frozen! Try again, please.".format(victim_id),True)
 
     user_role = db_get(user_id,'role')
     user_channel = int(db_get(user_id,'channel'))
-    user_undead = int(db_get(user_id,'undead'))
 
-    if user_undead == 1:
-        return Mailbox().dm("I am sorry! An undead cannot use this power!",user_id)
-
-    # Add kill to the kill queue
+    db_set(user_id,'uses',uses - 1)
     db.add_kill(victim_id,user_role,user_id)
 
     answer = Mailbox().msg(ctory.kill_acceptance(victim_id),user_channel)
     return answer.log("The **{}** <@{}> has chosen to pay <@{}> a visit tonight.".format(user_role,user_id,victim_id))
 
+# Pyromancer
 def powder(user_id,victim_id):
     """This function powders a player if they are alive and not a pyromancer.
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
@@ -213,6 +272,7 @@ def ignite(user_id):
     answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
     return answer.msg("Okay! All powdered players will die tomorrow.",user_channel)
 
+# Aura Teller
 def aura(user_id,victim_id):
     """This function allows the aura teller to inspect if a given user is among the wolf pack or not.
     The function assumes the player is an aura teller and has the correct role, so make sure to have filtered this out already.
@@ -248,6 +308,7 @@ def aura(user_id,victim_id):
     answer = Mailbox().msg("🐶 - <@{}> has a **GREEN AURA** - they are not taking part in the wolf pack.".format(victim_id),user_channel)
     return answer.log("The **Aura Teller** <@{}> has inspected <@{}>, who, being the **{}**, wasn't part of the wolf pack.".format(user_id,victim_id,victim_role))
 
+# Cupid
 def cupid_kiss(user_id,victim_id,voluntarily = True):
     """This function makes the cupid fall in love with a partner.
     The function assumes the player is a cupid and has the correct role, so make sure to have filtered this out already.
@@ -293,40 +354,8 @@ def cupid_kiss(user_id,victim_id,voluntarily = True):
 
     return answer.msg_add("\nTogether, they will survive this town!")
 
-def dog_follow(user_id,role):
-    """This function allows the dog to choose a role to become.
-    The function assumes the player is a cupid and has provided a role, so make sure to have filtered this out already.
-    The role does not need to be Innocent, Cursed Civilian or Werewolf yet.
-    The function returns a Mailbox.
 
-    user_id -> the dog who chooses a role
-    role -> the role they'd like to be"""
-
-    uses = int(db_get(user_id,'uses'))
-    if uses < 1:
-        return Mailbox().respond("I am sorry! You currently cannot choose a role to become!",True)
-
-    user_channel = int(db_get(user_id,'channel'))
-
-    if role not in ['Innocent', 'Cursed Civilian', 'Werewolf']:
-        return Mailbox().msg("I'm sorry, <{}>. Being a dog lets you choose a role, but it doesn't mean you can become ANYTHING.".format(user_id),user_channel,True)
-
-    db_set(user_id,'uses',uses - 1)
-
-    answer = Mailbox().msg("You have chosen to become the **{}**!".format(role),user_channel)
-    answer.log("The **Dog** <@{}> has chosen to become a")
-
-    if role == 'Innocent':
-        answer.log_add('n **Innocent**!').dm("You have chosen to become an **Innocent**. Protect the town, kill all those wolves!",user_id)
-    if role == 'Cursed Civilian':
-        answer.log_add(' **Cursed Civilian**!').dm("You have chosen to become a **Cursed Civilian**! You will be part of the town... for now.",user_id)
-    if role == 'Werewolf':
-        answer.log_add(' **Werewolf**!').dm("You have chosen to become a **Werewolf**! You will now join the wolf pack!",user_channel)
-        # TODO: Add dog to wolf channel
-
-    db_set(user_id,'role',role)
-    return answer
-
+# Executioner
 def executioner(user_id,victim_id):
     """This function allows the Executioner / huntress to choose a victim that will die in their place, may they get lynched during the day.
     The function assumes the player is a huntress and has provided a living participant, so make sure to have filtered this out already.
@@ -362,6 +391,7 @@ def executioner(user_id,victim_id):
 
     return answer
 
+# Grandma
 def silence(user_id,victim_id):
     """This fuction is taking grandma's action of silencing people.
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.
@@ -399,6 +429,7 @@ def silence(user_id,victim_id):
 
     return answer.log("**Grandma** <@{}> has silenced <@{}>.".format(user_id,victim_id))
 
+# Innkeeper
 def unfreeze(user_id,victim_id):
     """This function allows the innkeeper to unfreeze frozen victims.
     The function assumes both players are participants, of which the casting user is an innkeeper. Make sure to have filtered this out already.
@@ -435,6 +466,7 @@ def unfreeze(user_id,victim_id):
     answer.dm("Great news, <@{}>! You have been unfrozen by an **Innkeeper**! You can now take part with the town again!".format(victim_id),victim_id)
     return answer.log("The **Innkeeper** <@{}> has unfrozen <@{}>.".format(user_id,victim_id))
 
+# Priestess
 def purify(user_id,victim_id):
     """This function allows the priestess to purify targets.
     The function assumes both players are participants, and that the casting user is a priestess. Make sure to have filtered this out beforehand.
@@ -479,6 +511,7 @@ def purify(user_id,victim_id):
 
     return answer
 
+# Flute Player
 def enchant(user_id,victim_id):
     """This function allows the flute player to enchant targets.
     The function assumes both players are participants, of which the casting user is a flute player. Make sure to have filtered this out already.
@@ -523,6 +556,7 @@ def enchant(user_id,victim_id):
 
     return answer
 
+# Ice King
 def freeze(user_id,victim_id = None,role = None):
     """This function allows the ice king to add a user to their list of potential freezers, or possibly remove one.
     The function assumes both players are participants, so make sure to have filtered this out already.
@@ -614,10 +648,9 @@ def freeze_all(user_id):
         db.delete_freezer(user_id,supersuit[0])
         answer.freeze(supersuit[0])
 
-    # TODO: Give players access to frozen realm.
-
     return answer
 
+# Crowd Seeker
 def seek(user_id,victim_id,role):
     """This fuction allows the crowd seeker to inspect players.
     The function assumes the player is a participant and has the correct role, so make sure to have filtered this out already.

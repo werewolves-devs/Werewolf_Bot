@@ -1,6 +1,7 @@
 # Discord API / Login settings
 WW_TOKEN = "yo_mommas_token"
 TM_TOKEN = "yo_poppas_token"
+SHOP_TOKEN = "yo_devils_token"
 
 
 # Rules 'n' settings
@@ -18,6 +19,8 @@ universal_prefix = "#!003-88-6521"
 dynamic_config = "dynamic.json"
 general_database = 'general.db'
 database = 'game.db'
+shop_file = 'shop.json'
+stats_file = 'stats.json'
 max_channels_per_category = 50
 
 # List of specific channels
@@ -25,6 +28,8 @@ welcome_channel = 446046437114118145
 game_log = 456880259636396034
 bot_spam = 482219246177222657
 story_time = 477533978547453972
+shop_channel = 482660799626608640
+quotes = 484090767254749215
 
 # List of specific roles
 administrator = 446235596722012160
@@ -34,3 +39,6 @@ dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
 peasant = 0 # TODO
+
+mayor = 0 # TODO
+reporter = 0 # TODO
