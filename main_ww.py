@@ -77,6 +77,8 @@ async def remove_all_game_roles(member):
         if role.id == config.participant:
             await member.remove_roles(role, reason="Updating CC permissions")
 
+already_quoted = []
+
 @client.event
 async def on_reaction_add(reaction, user):
     if user != client.user and db_shop.is_shop(reaction.message.id):
@@ -86,6 +88,9 @@ async def on_reaction_add(reaction, user):
         await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
     elif user != client.user and reaction.emoji == "⭐":
         # For Quoting
+        if reaction.message.id in already_quoted:
+            return
+        already_quoted.append(reaction.message.id)
         botspam_channel = client.get_channel(int(config.bot_spam))
         quote_channel = client.get_channel(int(config.quotes))
         request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
