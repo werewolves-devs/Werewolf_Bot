@@ -543,7 +543,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 channel_display += letter
             embed.add_field(name='Channel Name', value=channel_display[3+len(season):])
             embed.add_field(name='Participants', value=member_text)
-            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
+            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.display_name)
             return [Mailbox().embed(embed, message.channel.id)]
         if is_command(message, ['info'], True):
             msg = "**Usage:** Gain information about a conspiracy channel.\n\n`" + prefix + "info`\n\n"
