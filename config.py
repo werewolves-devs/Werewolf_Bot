@@ -20,6 +20,7 @@ dynamic_config = "dynamic.json"
 general_database = 'general.db'
 database = 'game.db'
 shop_file = 'shop.json'
+stats_file = 'stats.json'
 max_channels_per_category = 50
 
 # List of specific channels

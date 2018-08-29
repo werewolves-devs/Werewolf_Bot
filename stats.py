@@ -54,22 +54,25 @@
                   "We do not sell data to advertisers"
                   "Violating your privacy since 2004™"
                              - The Zucc
+
+                           *In Zucc We Trust*
 '''
 
 import json
+from config import stats_file
 
 
 def get_stats():
     """Returns the current stats from the file as a JSON object"""
     try:
-        with open('stats.json') as f:
+        with open(stats_file) as f:
             return json.load(f)
     except:
         print("WARNING: Stats file is invalid! Writing a new one.")
         write_stats({"users":{}})
 def write_stats(stats):
     """Writes the stats to the file"""
-    with open('stats.json', 'w') as outfile:
+    with open(stats_file, 'w') as outfile:
         json.dump(stats, outfile)
 
 def reset_stats(confirm):
