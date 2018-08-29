@@ -18,9 +18,69 @@ from management import db, dynamic as dy
 import management.setup as setup
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
+UNICODE_VERSION = 8
+EMOJI_RANGES_UNICODE = {
+    6: [
+        ('\U0001F300', '\U0001F320'),
+        ('\U0001F330', '\U0001F335'),
+        ('\U0001F337', '\U0001F37C'),
+        ('\U0001F380', '\U0001F393'),
+        ('\U0001F3A0', '\U0001F3C4'),
+        ('\U0001F3C6', '\U0001F3CA'),
+        ('\U0001F3E0', '\U0001F3F0'),
+        ('\U0001F400', '\U0001F43E'),
+        ('\U0001F440', ),
+        ('\U0001F442', '\U0001F4F7'),
+        ('\U0001F4F9', '\U0001F4FC'),
+        ('\U0001F500', '\U0001F53C'),
+        ('\U0001F540', '\U0001F543'),
+        ('\U0001F550', '\U0001F567'),
+        ('\U0001F5FB', '\U0001F5FF')
+    ],
+    7: [
+        ('\U0001F300', '\U0001F32C'),
+        ('\U0001F330', '\U0001F37D'),
+        ('\U0001F380', '\U0001F3CE'),
+        ('\U0001F3D4', '\U0001F3F7'),
+        ('\U0001F400', '\U0001F4FE'),
+        ('\U0001F500', '\U0001F54A'),
+        ('\U0001F550', '\U0001F579'),
+        ('\U0001F57B', '\U0001F5A3'),
+        ('\U0001F5A5', '\U0001F5FF')
+    ],
+    8: [
+        ('\U0001F300', '\U0001F579'),
+        ('\U0001F57B', '\U0001F5A3'),
+        ('\U0001F5A5', '\U0001F5FF')
+    ]
+}
 
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
+
+def random_emoji(unicode_version = 8):
+    if unicode_version in EMOJI_RANGES_UNICODE:
+        emoji_ranges = EMOJI_RANGES_UNICODE[unicode_version]
+    else:
+        emoji_ranges = EMOJI_RANGES_UNICODE[-1]
+
+    count = [ord(r[-1]) - ord(r[0]) + 1 for r in emoji_ranges]
+    weight_distr = list(accumulate(count))
+
+    point = randrange(weight_distr[-1])
+
+    emoji_range_idx = bisect(weight_distr, point)
+    emoji_range = emoji_ranges[emoji_range_idx]
+
+    point_in_range = point
+    if emoji_range_idx is not 0:
+        point_in_range = point - weight_distr[emoji_range_idx - 1]
+
+    emoji = chr(ord(emoji_range[0]) + point_in_range)
+    emoji_name = unicode_name(emoji, "[Error finding emoji name]").capitalize()
+
+    return (emoji, emoji_name)
+
 
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
@@ -89,7 +149,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['pay'],False,unip):
             # Initiate the day.
             return switch.pay()
-        
+
         if is_command(message,['day'],False,unip):
             # Initiate the second part of the day
             return [switch.day()]
