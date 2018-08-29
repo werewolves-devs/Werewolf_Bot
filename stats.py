@@ -64,7 +64,7 @@ def write_stats(stats):
         json.dump(stats, outfile)
 
 def reset_stats(confirm):
-    """Resets all stats, ever"""
+    """Overwrites all stats, ever"""
     if confirm:
         stats = {}
         write_stats(stats)
