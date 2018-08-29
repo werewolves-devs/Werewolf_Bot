@@ -8,7 +8,7 @@ import asyncio
 import datetime
 
 # Import config data
-from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours
+from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel
 from management.shop import age_shop
 
 client = discord.Client()
@@ -73,7 +73,7 @@ async def on_ready():
     print('   | > ' + client.user.name)
     print('   | > ' + str(client.user.id))
 
-    await client.get_channel(int(bot_spam)).send('Heyo, ya boi online!')
+    await client.get_channel(int(welcome_channel)).send('Heyo, ya boi online!')
 
 print(' --> Please wait whilst we start up background tasks ...')
 client.loop.create_task(check_time())
