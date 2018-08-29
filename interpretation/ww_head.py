@@ -3,7 +3,7 @@ from discord import Embed
 
 import interpretation.check as check
 import roles_n_rules.functions as func
-from config import max_cc_per_user, season, universal_prefix as unip
+from config import max_cc_per_user, season, universal_prefix as unip, max_participants
 from config import ww_prefix as prefix
 from interpretation.check import is_command
 from main_classes import Mailbox
@@ -11,9 +11,11 @@ from management.position import valid_distribution
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
+from roles_n_rules.role_data import attack
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
-import management.db as db
+from management import db, dynamic as dy
+import management.setup as setup
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 
@@ -28,45 +30,45 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg = "**List of commands:**\n"
 
-    '''day'''
-    if is_command(message, ['day']):
-        return [switch.day(),Mailbox().respond("Dayyyyyy")]
-
-    '''standoff'''
-    if is_command(message,['stand']):
-        users = check.users(message,2,True)
-        role = check.roles(message)
-        if not users or not role:
-            return [Mailbox().respond("**NO**")]
-        db.add_standoff(users[0],role[0],users[1])
-        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
-
-    '''tokill'''
-    if is_command(message,['tokill']):
-        users = check.users(message,2,True)
-        role = check.roles(message)
-        if not users or not role:
-            return [Mailbox().respond("**NO**")]
-        db.add_kill(users[0],role[0],users[1])
-        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
-
-    '''evaluate'''
-    if is_command(message, ['eval']):
-        return [Mailbox(True)]
-
-    '''testpoll'''
-    if is_command(message,['poll','testpoll']):
-        return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
-
-    '''dist'''
-    if is_command(message,['dist','checkdist','check_dist']):
-        roles = check.roles(message)
-        if not roles:
-            return [Mailbox().respond("You gotta provide some roles, bud!",True)]
-        judgment = valid_distribution(roles)
-        if not judgment:
-            return [Mailbox().respond("Sorry, that's an invalid role distribution!",True)]
-        return [Mailbox().respond(judgment,True)]
+#    '''day'''
+#    if is_command(message, ['day']):
+#        return [switch.day(),Mailbox().respond("Dayyyyyy")]
+#
+#    '''standoff'''
+#    if is_command(message,['stand']):
+#        users = check.users(message,2,True)
+#        role = check.roles(message)
+#        if not users or not role:
+#            return [Mailbox().respond("**NO**")]
+#        db.add_standoff(users[0],role[0],users[1])
+#        return [Mailbox().respond("<@{}> snipes <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+#
+#    '''tokill'''
+#    if is_command(message,['tokill']):
+#        users = check.users(message,2,True)
+#        role = check.roles(message)
+#        if not users or not role:
+#            return [Mailbox().respond("**NO**")]
+#        db.add_kill(users[0],role[0],users[1])
+#        return [Mailbox().respond("<@{}> kills <@{}> as {}. Gotcha.".format(users[1],users[0],role[0]))]
+#
+#    '''evaluate'''
+#    if is_command(message, ['eval']):
+#        return [Mailbox(True)]
+#
+#    '''testpoll'''
+#    if is_command(message,['poll','testpoll']):
+#        return [Mailbox().new_poll(message.channel.id,'wolf',message.author.id,message.content.split(' ',1)[1])]
+#
+#    '''dist'''
+#    if is_command(message,['dist','checkdist','check_dist']):
+#        roles = check.roles(message)
+#        if not roles:
+#            return [Mailbox().respond("You gotta provide some roles, bud!",True)]
+#        judgment = valid_distribution(roles)
+#        if not judgment:
+#            return [Mailbox().respond("Sorry, that's an invalid role distribution!",True)]
+#        return [Mailbox().respond(judgment,True)]
 
     # =============================================================
     #
@@ -82,23 +84,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['idle'],False,unip):
             # Kill the inactive user
             answer = Mailbox().story("<@{}> has been killed due to inactivity.".format(message.mentions[0].id))
-            return [answer]
+            return [attack(message.mentions[0].id,'Inactive','',answer.log(""))]
 
         if is_command(message,['pay'],False,unip):
-            # Initiate the first round of starting the day.
-            return [Mailbox(True)]
-
+            # Initiate the day.
+            return switch.pay()
+        
         if is_command(message,['day'],False,unip):
-            # Initiate the second round of starting the day.
-            pass
+            # Initiate the second part of the day
+            return [switch.day()]
 
-        if is_command(message,['pight',False,unip]):
-            # Initiate the first round of starting the night.
-            return [Mailbox(True)]
+        if is_command(message,['pight'],False,unip):
+            # Initiate the night.
+            return switch.pight()
 
         if is_command(message,['night'],False,unip):
-            # Initiate the second round of starting the night.
-            pass
+            # Initiate the second part of the night.
+            return [switch.night()]
 
     # =============================================================
     #
@@ -126,8 +128,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "\nThe command does not accept multiple categories. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "delete_category` - Delete a category.\n"
-    elif is_command(message, ['delete_category']):
+
+        '''start'''
+        # This command is used to start a game.
+        if is_command(message, ['start']):
+            return [switch.start_game()]
+        if is_command(message, ['start'], True):
+            return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
+    elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+
 
     # =============================================================
     #
@@ -143,8 +153,14 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # If the list is greater than the amount of participants, some random roles will be left out.
         # The game cannot start as long as this list is incomplete.
         if is_command(message, ['addrole']):
-            # TODO
-            return todo()
+            amount = check.numbers(message)
+            if not amount:
+                amount = [1]
+            role = check.roles(message)
+            if not role:
+                return [Mailbox().respond("**INVALID SYNTAX:** No role provided.\n\nPlease give us a role to add.")]
+            setup.add_role(role[0],amount[0])
+            return [Mailbox().respond("You have successfully added the **{}** role {} times to the game pool!".format(role[0],amount[0]))]
         if is_command(message, ['addrole'], True):
             msg = "**Usage:** Add a role to the game pool\n\n`" + prefix + "addrole <role>`\n\n**Example:** `" + prefix + "addrole Innocent`"
             msg += "\nThe command accepts multiple roles. This command can only be used by Game Masters."
@@ -205,6 +221,55 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond("**Usage:** Give a player more cc's.\n\n`" + prefix + "donate <user> <number>`\n\n**Example:** `" + prefix + "donate @Randium#6521 3`",True)]
         help_msg += "`" + prefix + "donate` - Give a player more cc's.\n"
 
+        '''info'''
+        # This command allows users to view information about a conspiracy channel.
+        # Says the user must be in a cc if they're not.
+        if is_command(message, ['info']):
+            guild = message.channel.guild
+            try:
+                owner_id = channel_get(message.channel.id, 'owner')
+            except:
+                return [Mailbox().respond(
+                    'Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            if owner_id != None:
+                owner_object = guild.get_member(int(owner_id))
+            else:
+                owner_object = None
+            embed = Embed(color=0x00cdcd, title='Conspiracy Channel Info')
+            if owner_object != None and owner_id != None:
+                embed.add_field(name='Channel Owner', value='<@' + owner_id + '>')
+                embed.set_thumbnail(url=owner_object.avatar_url)
+            elif owner_id == None:
+                return [Mailbox().respond(
+                    'Sorry, but it doesn\'t look like you\'re in a CC! If you are, please alert a Game Master as soon as possible.')]
+            else:
+                try:
+                    owner_name = db_get(owner_id, 'name')
+                    if str(owner_name) == 'None':
+                        owner_name = 'Sorry, an error was encountered. Please alert a Game Master.'
+                except:
+                    owner_name == 'Sorry, an error was encountered. Please alert a Game Master.'
+
+                embed.add_field(name='Channel Owner', value=owner_name)
+            member_text = ""
+            for member in get_channel_members(message.channel.id):
+                member_text += "<@" + str(member) + "> "
+            # Parse channel name
+            channel_display = ''
+            for letter in message.channel.name:
+                if letter == '_':
+                    channel_display += '\\'
+                channel_display += letter
+            embed.add_field(name='Channel Name', value=channel_display[3+len(season):])
+            embed.add_field(name='Participants', value=member_text)
+            embed.set_footer(text='Conspiracy Channel Information requested by ' + message.author.nick)
+            return [Mailbox().embed(embed, message.channel.id)]
+        if is_command(message, ['info'], True):
+            msg = "**Usage:** Gain information about a conspiracy channel.\n\n`" + prefix + "info`\n\n"
+            msg += "Try it! You\'ll see what it does."
+            return [Mailbox().respond(msg, True)]
+        help_msg += "`" + prefix + "info` - Gain info about conspiracy channel.\n"
+
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
@@ -220,13 +285,20 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # This command is started when a new game can be started.
         # Make sure the bot has reset itself beforehand.
         if is_command(message, ['open_signup']):
-            # TODO
-            return todo()
+            if dy.get_signup() == 0:
+                dy.set_signup(1)
+                answer = Mailbox().story("Alright, @everyone! Who's excited for a new game? I am.\n")
+                answer.story_add("This time, up to {} players can sign up. Be quick!".format(max_participants))
+                return [answer.spam('<@{}> has opened the signups.'.format(user_id))]
+            if dy.get_signup() == 1:
+                return [Mailbox().respond('Don\'t worry, bud! The signups are already open.')]
+            if dy.get_signup() == 2:
+                return [Mailbox().respond('I\'m sorry, but you can\'t open sign ups if there\'s already a game going.')]
         if is_command(message, ['open_signup'], True):
             msg = "**Usage:** Allow users to sign up for a new game.\n\n`" + prefix + "open_signup`\n\n"
             msg += "This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
-        help_msg += "`" + prefix + "open_signup` - Allow users to sign up."
+        help_msg += "`" + prefix + "open_signup` - Allow users to sign up.\n"
 
         '''whois'''
         # This command reveals the role of a player.
@@ -672,7 +744,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return todo()
             if is_command(message, ['copy', 'imitate', 'mirror', 'resemble'], True) and user_role == "Look-Alike":
                 msg = "**Usage:** Copy a players role.\n\n`" + prefix + "copy <player>`\n\n"
-                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. " 
+                msg += "**Example:** `" + prefix + "copy @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by Look-Alike's."
                 return [Mailbox().respond(msg,True)]
             if user_role == "Look-Alike":
@@ -704,7 +776,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 msg = "**Usage:** Purify a player.\n\n`" + prefix + "purify <player>`\n\n"
                 msg += "**Example:** `" + prefix + "purify @Randium#6521`\nThe command is compatible with emojis as a replacement for user mentions. "
                 msg += "This command can only be used by the Priestess."
-                return [Mailbox().respond(msg,True)]return todo()
+                return [Mailbox().respond(msg,True)]
             if user_role == "Priestess" and user_undead == 0:
                 help_msg += "`" + prefix + "purify` - Purify a player. (Priestess only)\n"
 
@@ -724,7 +796,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''reveal'''
             # The Royal Knight's command
             if is_command(message, ['end', 'prevent', 'reveal', 'stop']) and user_role == "Royal Knight":
-                # TODO             
+                # TODO
                 return todo()
             if is_command(message, ['end', 'prevent', 'reveal', 'stop'], True) and user_role == "Royal Knight":
                 msg = "**Usage:** Prevent a lynch.\n\n`" + prefix + "prevent`\n\n"
@@ -992,9 +1064,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
+    '''shop'''
+    # This command creates a new shop instance in the channel it was sent in
+    # This function returns a mailbox
+    if is_command(message, ['shop']):
+        return [Mailbox().shop(message.channel)]
+
     '''signup'''
     # This command signs up the player with their given emoji, assuming there is no game going on.
     if is_command(message, ['signup']):
+        if dy.get_signup() == 0:
+            return [Mailbox().respond("I am sorry, but you currently cannot sign up yet! Ask Game Masters to open the signups.", True)]
+
+        if dy.get_signup() == 1 and len(db.player_list()) >= max_participants:
+            return [Mailbox().respond("I am terribly sorry! We have closed the signups because the game's full!\nPlease try again later or contact the Game Masters.")]
+
         emojis = check.emojis(message)
         choice_emoji = ""
 
@@ -1018,13 +1102,18 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [reaction.spam("<@{}> has changed their emoji to the {} emoji.".format(user_id, choice_emoji))]
 
         if choice_emoji == "":
-            if len(choice_emoji) == 1:
+            if len(emojis) == 1:
                 return [Mailbox().respond("I am sorry! Your chosen emoji was already occupied.", True)]
             return [Mailbox().respond("I am sorry, but all of your given emojis were already occupied! Such bad luck.",
                                       True)]
         signup(user_id, message.author.name, choice_emoji)
         reaction = Mailbox().respond("You have successfully signed up with the {} emoji!".format(choice_emoji))
-        return [reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))]
+
+        if dy.get_signup() == 1:
+            reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
+        else:
+            reaction.spam("<@{}> has started to spectate.".format(user_id))
+        return [reaction]
     if is_command(message, ['signup'], True):
         msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
         return [Mailbox().respond(msg, True)]

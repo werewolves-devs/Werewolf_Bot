@@ -3,6 +3,7 @@ from management import db, dynamic as dy, setup, position as pos
 from management.db import db_get, db_set, channel_change_all
 from management.setup import view_roles
 from roles_n_rules.functions import cupid_kiss
+from story_time.polls import story_text
 import random
 import roles_n_rules.role_data as roles
 import story_time.powerup as power
@@ -13,8 +14,11 @@ def pay():
     """This function takes care of all properties that need to happen in the first wave of the end of the night.
     The function returns a Mailbox."""
 
-    answer_table = []
-    answer = Mailbox(True)
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
+
+    answer_table = [Mailbox(True).log("```Day {}```".format(dy.day_number() + 1))]
+    answer = Mailbox()
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -60,7 +64,8 @@ def pay():
         # Remove zombie tag
         db_set(user_id,'bitten',0)
 
-    return answer
+    answer_table.append(answer)
+    return answer_table
 
 def day():
     """Start the second part of the day.  
@@ -68,6 +73,9 @@ def day():
     The function returns a Mailbox."""
     threat = db.get_kill()
     answer = Mailbox().log("**Results from night attacks:**")
+
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Sure, man. Whatever.")]
 
     while threat != None:
 
@@ -90,6 +98,90 @@ def day():
                 break
 
     answer.story(morning.story_time(db.get_deadies()))
+    db.delete_deadies()
+    db.delete_hookers()
+
+    # Add polls
+    answer.new_poll(dy.voting_booth(),'lynch','',story_text('lynch'))
+    if dy.get_mayor() == 0:
+        answer.new_poll(dy.voting_booth(),'Mayor','',story_text('Mayor'))
+    elif dy.get_reporter() == 0:
+        answer.new_poll(dy.voting_booth(),'Reporter','',story_text('Reporter'))
+
+    dy.next_day()
+    dy.set_stage('Day')
+
+    return answer
+
+def pight():
+    """This function takes care of all properties that need to happen in the first wave of the end of the day.
+    The function returns a Mailbox."""
+
+    if dy.get_stage() == "Night":
+        return [Mailbox().respond("Whaddaya mean, `{}pight`? It already **is** night, bud.".format(config.universal_prefix))]
+
+    answer = Mailbox(True).log("```Night {}```".format(dy.day_number()))
+    for user_id in db.player_list():
+        user_role = db_get(user_id,'role')
+
+        # Remove potential day uses
+        for i in range(len(roles.day_users)):
+            if user_role in roles.day_users[i]:
+                if i > 0:
+                    db_set(user_id,'uses',0)
+                break
+        
+        # Give the user their votes back
+        db_set(user_id,'votes',1)
+        if user_role == "Immortal":
+            db_set(user_id,'votes',3)
+        if user_role == "Idiot ":
+            db_set(user_id,'votes',0)
+        
+    return [answer]
+
+def night():
+    """Start the second part of the day.  
+    The function assumes all polls have been evaluated, and that looking after attacks can begin.  
+    The function returns a Mailbox."""
+    threat = db.get_kill()
+    answer = Mailbox().log("**Results from night attacks:**")
+
+    if dy.get_stage() == "Day":
+        return [Mailbox().respond("Sure, man. Whatever.")]
+
+    while threat != None:
+
+        answer = roles.attack(threat[1],threat[2],threat[3],answer)
+        threat = db.get_kill()
+
+    for player in db.player_list(True):
+        # Give potential night uses
+        user_role = db_get(player,'role')
+        for i in range(len(roles.night_users)):
+            if user_role in roles.night_users[i]:
+                # Give one-time users their one-time power
+                if i == 0:
+                    if dy.day_number() == 0:
+                        db_set(player,'uses',1)
+                    break
+
+                db_set(player,'uses',i)
+                answer.msg(power.power(user_role),db_get(player,'channel'))
+                break
+
+    # TODO: Write story time.
+    db.delete_deadies()
+
+    # Add polls
+    for channel_id in db.get_secret_channels('Werewolf'):
+        answer.new_poll(channel_id,'wolf',db.random_wolf(),story_text('wolf'))
+    for channel_id in db.get_secret_channels('Cult_Leader'):
+        answer.new_poll(channel_id,'cult',db.random_cult(),story_text('cult'))
+    for channel_id in db.get_secret_channels('Swamp'):
+        answer.new_poll(channel_id,'thing','',story_text('thing'))
+
+    dy.set_stage("Night")
 
     return answer
 
@@ -163,6 +255,12 @@ def start_game():
                 if user_role == "Witch":
                     db_set(user_id,'uses',3)
             
+            answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
+            answer.story('I know, I know. That looks ugly as hell.')
+
+            if "Flute Player" in chosen_roles:
+                answer.create_cc("Flute_Victims",0,[],[],True)
+
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:
                 nothorse_table = [user_id for user_id in db.player_list() if db_get(user_id,'role') != 'Horseman']
@@ -181,7 +279,7 @@ def start_game():
             dy.reset_day()
             dy.set_stage('Night')
 
-            return answer
+            return answer.respond("Very well! The game will start tomorrow morning.")
     
     answer.respond("Timeout reached! Your distribution is too crazy!",True)
     return answer

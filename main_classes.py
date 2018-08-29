@@ -1,5 +1,5 @@
-from management.db import db_get, db_set, channel_change_all, channel_get
-from config import game_log
+from management.db import db_get, db_set, channel_change_all, channel_get, get_secret_channels
+from config import game_log, shop_file
 
 # This class is being used to pass on to above. While the administration is done underneath the hood, messages are passed out to give the Game Masters and the players an idea what has happened.
 class Mailbox:
@@ -14,8 +14,42 @@ class Mailbox:
         self.oldchannels = []      # Edit existing channel
         self.polls = []            # Create new polls
         self.deletecategories = [] # Delete categories and channels they contain
+        self.demotions = []        # Remove Mayor + Reporter role
+        self.shops = []            # Create shop
+        self.cleaners = []         # Delete all trash messages from given channel
 
         self.evaluate_polls = evaluate_polls
+
+    # ------------------------------
+    # Commands for easier management
+    # ------------------------------
+    def __len__(self):
+        length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
+        length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
+        length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
+        length += len(self.cleaners)
+    
+    def __repr__(self):
+        answer = "<MAILBOX|"
+        if self.gamelog != []:          answer += "|gamelog={}".format(self.gamelog)
+        if self.botspam != []:          answer += "|botspam={}".format(self.botspam)
+        if self.storytime != []:        answer += "|story={}".format(self.storytime)
+        if self.answer != []:           answer += "|answer={}".format(self.answer)
+        if self.channel != []:          answer += "|channel={}".format(self.channel)
+        if self.player != []:           answer += "|player={}".format(self.player)
+        if self.newchannels != []:      answer += "|newchannels={}".format(self.newchannels)
+        if self.oldchannels != []:      answer += "|oldchannels={}".format(self.oldchannels)
+        if self.polls != []:            answer += "|polls={}".format(self.polls)
+        if self.deletecategories != []: answer += "|deletecategories={}".format(self.deletecategories)
+        if self.demotions != []:        answer += "|demotions={}".format(self.demotions)
+        if self.shops != []:            answer += "|shops={}".format(self.shops)
+        if self.cleaners != []:         answer += "|cleaners={}".format(self.cleaners)
+        answer += "|"
+        answer += "|evaluate_polls={}".format(self.evaluate_polls)
+        answer += ">"
+        return answer
+
+    # ------------------------------
 
     def log(self,content,temporary = False,reactions = []):
         """Send a message to the gamelog channel."""
@@ -32,6 +66,11 @@ class Mailbox:
     def log_react(self,emoji):
         """Add a reaction to the last gamelog message"""
         self.gamelog[-1].react(emoji)
+        return self
+
+    def shop(self, destination, shop_config = ''):
+        """Add a shop"""
+        self.shops.append(Shop(destination, shop_config))
         return self
 
     def spam(self,content,temporary = False,reactions = []):
@@ -109,9 +148,9 @@ class Mailbox:
         self.player[-1].react(emoji)
         return self
 
-    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False):
+    def create_cc(self,channel_name,channel_owner,members = [],settlers=[],secret=False,trashy=False):
         """Send an order to create a channel"""
-        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret))
+        self.newchannels.append(ChannelCreate(channel_name,channel_owner,members,settlers,secret,trashy))
         return self
     def edit_cc(self,channel_id,user_id,number):
         """Send an order to edit a channel"""
@@ -125,7 +164,7 @@ class Mailbox:
             if role[i] == ' ':
                 new_role += '_'
             else:
-                new_role += role[i] 
+                new_role += role[i]
         self.create_cc(new_role,0,[user_id],[user_id],True)
         return self
     def add_to_sc(self,user_id,role):
@@ -155,6 +194,10 @@ class Mailbox:
         self.deletecategories.append(CategoryDelete(channel_id))
         return self
 
+    def cleanup(self,channel_id):
+        """Add a channel that needs to be erased from content."""
+        self.cleaners.append(channel_id)
+        return self
     
     # Commands that change one's cc status
     def freeze(self,user_id):
@@ -162,8 +205,11 @@ class Mailbox:
         This function alters the Mailbox, so 'add' and react commands may not work as intended."""
         db_set(user_id,'frozen',1)
         self.spam("<@{}> was frozen.".format(user_id))
+        to_freeze = channel_change_all(user_id,1,2)
 
-        for channel_id in channel_change_all(user_id,1,2):
+        for channel_id in get_secret_channels('Frozen_Realm'):
+            self.edit_cc(channel_id,user_id,1)
+        for channel_id in to_freeze:
             self.edit_cc(channel_id,user_id,2)
         return self
     
@@ -173,7 +219,11 @@ class Mailbox:
         db_set(user_id,'frozen',0)
         self.spam("<@{}> is no longer frozen.".format(user_id))
 
-        for channel_id in channel_change_all(user_id,2,1):
+        to_unfreeze = channel_change_all(user_id,2,1)
+
+        for channel_id in get_secret_channels('Frozen_Realm'):
+            self.edit_cc(channel_id,user_id,0)
+        for channel_id in to_unfreeze:
             self.edit_cc(channel_id,user_id,1)
         return self
     
@@ -187,6 +237,8 @@ class Mailbox:
             self.edit_cc(channel_id,user_id,3)
         for channel_id in channel_change_all(user_id,5,6):
             self.edit_cc(channel_id,user_id,6)
+        for channel_id in get_secret_channels('Swamp'):
+            self.edit_cc(channel_id,user_id,1)
         return self
     
     def unabduct(self,user_id):
@@ -237,7 +289,14 @@ class Mailbox:
         if channel_settings == 3:
             self.edit_cc(channel_id,user_id,6)
         return self
+    
+    def remove_proms(self,user_id):
+        """Remove the Mayor and Reporter role from the given user.  
         
+        Keyword arguments:  
+        user_id -> the user who must lose the roles"""
+        self.demotions.append(int(user_id))
+
 
 # Class used to send messages through the mailbox
 class Message:
@@ -253,17 +312,55 @@ class Message:
     def react(self,emoji):
         self.reactions.append(emoji)
         return self
+    def __repr__(self):
+        temp_content = self.content[0:min(20,len(self.content))]
+        if len(self.content) > 20:
+            temp_content += '...'
+        answer = "<Message|"
+        if temp_content != "":      answer += "|content=\'{}\'".format(temp_content)
+        if self.destination != "":  answer += "|destination={}".format(self.destination)
+        if self.reactions != []:    answer += "|reactions={}".format(self.reactions)
+        answer += "|"
+        if self.temporary != False: answer += "|temporary={}".format(self.temporary)
+        if self.embed != False:     answer += "|embed={}".format(self.embed)
+        answer += ">"
+        return answer
+
+# Class for creating a shop embed
+class Shop:
+    def __init__(self, destination, shop_config = shop_file):
+        self.destination = destination
+        self.shop_config = shop_config
+    def __repr__(self):
+        answer = "<Shop|"
+        answer += "|destination={}".format(self.destination)
+        if self.shop_config != shop_file:   answer += "|shop_config={}".format(self.shop_config)
+        answer += ">"
+        return answer
 
 # Class for sending commands back to main.py to create/alter channels
 class ChannelCreate:
-    def __init__(self,name,owner,members=[],settlers=[],secret=False):
+    def __init__(self,name,owner,members=[],settlers=[],secret=False,trashy=False):
         self.name = name
         self.owner = owner
         self.members = members
         self.settlers = settlers
         self.secret = secret
+        self.trashy = trashy
         if owner not in members and owner != 0:
             self.members.append((owner))
+
+    def __repr__(self):
+        answer = "<ChannelCreate|"
+        answer += "|name={}".format(self.name)
+        answer += "|owner={}".format(self.owner)
+        if self.members != []:  answer += "|members={}".format(self.members)
+        if self.settlers != []: answer += "|settlers={}".format(self.settlers)
+        answer += "|"
+        if self.secret == True: answer += "|secret={}".format(self.secret)
+        if self.trashy == True: answer += "|trashy={}".format(self.trashy)
+        answer += ">"
+        return answer
 
 class ChannelChange:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
@@ -274,12 +371,19 @@ class ChannelChange:
         self.victim = victim
         self.number = number
 
+    def __repr__(self):
+        return "<ChannelChange||channel={}|victim={}|number={}>".format(self.channel,self.victim,self.number)
+
 class CategoryDelete:
     # Notice how settlers is not a value here, while it does happen in games that a user switches standard channels.
     # This is because settlers is just a database function to execute. When changing a channel, the id is known and
     # can be executed easily. However, this isn't the case when the channel doesn't yet exist.
     def __init__(self,channel):
         self.channel = channel
+
+    def __repr__(self):
+        return "<CategoryDelete||channel={}>".format(self.channel)
+    
 
 class PollRequest:
     def __init__(self,channel_id,purpose,user_id,description):
@@ -291,6 +395,13 @@ class PollRequest:
             self.description = description[0:512]
         else:
             self.description = description
+    
+    def __repr__(self):
+        temp_desc = self.description[0:min(20,len(self.description))]
+        if len(self.description) > 20:
+            temp_desc += '...'
+        return "<PollRequest||channel={}|purpose={}|user={}|desc=\'{}\'>".format(self.channel,self.purpose,self.user_id,temp_desc)
+    
 
 class PollToEvaluate:
     def __init__(self,database_tuple):
@@ -299,3 +410,19 @@ class PollToEvaluate:
         self.channel = database_tuple[3]
 
         self.msg_table = [int(database_tuple[i+4]) for i in range(len(database_tuple) - 4) if int(database_tuple[i+4]) != 0]
+    
+    def __repr__(self):
+        return "<PollToEvaluate||purpose={}|blamed=\'{}\'|channel={}|msg_table={}>".format(self.purpose,self.blamed,self.channel,self.msg_table)
+
+if __name__ == "__main__":
+    print(PollToEvaluate(['lynch','','12345','1','2','3']))
+    print("{}".format(PollToEvaluate(['lynch','','12345','1','2','3'])))
+    print(str(PollToEvaluate(['lynch','','12345','1','2','3'])))
+
+    print(PollRequest(100,'Mayor',1234,"It was a hairy night in Tumble Town. Oh, btw, we need a Mayor."))
+
+    answer = Mailbox().log("Hi there!")
+    answer.log("This is a test!\n")
+    answer.log_add("Woohoo!")
+    answer.edit_cc(123124312,123423523,3)
+    print(answer)

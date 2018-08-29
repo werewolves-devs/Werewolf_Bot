@@ -7,28 +7,30 @@ def power(role,user_id=0):
         msg = exclamate('Assassin')
         msg += 'The time has arrived to free this town from the evil beings that roam around! '
         msg += 'Whom shall you assassinate to free this town from a potential threat?'
-    if role == 'Aura Teller':
+    elif role == 'Aura Teller':
         msg = exclamate('Aura Teller')
         msg += 'Your visions have come back and they show you the aura of... whose aura do they show exactly?'
-    if role == 'Crowd Seeker':
+    elif role == 'Crowd Seeker':
         msg = exclamate('Crowd Seeker')
         msg += 'You have once again decided to look through the crowd, searching for that one role you need. '
         msg += 'Whom shall you inspect tonight?'
-    if role == 'Cupid':
+    elif role == 'Cupid':
         msg = exclamate('Cupid')
         msg += 'Your arrows have gone loose, and you accidentally shot yourself! You know what\'s about to happen...\n'
         msg += 'It\'s time to choose your least unattractive buddy in town, so that the two of you can fall in love!'
-    if role == 'Dog':
+    elif role == 'Dog':
         msg = exclamate('ARROOOO')
         msg += 'Dear Dog, it is time to see where your true loyalty lies; with your friends from town or where nature calls you!\n'
         msg += 'Time to make a choice! What will you be? An **Innocent**, a **Cursed Civilian** or a **Werewolf**?'
-    if role == '':
-        msg = ''
+    else:
+        msg = "Hey bud! Time to do something!"
+    # TODO
 
     return msg
 
 def creation(role,user_id=0):
-    msg = 'That is strange! Your role doesn\'t exist in my logs.... or not yet, at least.'
+    msg = 'That is strange! Your role doesn\'t exist in my logs.... or not yet, at least.\n'
+    msg += 'But don\'t worry! At this stage, this message\'s perfectly normal. :hugging:'
 
     if role == 'Amulet Holder':
         msg = exclamate('AMULET HOLDER,')
