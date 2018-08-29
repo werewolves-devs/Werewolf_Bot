@@ -298,7 +298,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg = "**Usage:** Allow users to sign up for a new game.\n\n`" + prefix + "open_signup`\n\n"
             msg += "This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
-        help_msg += "`" + prefix + "open_signup` - Allow users to sign up."
+        help_msg += "`" + prefix + "open_signup` - Allow users to sign up.\n"
 
         '''whois'''
         # This command reveals the role of a player.
