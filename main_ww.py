@@ -179,18 +179,18 @@ async def on_message(message):
     isGameMaster = False
     isAdmin = False
     isPeasant = False
-    try:
-        if message.guild == client.get_channel(int(config.game_log)).guild:
+    if message.guild == client.get_channel(int(config.game_log)).guild:
+        try:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
-
+        except Exception:
+            print('Unable to acquire role_table from {}'.format(message.author.display_name))
+        else:
             if game_master in role_table:
                 isGameMaster = True
             if administrator in role_table:
                 isAdmin = True
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
-    except Exception:
-        pass
 
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
