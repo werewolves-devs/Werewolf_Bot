@@ -91,4 +91,12 @@ def creation(role,user_id=0):
         msg += "**You are the Barber! You can kill a player at any time during the day. Choose wisely, however! "
         msg += "You can only use this power once.**"
 
+    if role == 'Crowd Seeker':
+        msg = exclamate('Seek and thou shall find')
+        msg += "Your powers do not allow you to sense specific players too well, but you are capable of following your "
+        msg += "senses and finding specific roles among the crowd! This is why you've given yourself the task to find "
+        msg += "and kill the evil geings in your town!\n"
+        msg += "**You are the Crowd Seeker! Use your powers to confirm or debunk people who claim their roles. "
+        msg += "Make sure to kill everything that does not belong here!**"
+
     return msg

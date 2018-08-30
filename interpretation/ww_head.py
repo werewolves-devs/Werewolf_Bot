@@ -1127,6 +1127,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             answer.respond(phrase)
         return [answer]
 
+    if message.content.startswith('Eyyy'):
+        return [answer.respond('Ayyyy!')]
+
     # --------------------------------------------------------------
     #                          HELP
     # --------------------------------------------------------------
