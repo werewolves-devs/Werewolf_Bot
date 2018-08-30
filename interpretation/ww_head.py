@@ -87,7 +87,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [attack(message.mentions[0].id,'Inactive','',answer.log(""))]
 
         if is_command(message,['pay'],False,unip):
-            # Initiate the day.
+            print('The day is about to start!')
             return switch.pay()
 
         if is_command(message,['day'],False,unip):
@@ -95,7 +95,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [switch.day()]
 
         if is_command(message,['pight'],False,unip):
-            # Initiate the night.
+            print('The night is about to start!')
             return switch.pight()
 
         if is_command(message,['night'],False,unip):
