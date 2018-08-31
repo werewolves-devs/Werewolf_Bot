@@ -17,6 +17,7 @@ import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 from management import db, dynamic as dy
 import management.setup as setup
+import stats
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
@@ -88,6 +89,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
         if is_command(message,['pay'],False,unip):
             print('The day is about to start!')
+            stats.next_day()
             return switch.pay()
 
         if is_command(message,['day'],False,unip):

@@ -69,7 +69,7 @@ def get_stats():
             return json.load(f)
     except:
         print("WARNING: Stats file is invalid! Writing a new one.")
-        write_stats({"users":{}})
+        write_stats({"users":{}, "current_day": {}})
 def write_stats(stats):
     """Writes the stats to the file"""
     with open(stats_file, 'w') as outfile:
@@ -78,7 +78,7 @@ def write_stats(stats):
 def reset_stats(confirm):
     """Overwrites all stats, ever"""
     if confirm:
-        write_stats({"users":{}})
+        write_stats({"users":{}, "current_day": {}})
         return True
     return False
 
@@ -89,6 +89,10 @@ def increment_stat(stat, amount):
         stats[stat] += amount
     except:
         stats[stat] = amount
+    try:
+        stats["current_day"][stat] += amount
+    except:
+        stats["current_day"][stat] = amount
     write_stats(stats)
 
 def get_stat(stat):
@@ -110,4 +114,9 @@ def increment_user_stat(user_id, stat, value):
         stats["users"][user_id][stat] += value
     except:
         stats["users"][user_id][stat] = value
+    write_stats(stats)
+
+def next_day():
+    stats = get_stats()
+    stats["current_day"] = {}
     write_stats(stats)
