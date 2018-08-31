@@ -10,6 +10,7 @@ import datetime
 # Import config data
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel
 from management.shop import age_shop
+from management.general import purge_activity, deal_credits
 
 client = discord.Client()
 
@@ -40,6 +41,13 @@ async def check_time():
         
             # Set each shop's age one up.
             age_shop()
+
+            # Purge activity
+            purge_activity()
+
+            # Give free credits in the middle of the night.
+            if str(time.hour) == "0":
+                deal_credits()
 
             # Give the day signal
             if str(time.hour) == "8":

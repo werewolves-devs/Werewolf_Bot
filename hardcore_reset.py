@@ -19,6 +19,8 @@ def hard_reset(skip = False):
     # Reset the game table.
     reset.reset(True)
     print('\nDeleting any remaining data...')
+    c.execute("DROP TABLE IF EXISTS 'users'")
+    c.execute("DROP TABLE IF EXISTS 'activity'")
     c.execute("DROP TABLE IF EXISTS 'offers'")
     c.execute("DROP TABLE IF EXISTS 'requests'")
     c.execute("DROP TABLE IF EXISTS 'tokens'")
@@ -27,6 +29,8 @@ def hard_reset(skip = False):
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new database....')
+    c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
+    c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'requests' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'tokens' ('token' TEXT NOT NULL, 'owner' INTEGER NOT NULL, 'status' INTEGER NOT NULL DEFAULT 0, 'opt1' TEXT, 'opt2' TEXT, 'opt3' TEXT, 'choice' TEXT, 'source1' TEXT, 'source2' TEXT, PRIMARY KEY('token'));")
