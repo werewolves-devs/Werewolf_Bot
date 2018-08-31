@@ -302,6 +302,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "open_signup` - Allow users to sign up.\n"
 
+        '''testpoll'''
+        # Create a poll if the bot has failed to.
+        if is_command(message,['poll']):
+            commands = message.content.split(' ',2)
+            if commands[1] in ['lynch','Mayor','Reporter','wolf','cult','thing']:
+                return [Mailbox().new_poll(message.channel.id,commands[1],message.author.id,commands[2])]
+            return [Mailbox().respond("Invalid poll type provided!",True)]
+        if is_command(message,['poll'],True):
+            msg = "**Usage:** Create a poll if the bot failed to do so.\n\n`" + prefix + "poll <type> <text>`\n\n"
+            msg += "**Example:** `" + prefix + "poll lynch Who shall die tonight?`\n"
+            msg += "Allowed poll types: `lynch`, `Mayor`, `Reporter`, `wolf`, `cult` and `thing`. "
+            msg += "The types are case sensitive."
+            return [Mailbox().respond(msg,True)]
+        help_msg += "`" + prefix + "poll` - Create a poll\n"
+
         '''whois'''
         # This command reveals the role of a player.
         # To prevent spoilers, the response isn't made in the message's channel, but rather in the bot spam channel.
