@@ -17,6 +17,7 @@ import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 from management import db, dynamic as dy
 import management.setup as setup
+import stats
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
@@ -88,6 +89,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
         if is_command(message,['pay'],False,unip):
             print('The day is about to start!')
+            stats.next_day()
             return switch.pay()
 
         if is_command(message,['day'],False,unip):
@@ -624,13 +626,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''follow'''
             # The command that allows the dog to choose a side.
             if is_command(message, ['bark', 'become', 'choose', 'follow']) and user_role == "Dog":
-                target = check.users(message,1,True,True)
-                if not target:
-                    return [Mailbox().respond("**INVALID SYNTAX:**\nPlease make sure to mention a user.\n\n**Tip:** You can also mention their emoji!",True)]
                 disguise = check.roles(message,1)
                 if not disguise:
                     return [Mailbox().respond("**INVALID SYNTAX:** \nPlease make sure to provide a role.")]
-                return [func.disguise(user_id,target[0],disguise[0])]
+                return [func.dog_follow(user_id,disguise[0])]
             if is_command(message,['bark','become','choose','follow'],True) and user_role == "Dog":
                 msg = "**Usage:** Choose a role to play as.\n\n`" + prefix + "choose <role>`\n\n"
                 msg += "**Example:** `" + prefix + "choose Innocent`\nThe options are **Innocent**, **Cursed Civilian** and **Werewolf**. "

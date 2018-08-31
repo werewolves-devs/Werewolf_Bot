@@ -75,7 +75,7 @@ def day():
     answer = Mailbox().log("**Results from night attacks:**")
 
     if dy.get_stage() == "Day":
-        return [Mailbox().respond("Sure, man. Whatever.")]
+        return Mailbox().respond("Sure, man. Whatever.")
 
     while threat != None:
 
@@ -147,8 +147,8 @@ def night():
     threat = db.get_kill()
     answer = Mailbox().log("**Results from night attacks:**")
 
-    if dy.get_stage() == "Day":
-        return [Mailbox().respond("Sure, man. Whatever.")]
+    if dy.get_stage() == "Night":
+        return Mailbox().respond("Sure, man. Whatever.")
 
     while threat != None:
 
