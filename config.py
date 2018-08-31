@@ -3,7 +3,6 @@ WW_TOKEN = "yo_mommas_token"
 TM_TOKEN = "yo_poppas_token"
 SHOP_TOKEN = "yo_devils_token"
 
-
 # Rules 'n' settings
 max_channels_per_category = 50
 max_participants = 40
@@ -39,6 +38,9 @@ dead_participant = 457498358077063170
 frozen_participant = 457498631344357387
 suspended = 0 # TODO
 peasant = 0 # TODO
-
 mayor = 0 # TODO
 reporter = 0 # TODO
+
+# Box
+base_url = 'https://example.com/box'
+box_token = 'wtDzVN4-30DmcDiHBe9WQ-L0lBTW-R4nd1Umi5G4y-wtDzVN430Dmc-DiHBe9WQ'
