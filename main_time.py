@@ -71,7 +71,7 @@ async def check_time():
 
             await asyncio.sleep(45)
 
-        await asyncio.sleep(45)
+        await asyncio.sleep(10)
 
 
 # Whenever the bot regains his connection with the Discord API.
