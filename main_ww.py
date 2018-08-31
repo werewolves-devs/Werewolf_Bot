@@ -392,54 +392,59 @@ async def process_message(message,result):
             # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
+            user = client.get_user(int(element.victim))
             main_guild = botspam_channel.guild
-            member = main_guild.get_member(element.victim)
-            await remove_all_game_roles(member)
-            if element.number == 0:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                try:
-                    if int(db_get(member.id,'frozen')) == 0:
-                        raise NotImplementedError("This is a purposeful error raise!")
-                except Exception:
-                    if db.isParticipant(member.id):
-                        await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-                    elif db.isParticipant(member.id,True,True):
-                        await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-                    elif db.isParticipant(member.id,True,True,True):
-                        await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
-                else:
-                    await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
-            elif element.number == 1:
-                await channel.set_permissions(user, read_messages=True, send_messages=True)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 2:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
-            elif element.number == 3:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 4:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                if db.isParticipant(member.id,False,True):
-                    await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-            elif element.number == 5:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 6:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 7:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 8:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+            member = main_guild.get_member(int(element.victim))
+            if member == None:
+                if user == None:
+                    botspam_channel.send("That\'s problematic! I couldn\'t find this user! {}".format(element.victim))
+                member = user
             else:
-                await msg.channel.send('Something went wrong! Please contact a Game Master.')
-                return
-            if db.isParticipant(element.victim,True,True):
-                db.set_user_in_channel(element.channel,element.victim,element.number)
+                await remove_all_game_roles(member)
+                if element.number == 0:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    try:
+                        if int(db_get(member.id,'frozen')) == 0:
+                            raise NotImplementedError("This is a purposeful error raise!")
+                    except Exception:
+                        if db.isParticipant(member.id):
+                            await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                    else:
+                        await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 1:
+                    await channel.set_permissions(user, read_messages=True, send_messages=True)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 2:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 3:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 4:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    if db.isParticipant(member.id,False,True):
+                        await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                elif element.number == 5:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 6:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 7:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 8:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                else:
+                    await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                    return
+                if db.isParticipant(element.victim,True,True):
+                    db.set_user_in_channel(element.channel,element.victim,element.number)
 
 
         # New channels are created here.
