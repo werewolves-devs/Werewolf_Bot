@@ -320,6 +320,8 @@ def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
         dy.kill_reporter()
         answer.remove_proms(user_id)
 
+    for channel_id in db.get_secret_channels("Graveyard"):
+        answer.edit_cc(channel_id,user_id,1)
 
     # Change all channel settings
     for channel_id in db.channel_change_all(user_id,1,4):
