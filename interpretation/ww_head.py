@@ -992,22 +992,27 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             '''powder'''
             # Powder a player
             if is_command(message, ['creeper', 'powder']) and user_role == "Pyromancer":
-                # TODO
-                return todo()
-            if is_command(message, ['creeper', 'powder'], True) and user_role == "Pyromancer":
-                # TODO
-                target = check.users(message, amount=1, must_be_participant=True)
+                target = check.users(message,1,True,True)
                 if not target:
-                    return [Mailbox().embed(destination=message.channel, embed=Embed(
-                    title="Invalid user", description="Please mention a user (either by mention, or by emoji)"
-                        .format(user=message.author.id, target=target[0].id)), temporary=True)]
-
-                func.powder(message.author.id, target[0].id)
-                return [Mailbox().embed(destination=message.channel, embed=Embed(
-                    title="Powdered a participant", description="<@{user}> powdered <@{target}>"
-                        .format(user=message.author.id, target=target[0].id)))]
+                    return [Mailbox().respond("No target provided! Please give us a target to powder.",True)]
+                return [func.powder(user_id,target[0])]
+            if is_command(message, ['creeper', 'powder'], True) and user_role == "Pyromancer":
+                msg = "**Usage:** Powder a player.\n\n`" + prefix + "powder <target>`\n\n"
+                msg += "**Example:** `" + prefix + "powder @Randium#6521`\nThis command can only be used by pyromancers."
+                return [Mailbox().respond(msg,True)]
             if user_role == "Pyromancer":
                 help_msg += "`" + prefix + "powder` - Powder a player. (Pyromancer only)\n"
+
+            '''ignite'''
+            # Set all powdered players on fire.
+            if is_command(message,['ignite','flame','blaze']) and user_role == "Pyromancer":
+                return [func.ignite(user_id)]
+            if is_command(message,['ignite','flame','blaze']) and user_role == "Pyromancer":
+                msg = "**Usage:** Kill all powdered players.\n\n`" + prefix + "ignite`\n\n"
+                msg += "This command can only be used by Pyromancers."
+                return [Mailbox().respond(msg,True)]
+            if user_role == "Pyromancer":
+                help_msg += "`" + prefix + "ignite` - Kill all powdered players. (Pyromancer only)\n"
 
             '''abduct'''
             # To kidnap players
@@ -1034,12 +1039,12 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         	    help_msg += "`" + prefix + "create_swamp` - Create swamp with chosen players. (The Thing only)\n"
     elif is_command(message, [
         'abduct', 'abduct_all', 'add', 'apocalypse', 'assassinate', 'aura',
-        'barber_kill', 'bark', 'become', 'cast', 'cc', 'change', 'chew', 'choose',
+        'barber_kill', 'bark', 'become', 'blaze', 'cast', 'cc', 'change', 'chew', 'choose',
         'clean', 'cloth', 'copy', 'corrupt', 'cough', 'create_swamp', 'creeper',
         'crowd', 'curse', 'cut', 'death', 'devour', 'disguise', 'donate', 'eat',
-        'enchant', 'end', 'execute', 'exercise', 'exorcise', 'flute', 'follow',
+        'enchant', 'end', 'execute', 'exercise', 'exorcise', 'flame', 'flute', 'follow',
         'forsee', 'freeze', 'freeze_all', 'fuck', 'give_amulet', 'give_cc', 'guess',
-        'guess_that', 'heal', 'hide', 'holify', 'hook', 'hunt', 'imitate', 'infect',
+        'guess_that', 'heal', 'hide', 'holify', 'hook', 'hunt', 'ignite', 'imitate', 'infect',
         'info', 'inspect', 'kidnap', 'kill', 'kiss', 'knit', 'knot', 'life', 'light',
         'love', 'melt', 'mirror', 'more_cc', 'munch', 'murder', 'myrole', 'poison',
         'powder', 'prevent', 'purify', 'raven', 'remove', 'resemble', 'reveal',
