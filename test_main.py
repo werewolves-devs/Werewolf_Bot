@@ -6,6 +6,7 @@ from main_classes import Mailbox
 import roles_n_rules.switch as switch
 import interpretation.check as check
 import management.db as db
+import management.boxes as box
 import reset
 
 # Sanity checks
