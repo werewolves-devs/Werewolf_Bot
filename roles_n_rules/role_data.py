@@ -337,8 +337,14 @@ def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
     for channel_id in db.channel_change_all(user_id,6,7):
         answer.edit_cc(channel_id,user_id,7)
 
-    for channel in db.get_secret_channels("Market"):
+    for channel_id in db.get_secret_channels("Market"):
         answer.edit_cc(channel_id,user_id,4)
+
+    for channel_id in db.get_secret_channels("Reporter"):
+        if int(db_get(user_id,'undead')) == 1:
+            answer.msg("{} - <@{}> had the role of the `Undead`!".format(db_get(user_id,'emoji'),user_id),channel_id)
+        else:
+            answer.msg("{} - <@{}> had the role of the `{}`!".format(db_get(user_id,'emoji'),user_id,db_get(user_id,'role')),channel_id)
 
     # Kill that user already! 
     db_set(user_id,'role','Dead')
