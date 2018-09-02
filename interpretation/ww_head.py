@@ -340,7 +340,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 embed.add_field(name='Total Messages Edited', value=stats.get_stat("messages_edited"))
                 embed.add_field(name='Total Messages Sent by Bot', value=stats.get_stat("bot_messages_sent"))
                 embed.set_footer(text='Game Stats requested by ' + message.author.display_name)
-            return [Mailbox().embed(embed, bot_spam)]
+            return [Mailbox().embed(embed, bot_spam, True)]
         if is_command(message, ['stats'],True):
             # TODO
             return []
