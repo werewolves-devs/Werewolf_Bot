@@ -667,7 +667,7 @@ def seek(user_id,victim_id,role):
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
 
-    victim_role = db_get(victim_id,'role')
+    victim_role = db_get(victim_id,'fakerole')
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
 
