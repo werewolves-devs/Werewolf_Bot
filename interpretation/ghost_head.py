@@ -2,31 +2,26 @@
 from discord import Embed
 
 import interpretation.check as check
-import roles_n_rules.functions as func
-from config import max_cc_per_user, season, universal_prefix as unip
+from config import max_cc_per_user, season, universal_prefix as unip, max_participants
 from config import ghost_prefix as prefix
-from interpretation.check import is_command as old_is_command
+from interpretation.check import is_command
 from main_classes import Mailbox
-from management.position import valid_distribution
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from story_time.commands import cc_goodbye, cc_welcome
-import story_time.eastereggs as eggs
+from management import db, dynamic as dy
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
-
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
-
-def is_command(message,list,bool=False,std_prefix=prefix):
-    return old_is_command(message,list,bool,std_prefix)
 
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
     message_channel = message.channel.id
+    user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
 
     # =============================================================
     #
@@ -34,13 +29,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
     if isPeasant == True:
-        if is_command(message,['kill'],False,unip):
-            answer = Mailbox()
-            for member in message.mentions:
-                answer.dm("Hey there, buddy!\n",member.id)
-                answer.dm_add("I\'m sorry for you that you died, that you lost the game! ")
-                answer.dm_add("But don't worry, there\'s still a lot to do in the afterlife!\n")
-                answer.dm_add("This story isn\'t finished, but it does need more explanation.")
+        pass
 
     # =============================================================
     #
@@ -50,8 +39,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isAdmin == True:
         help_msg += "\n __Admin commands:__\n"
 
-    elif is_command(message, ['delete_category']):
+    elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+
 
     # =============================================================
     #
@@ -66,14 +56,18 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     # =============================================================
     #
-    #                         DEAD PARTICIPANTS
+    #                         PARTICIPANTS
     #
     # =============================================================
 
-    if not isParticipant(user_id):
+    if isParticipant(user_id):
         help_msg += "\n__Participant commands:__\n"
 
         user_undead = int(db_get(user_id,'undead'))
+
+    elif is_command(message, []):
+        return [Mailbox().respond(PERMISSION_MSG.format("Participant"), True)]
+
 
     # =============================================================
     #
@@ -86,10 +80,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     '''age'''
     # Allows users to set their age.
     if is_command(message, ['age']):
-        # TODO
-        return todo()
+        numbers = check.numbers(message)
+        if not numbers:
+            return [Mailbox().respond("**INVALID SYNTAX:** No number provided.\n\nPlease provide us with a valid age.")]
     if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age<number>\n\n**Example:** `!age 19`"
+        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age <number>\n\n**Example:** `!age 69`"
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 

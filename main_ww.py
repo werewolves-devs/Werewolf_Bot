@@ -397,10 +397,12 @@ async def process_message(message,result):
             member = main_guild.get_member(int(element.victim))
             if member == None:
                 if user == None:
-                    botspam_channel("That\'s problematic! I couldn\'t edit the cc info of <@{0}> *(<#{0}> <@&{0}> ?)*".format(element.victim))
+                    await botspam_channel.send("That\'s problematic! I couldn\'t edit the cc info of <@{0}> *(<#{0}> <@&{0}> ?)*".format(element.victim))
                     print('Unable to locate member {}.'.format(element.victim))
                 member = user
-            if member != None:
+            if channel == None:
+                await botspam_channel.send('Unable to edit channel <#{0}> *(<@{0}> <@&{0}> ?)*'.format(int(element.victim)))
+            elif member != None:
                 await remove_all_game_roles(member)
                 if element.number == 0:
                     await channel.set_permissions(user, read_messages=False, send_messages=False)
@@ -487,6 +489,7 @@ async def process_message(message,result):
                     member = main_guild.get_member(user)
 
                     if member == None:
+                        await botspam_channel.send("That\'s problematic! I couldn\'t add <@{0}> to a cc. *(<#{0}> <@&{0}> ?)*".format(element.victim))
                         await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
                     elif db.isParticipant(user,False,True) == True:
                         if int(db_get(user,'abducted')) == 1:
