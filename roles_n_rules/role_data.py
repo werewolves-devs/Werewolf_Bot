@@ -337,6 +337,9 @@ def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
     for channel_id in db.channel_change_all(user_id,6,7):
         answer.edit_cc(channel_id,user_id,7)
 
+    for channel in db.get_secret_channels("Market"):
+        answer.edit_cc(channel_id,user_id,4)
+
     # Kill that user already! 
     db_set(user_id,'role','Dead')
     db_set(user_id,'fakerole','Dead')

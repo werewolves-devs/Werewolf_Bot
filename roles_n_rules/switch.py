@@ -261,6 +261,7 @@ def start_game():
             if "Flute Player" in chosen_roles:
                 answer.create_cc("Flute_Victims",0,[],[],True)
             answer.create_cc("Graveyard",0,[],[],True)
+            answer.create_cc("Market",0,[],[],True)
 
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:
