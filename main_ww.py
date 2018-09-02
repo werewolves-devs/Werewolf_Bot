@@ -400,7 +400,9 @@ async def process_message(message,result):
                     await botspam_channel.send("That\'s problematic! I couldn\'t edit the cc info of <@{0}> *(<#{0}> <@&{0}> ?)*".format(element.victim))
                     print('Unable to locate member {}.'.format(element.victim))
                 member = user
-            if member != None:
+            if channel == None:
+                await botspam_channel.send('Unable to edit channel <#{0}> *(<@{0}> <@&{0}> ?)*'.format(int(element.victim)))
+            elif member != None:
                 await remove_all_game_roles(member)
                 if element.number == 0:
                     await channel.set_permissions(user, read_messages=False, send_messages=False)
