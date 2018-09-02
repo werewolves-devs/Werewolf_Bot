@@ -551,14 +551,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # =======================================================
         #                ROLE SPECIFIC COMMANDS
         # =======================================================
-        if personal_channel(user_id, message_channel) == True:
-            help_msg += "\n"
-
-            # This is going to have to be moved. This can't stay here.
+        if message_channel in db.get_secret_channels('Amulet_Holder'):
             '''give_amulet'''
             # This command can be executed by everyone, but only in one channel.
             # That's the amulet channel.
-            # To be worked out how exactly.
             if is_command(message, ['give_amulet']):
                 # TODO
                 return todo()
@@ -566,6 +562,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             help_msg += "`" + prefix + "give_amulet`\n"
+
+        if personal_channel(user_id, message_channel) == True:
+            help_msg += "\n"
 
             '''assassinate'''
             # Assassin's command; kill a victim
