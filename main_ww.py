@@ -248,7 +248,7 @@ async def process_message(message,result):
                         dy.set_mayor(chosen_one)
                         member = gamelog_channel.guild.get_member(int(chosen_one))
                         if member != None:
-                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".fprmat(member.display_name))
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".format(member.display_name))
                     elif poll.purpose == 'Reporter':
                         dy.set_reporter(chosen_one)
                         for channel_id in db.get_secret_channels("Reporter"):
