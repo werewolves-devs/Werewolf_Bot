@@ -18,6 +18,7 @@ import roles_n_rules.switch as switch
 from management import db, dynamic as dy
 import management.setup as setup
 import stats
+from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
@@ -30,6 +31,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
+    profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
+    if profile_commands:
+        return profile_commands
 
 #    '''day'''
 #    if is_command(message, ['day']):
