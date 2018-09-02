@@ -259,7 +259,7 @@ def start_game():
                     db_set(user_id,'uses',3)
             
             answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
-            answer.story('I know, I know. That looks ugly as hell.')
+            answer.story('I know, I know. That looks ugly as hell. We\'re trying to make it look good!')
 
             if "Flute Player" in chosen_roles:
                 answer.create_cc("Flute_Victims",0,[],[],True)
