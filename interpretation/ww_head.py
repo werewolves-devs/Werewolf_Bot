@@ -140,6 +140,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+    help_msg += "`" + prefix + "start` - Start the game.\n"
 
 
     # =============================================================
