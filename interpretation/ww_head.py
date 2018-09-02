@@ -1089,8 +1089,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [answer]
         
         # TODO: Add more info
-        return [Mailbox()]
-    help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles"
+        return [Mailbox().respond("No role provided! Please give us a role!",True)]
+    help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles\n"
 
     '''profile'''
     # This command allows one to view their own profile
@@ -1168,8 +1168,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message,['randiumlooks','whatdoesrandiumlooklike']):
         answer = Mailbox()
         for phrase in eggs.randiumlooks():
-            answer.respond(phrase)
+            answer.respond(phrase,True)
         return [answer]
+    help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
         return [answer.respond('Ayyyy!')]
