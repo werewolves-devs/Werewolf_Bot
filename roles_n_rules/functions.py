@@ -266,7 +266,7 @@ def ignite(user_id):
 
     # Ignite all living players.
     for user in db.player_list(True,True):
-        if db.isParticipant(user) and user_role != 'Pyromancer':
+        if db.isParticipant(user) and db_get(user,'role') != 'Pyromancer':
             db.add_kill(int(user),'Pyromancer',user_id)
 
     answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
