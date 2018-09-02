@@ -242,7 +242,7 @@ def channel_change_all(user_id,old,new):
 
     conn.commit()
 
-    return [element[0] for element in change_list]
+    return [int(element[0]) for element in change_list]
 
 # Gain all information of a channel
 # If the channel does not exist, it returns None
