@@ -235,7 +235,7 @@ async def process_message(message,result):
 
                 log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
-                await gamelog_channel.send(log)
+                await botspam_channel.send(log)
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
