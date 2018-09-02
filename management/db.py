@@ -400,9 +400,9 @@ def has_amulet(user_id):
 
 def insert_deadie(user_id):
     """Add a new deadie to the list. This list will be evaluated for the storytime."""
-    c.execute("SELECT * FROM 'deadies' WHERE 'user_id' =?",(user_id,))
+    c.execute("SELECT * FROM 'deadies' WHERE user_id =?",(user_id,))
     if c.fetchall == []:
-        c.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);",(user_id,))
+        c.execute("INSERT INTO 'deadies'(user_id) VALUES (?);",(user_id,))
     conn.commit()
 
 def get_deadies():
