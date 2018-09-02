@@ -150,6 +150,29 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
+        '''stats'''
+        # Returns the game's stats in embed form
+        if is_command(message, ['stats']):
+            if "today" in message.content.lower():
+                embed = Embed(color=0x00cdcd, title='Game Stats')
+                embed.add_field(name='Total Messages Sent Today', value=stats.get_stat_day("messages_sent"))
+                embed.add_field(name='Total Messages Edited Today', value=stats.get_stat_day("messages_edited"))
+                embed.add_field(name='Total Messages Sent by Bot Today', value=stats.get_stat_day("bot_messages_sent"))
+                embed.set_footer(text='Game Stats requested by ' + message.author.display_name)
+            elif check.users(message):
+                users = check.users(message)
+                embed = Embed(color=0x00cdcd, title='User Stats')
+                embed.add_field(name='Total Messages Sent', value=stats.get_user_stat(users[0], "messages_sent"))
+                embed.add_field(name='Total Messages Edited', value=stats.get_user_stat(users[0], "messages_edited"))
+                embed.set_footer(text='User Stats requested by ' + message.author.display_name)
+            else:
+                embed = Embed(color=0x00cdcd, title='Game Stats')
+                embed.add_field(name='Total Messages Sent', value=stats.get_stat("messages_sent"))
+                embed.add_field(name='Total Messages Edited', value=stats.get_stat("messages_edited"))
+                embed.add_field(name='Total Messages Sent by Bot', value=stats.get_stat("bot_messages_sent"))
+                embed.set_footer(text='Game Stats requested by ' + message.author.display_name)
+            return [Mailbox().embed(embed, message.channel.id)]
+
         '''addrole'''
         # Before the game starts, a list of roles is kept track of.
         # That list is the list of roles that will be dealt among the participants.
@@ -1087,7 +1110,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 answer.respond(book.find_role_rules(role),True) # CHANGE IN FUNCTION
 
             return [answer]
-        
+
         # TODO: Add more info
         return [Mailbox().respond("No role provided! Please give us a role!",True)]
     help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles\n"
