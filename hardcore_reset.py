@@ -1,6 +1,7 @@
 import reset
 import config
 import sqlite3
+import stats
 
 conn = sqlite3.connect(config.general_database)
 c = conn.cursor()
@@ -15,6 +16,12 @@ def hard_reset(skip = False):
         if confirm != 'Yes':
             print('Resetting canceled.')
             return
+
+    print("\nWiping stats...")
+    if stats.reset_stats(True):
+        print("\nSuccessfully reset stats")
+    else:
+        print("\n-----\nWARNING: Stats wipe failed\n-----\n")
 
     # Reset the game table.
     reset.reset(True)
