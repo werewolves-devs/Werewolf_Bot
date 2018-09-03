@@ -135,7 +135,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''start'''
         # This command is used to start a game.
         if is_command(message, ['start']):
-            return [switch.start_game()]
+            answer = switch.start_game()
+            print(answer)
+            print('This start command Mailbox had length {}!'.format(len(answer)))
+            return [answer]
         if is_command(message, ['start'], True):
             return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
     elif is_command(message, ['delete_category','start']):

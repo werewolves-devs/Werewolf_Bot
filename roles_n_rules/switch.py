@@ -251,7 +251,7 @@ def start_game():
                 if user_role in pos.wolf_pack:
                     answer.add_to_sc(user_id,"Werewolf")
                 if user_role == "Bloody Butcher":
-                    answer.add_to_sc(user_id,"Baker")
+                    answer.add_to_sc(user_id,"Butcher")
                 if user_role == "Devil":
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
