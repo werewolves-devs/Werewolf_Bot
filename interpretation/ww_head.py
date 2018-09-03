@@ -19,7 +19,6 @@ from management import db, dynamic as dy
 from story_time import book, tip
 import management.setup as setup
 import stats
-from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
@@ -32,10 +31,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
-
-    profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
-    if profile_commands:
-        return profile_commands
 
 #    '''day'''
 #    if is_command(message, ['day']):
@@ -1068,16 +1063,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
-    '''age'''
-    # Allows users to set their age.
-    if is_command(message, ['age']):
-        # TODO
-        return todo()
-    if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age<number>\n\n**Example:** `!age 19`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "age` - Set your age.\n"
-
     '''book'''
     # Gives users info about the game, roles or the game
     if is_command(message,['book']):
@@ -1097,17 +1082,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # TODO: Add more info
         return [Mailbox()]
     help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles"
-
-    '''profile'''
-    # This command allows one to view their own profile
-    # When giving another player's name, view that player's profile
-    if is_command(message, ['profile']):
-        # TODO
-        return todo()
-    if is_command(message, ['profile'], True):
-        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
     '''shop'''
     # This command creates a new shop instance in the channel it was sent in
