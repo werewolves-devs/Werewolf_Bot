@@ -6,7 +6,7 @@ from discord import Message, User, Embed
 from interpretation import check
 from interpretation.check import is_command
 from main_classes import Mailbox
-from management.general import ProfileModel
+from management.profile import ProfileModel
 
 
 def set_age(message: Message) -> List[Mailbox]:

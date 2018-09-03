@@ -436,8 +436,8 @@ def add_poll(msg_table,purpose,channel_id,user_id = 0):
     if len(msg_table) > amount:
         raise IndexError("Poll needed more space in database than expected!")
 
-    request_msg = "INSERT INTO 'polls' ('purpose','user_id','channel'"
-    request2_msg = ") VALUES ('{}',{},{}".format(purpose,user_id,channel_id)
+    request_msg = "INSERT INTO 'polls'('purpose','user_id','channel'"
+    request2_msg = ") VALUES ('{}','{}',{}".format(purpose,user_id,channel_id)
 
     for i in range(len(msg_table)):
 
