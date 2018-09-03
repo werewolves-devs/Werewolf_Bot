@@ -7,6 +7,7 @@ from interpretation import check
 from interpretation.check import is_command
 from main_classes import Mailbox
 from management.profile import ProfileModel
+from management.db import isParticipant
 
 
 def set_age(message: Message) -> List[Mailbox]:
@@ -48,6 +49,8 @@ def set_bio(message: Message):
 
 def view_profile(message: Message):
     users = check.users(message, amount=1, delete_duplicates=True, must_be_participant=False)
+    if isParticipant(message.author.id) and not isParticipant(users[0]):
+        return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
     user: User = message.author
     if users:
         user = message.channel.guild.get_member(users[0])
