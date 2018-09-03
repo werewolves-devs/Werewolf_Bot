@@ -686,7 +686,12 @@ async def process_message(message,result):
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
-        await msg.delete()
+        try:
+            await msg.delete()
+        except Exception:
+            # Unable to delete the message.
+            # It was probaly already deleted or something.
+            pass
 
 
 # Whenever the bot regains his connection with the Discord API.
