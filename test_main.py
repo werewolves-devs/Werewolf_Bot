@@ -63,13 +63,13 @@ def test_database():
   db.add_channel('12211',1)
   assert db.get_category() == 24
   assert db.channel_get('1234555') == (u'1234555',u'1',u'0')
-  assert db.channel_change_all(1,0,1) == [u'1234555',u'12211']
+  assert db.channel_change_all(1,0,1) == [1234555,12211]
   assert db.channel_get('1234555') == (u'1234555',u'1',u'1')
   assert db.channel_get('12211') == (u'12211',u'1',u'1')
   db.set_user_in_channel('1234555',1,2)
   assert db.channel_get('1234555') == (u'1234555',u'1',u'2')
   assert db.channel_get('1234555',1) == '2'
-  assert db.channel_change_all(1,2,3) == [u'1234555']
+  assert db.channel_change_all(1,2,3) == [1234555]
   db.signup(420,"BenTechy66",":poop:")
   assert db.channel_get('12211') == (u'12211',u'1',u'1',u'0')
 
