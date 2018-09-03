@@ -1140,7 +1140,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     '''tip'''
     if is_command(message,['tip']):
-        return [Mailbox().respond(tip.random())]
+        return [Mailbox().respond(tip.random(),True)]
+    if is_command(message['tip'],True):
+        # TODO
+        pass
+    help_msg += "`" + prefix + "tip` - Gain a random game tip.\n"
 
 
     # -----------------------
