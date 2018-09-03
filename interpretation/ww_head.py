@@ -431,7 +431,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
             db_set(user_id, 'ccs', num_cc_owned + 1)
             answer = Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members)
-            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))
+            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1].replace('@', '@\u200B')))
             if num_cc_owned + 1 >= max_cc_per_user:
                 answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n".format(user_id))
                 answer.spam_add("Use `" + prefix + "donate` to give them more channels to create!")
