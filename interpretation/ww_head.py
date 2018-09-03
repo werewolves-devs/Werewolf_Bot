@@ -16,6 +16,7 @@ from communication.emoji import random_emoji
 import story_time.eastereggs as eggs
 import roles_n_rules.switch as switch
 from management import db, dynamic as dy
+from story_time import book, tip
 import management.setup as setup
 import stats
 
@@ -1055,6 +1056,26 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "age` - Set your age.\n"
 
+    '''book'''
+    # Gives users info about the game, roles or the game
+    if is_command(message,['book']):
+        roles = check.roles(message,-1,True)
+
+        # Give info about roles, if given any
+        if roles != False:
+            if len(roles) > 3:
+                roles = [roles[0],roles[1],roles[2]]
+            answer = Mailbox()
+
+            for role in roles:
+                answer.respond(book.find_role_rules(role),True) # CHANGE IN FUNCTION
+
+            return [answer]
+        
+        # TODO: Add more info
+        return [Mailbox()]
+    help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles"
+
     '''profile'''
     # This command allows one to view their own profile
     # When giving another player's name, view that player's profile
@@ -1120,6 +1141,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         msg = "**Usage:** `" + prefix + "signup <emoji>`\n\nExample: `" + prefix + "signup :smirk:`"
         return [Mailbox().respond(msg, True)]
     help_msg += "`" + prefix + "signup` - Signup for a game.\n"
+
+    '''tip'''
+    if is_command(message,['tip']):
+        return [Mailbox().respond(tip.random())]
+
 
     # -----------------------
     # Easter eggs
