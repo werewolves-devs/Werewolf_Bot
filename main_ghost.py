@@ -52,6 +52,7 @@ import config
 import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
+import management.general as general
 import shop
 import stats
 from emoji import emojize
@@ -186,7 +187,7 @@ async def on_message(message):
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
 async def process_message(message,result):
-    # TODO: Give 'em an activity point
+    general.add_activity(message.author.id,message.author.name)
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))

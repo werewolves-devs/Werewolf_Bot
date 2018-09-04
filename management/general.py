@@ -2,14 +2,20 @@ import sqlite3
 import random
 from config import general_database
 from management.position import positionof
+from management.db import db_set
 
 conn = sqlite3.connect(general_database)
 c = conn.cursor()
 
-def add_activity(user_id):
+def add_activity(user_id,user_name):
     """Increase the activity score of a player."""
-    c.execute("UPDATE 'activity' SET spam_activity = spam_activity + 1 WHERE id =?",(user_id,))
+    c.execute("SELECT * FROM 'activity' WHERE id =?",(user_id,))
+    if c.fetchone():
+        c.execute("INSERT INTO 'activity'('id','name') VALUES (?,'?');",(user_id,))
+        c.execute("INSERT INTO 'users'('id','name') VALUES (?,'?');",(user_id,))
+    c.execute("UPDATE 'activity' SET spam_activity = spam_activity + 1 WHERE id =?",(user_id,user_name))
     conn.commit()
+    db_set(user_id,'name',user_name)
 
 def purge_activity():
     """Purge the activity score of all players."""
