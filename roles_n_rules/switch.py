@@ -8,6 +8,7 @@ import random
 import roles_n_rules.role_data as roles
 import story_time.powerup as power
 import story_time.morning as morning
+import story_time.evening as evening
 import config
 
 def pay():
@@ -171,7 +172,7 @@ def night():
                 answer.msg(power.power(user_role),db_get(player,'channel'))
                 break
 
-    # TODO: Write story time.
+    answer.story(evening.evening(db.get_deadies()))
     db.delete_deadies()
 
     # Add polls

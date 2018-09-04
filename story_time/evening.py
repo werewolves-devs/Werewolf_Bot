@@ -1,27 +1,31 @@
 import random
 
-def evening(victim,actual_victim):
+def evening(victims):
     msg_table = []
+    amount = len(victims)
 
-    if victim == actual_victim:
-        msg = '''This works basically the same as evening.py \
-<@{0}> is getting lynched if the victim is equal to the actual victim. \
-I\'d suggest focusing on this one mostly, for this is the most common scenario.'''.format(victim)
+    if amount == 0:
+        msg = "No-one wanted to die today. Yay!"
+        msg_table.append(msg)
+
+        msg = "The town had a few plans for today. They held a public vote, they chose a target, "
+        msg += "they prepared the fireplace, and... wait, who was the victim again?\n"
+        msg += "The whole town seemed to have forgotten who was to be lynched. Strange! Well, in that case, "
+        msg += "I guess no-one died today. Too bad!"
+        msg_table.append(msg)
+
+        msg = "Today was a tiring day, a *very* tiring day.\n"
+        msg += "So tired, they decided not to lynch anyone.\n\n...\n\nEven telling this story makes me sleepy."
         msg_table.append(msg)
     
-    if actual_victim == '':
-        msg = '''Though this isn\'t a very common scenario, it\'s not rare either. \
-Stories for this one should be like a plot twist. What happens in these scenarios, \
-is that for some reason <@{0}> wasn't lynched, even though that was the idea. \
-The reason it fails is kinda mysterious, so make the cause have strange things; \
-the rope broke when trying to hang them, they couldn't get a fire to burn them on, \
-when trying to drown them in the town's well, they kept floating, the king forbid their death, etc.'''.format(victim)
+    if amount == 1:
+        msg = "Yes, it was clear that the majority voted for <@{0}>. Bye bye!".format(victims[0])
         msg_table.append(msg)
     
-    if victim != actual_victim:
-        msg = '''This is a very rare scenario, but also a huge plot twist! In these cases,
-people die while others were supposed to. These are huge plot twists, but don\'t focus on them \
-TOO much given their frequency.'''
+    if amount == 2:
+        msg = "Oof, lots of people died.\nThen this is a great moment to make an advertisement, @everyone!\n\n"
+        msg += "Don't you think too the bot lacks a bit of storytime? So do we! Please, help us by writing something "
+        msg += "that could be said here instead of this annoying ping!"
         msg_table.append(msg)
     
     return msg_table[random.randint(0,len(msg_table)-1)]
