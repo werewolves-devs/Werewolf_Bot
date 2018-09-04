@@ -102,7 +102,8 @@ def day():
     db.delete_hookers()
 
     # Add polls
-    answer.new_poll(dy.voting_booth(),'lynch','',story_text('lynch'))
+    if dy.day_number() != 0:
+        answer.new_poll(dy.voting_booth(),'lynch','',story_text('lynch'))
     if dy.get_mayor() == 0:
         answer.new_poll(dy.voting_booth(),'Mayor','',story_text('Mayor'))
     elif dy.get_reporter() == 0:
