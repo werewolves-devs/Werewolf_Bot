@@ -174,10 +174,16 @@ def night():
     db.delete_deadies()
 
     # Add polls
-    for channel_id in db.get_secret_channels('Werewolf'):
-        answer.new_poll(channel_id,'wolf',db.random_wolf(),story_text('wolf'))
-    for channel_id in db.get_secret_channels('Cult_Leader'):
-        answer.new_poll(channel_id,'cult',db.random_cult(),story_text('cult'))
+    for player in db.player_list():
+        if db_get(player,'role') in pos.wolf_pack:
+            for channel_id in db.get_secret_channels('Werewolf'):
+                answer.new_poll(channel_id,'wolf',db.random_wolf(),story_text('wolf'))
+            break
+    for player in db.player_list():
+        if db_get(player,'role') == 'Cult Leader':
+            for channel_id in db.get_secret_channels('Cult_Leader'):
+                answer.new_poll(channel_id,'cult',db.random_cult(),story_text('cult'))
+            break
     for channel_id in db.get_secret_channels('Swamp'):
         answer.new_poll(channel_id,'thing','',story_text('thing'))
 
