@@ -18,8 +18,8 @@ def pay():
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
 
-    answer_table = [Mailbox(True).log("```Day {}```".format(dy.day_number() + 1))]
     answer = Mailbox()
+    answer_table = [Mailbox(True)]
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -112,6 +112,7 @@ def day():
 
     dy.next_day()
     dy.set_stage('Day')
+    answer.log("```Day {}```".format(dy.day_number()))
 
     return answer
 
@@ -122,7 +123,7 @@ def pight():
     if dy.get_stage() == "Night":
         return [Mailbox().respond("Whaddaya mean, `{}pight`? It already **is** night, bud.".format(config.universal_prefix))]
 
-    answer = Mailbox(True).log("```Night {}```".format(dy.day_number()))
+    answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -147,7 +148,7 @@ def night():
     The function assumes all polls have been evaluated, and that looking after attacks can begin.  
     The function returns a Mailbox."""
     threat = db.get_kill()
-    answer = Mailbox().log("**Results from night attacks:**")
+    answer = Mailbox().log("**Results from daily deaths:**")
 
     if dy.get_stage() == "Night":
         return Mailbox().respond("Sure, man. Whatever.")
@@ -189,6 +190,7 @@ def night():
     for channel_id in db.get_secret_channels('Swamp'):
         answer.new_poll(channel_id,'thing','',story_text('thing'))
 
+    answer.log("```Night {}```".format(dy.day_number()))
     dy.set_stage("Night")
 
     return answer
