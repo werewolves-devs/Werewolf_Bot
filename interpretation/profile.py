@@ -49,10 +49,10 @@ def set_bio(message: Message):
 
 def view_profile(message: Message):
     users = check.users(message, amount=1, delete_duplicates=True, must_be_participant=False)
-    if isParticipant(message.author.id) and not isParticipant(users[0]):
-        return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
     user: User = message.author
     if users:
+        if isParticipant(message.author.id) and not isParticipant(users[0]):
+            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
         user = message.channel.guild.get_member(users[0])
     model = ProfileModel.get_or_insert(user)
     em = Embed(
