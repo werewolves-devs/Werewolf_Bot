@@ -22,7 +22,7 @@ def evening(victims):
         msg = "Yes, it was clear that the majority voted for <@{0}>. Bye bye!".format(victims[0])
         msg_table.append(msg)
     
-    if amount == 2:
+    if amount > 2:
         msg = "Oof, lots of people died.\nThen this is a great moment to make an advertisement, @everyone!\n\n"
         msg += "Don't you think too the bot lacks a bit of storytime? So do we! Please, help us by writing something "
         msg += "that could be said here instead of this annoying ping!"

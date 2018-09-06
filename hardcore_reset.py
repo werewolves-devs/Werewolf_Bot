@@ -30,7 +30,7 @@ def hard_reset(skip = False):
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new database....')
-    c.execute("CREATE TABLE `inventory` ('id' INTEGER NOT NULL, \
+    c.execute("CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, \
 	'name' TEXT NOT NULL, \
 	'000' INTEGER NOT NULL DEFAULT 0, \
 	'001' INTEGER NOT NULL DEFAULT 0, \
