@@ -106,4 +106,6 @@ def cc_welcome(victim_id):
     msg = "I can't pull a rabbit out of my hat, but I can get <@{0}> in here! Welcome, <@{0}>!".format(victim_id)
     msg_table.append(msg)
 
+    msg = "It's ya boi, <@{}>!".format(victim_id)
+
     return msg_table[random.randint(0,len(msg_table) - 1)]

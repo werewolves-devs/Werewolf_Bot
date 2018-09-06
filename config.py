@@ -1,7 +1,8 @@
 # Discord API / Login settings
 WW_TOKEN = "yo_mommas_token"
 TM_TOKEN = "yo_poppas_token"
-SHOP_TOKEN = "yo_devils_token"
+DV_TOKEN = "yo_devils_token"
+GH_TOKEN = "yo_deadies_token"
 
 
 # Rules 'n' settings

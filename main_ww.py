@@ -82,52 +82,7 @@ already_quoted = []
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if user != client.user and db_shop.is_shop(reaction.message.id):
-        # For shop
-        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
-        await reaction.message.remove_reaction(reaction.emoji, user)
-        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
-    elif user != client.user and reaction.emoji == "⭐":
-        # For Quoting
-        stats.increment_stat("quotes_submitted", 1)
-        if reaction.message.id in already_quoted:
-            return
-        already_quoted.append(reaction.message.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        quote_channel = client.get_channel(int(config.quotes))
-        request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
-        request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-        request_embed.set_footer(text="React with ✅ to accept or ❎ to deny.")
-        request = await botspam_channel.send(embed=request_embed)
-        await request.add_reaction("✅")
-        await request.add_reaction("❎")
-
-        def check(reaction, user):
-            return config.game_master in [y.id for y in user.roles] and reaction.message.id == request.id
-
-        try:
-            reaction_confirm, user = await client.wait_for('reaction_add', timeout=172800, check=check)
-        except asyncio.TimeoutError:
-            request_embed = discord.Embed(title="Quote Request [Timed Out]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
-            request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-            await request.edit(embed=request_embed)
-            await reaction_confirm.message.clear_reactions()
-        else:
-            if reaction_confirm.emoji == "✅":
-                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
-                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
-                quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
-                quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
-                await quote_channel.send(embed=quote_embed)
-            if reaction_confirm.emoji == "❎":
-                stats.increment_stat("quotes_denied", 1)
-                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
+    return
 
 
 # Whenever a message is edited
@@ -179,18 +134,18 @@ async def on_message(message):
     isGameMaster = False
     isAdmin = False
     isPeasant = False
-    try:
-        if message.guild == client.get_channel(int(config.game_log)).guild:
+    if message.guild == client.get_channel(int(config.game_log)).guild:
+        try:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
-
+        except Exception:
+            print('Unable to acquire role_table from {}'.format(message.author.display_name))
+        else:
             if game_master in role_table:
                 isGameMaster = True
             if administrator in role_table:
                 isAdmin = True
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
-    except Exception:
-        pass
 
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
@@ -392,42 +347,62 @@ async def process_message(message,result):
             # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
+            user = client.get_user(int(element.victim))
             main_guild = botspam_channel.guild
-            member = main_guild.get_member(element.victim)
-            await remove_all_game_roles(member)
-            if element.number == 0:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 1:
-                await channel.set_permissions(user, read_messages=True, send_messages=True)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 2:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
-            elif element.number == 3:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 4:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-            elif element.number == 5:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 6:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 7:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 8:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
-            else:
-                await msg.channel.send('Something went wrong! Please contact a Game Master.')
-                return
-            if db.isParticipant(element.victim,True,True):
-                db.set_user_in_channel(element.channel,element.victim,element.number)
+            member = main_guild.get_member(int(element.victim))
+            if member == None:
+                if user == None:
+                    await botspam_channel.send("That\'s problematic! I couldn\'t edit the cc info of <@{0}> *(<#{0}> <@&{0}> ?)*".format(element.victim))
+                    print('Unable to locate member {}.'.format(element.victim))
+                member = user
+            if channel == None:
+                await botspam_channel.send('Unable to edit channel <#{0}> *(<@{0}> <@&{0}> ?)*'.format(int(element.victim)))
+            elif member != None:
+                await remove_all_game_roles(member)
+                if element.number == 0:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    try:
+                        if int(db_get(member.id,'frozen')) == 0:
+                            raise NotImplementedError("This is a purposeful error raise!")
+                    except Exception:
+                        if db.isParticipant(member.id):
+                            await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                    else:
+                        await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 1:
+                    await channel.set_permissions(user, read_messages=True, send_messages=True)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 2:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 3:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 4:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    if db.isParticipant(member.id,False,True):
+                        await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                elif element.number == 5:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 6:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 7:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 8:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                else:
+                    await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                    return
+                if db.isParticipant(element.victim,True,True):
+                    db.set_user_in_channel(element.channel,element.victim,element.number)
 
 
         # New channels are created here.
@@ -469,6 +444,7 @@ async def process_message(message,result):
                     member = main_guild.get_member(user)
 
                     if member == None:
+                        await botspam_channel.send("That\'s problematic! I couldn\'t add <@{0}> to a cc. *(<#{0}> <@&{0}> ?)*".format(element.victim))
                         await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
                     elif db.isParticipant(user,False,True) == True:
                         if int(db_get(user,'abducted')) == 1:
@@ -665,7 +641,12 @@ async def process_message(message,result):
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
-        await msg.delete()
+        try:
+            await msg.delete()
+        except Exception:
+            # Unable to delete the message.
+            # It was probaly already deleted or something.
+            pass
 
 
 # Whenever the bot regains his connection with the Discord API.

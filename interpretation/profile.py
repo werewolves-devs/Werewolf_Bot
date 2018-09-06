@@ -6,7 +6,8 @@ from discord import Message, User, Embed
 from interpretation import check
 from interpretation.check import is_command
 from main_classes import Mailbox
-from management.general import ProfileModel
+from management.profile import ProfileModel
+from management.db import isParticipant
 
 
 def set_age(message: Message) -> List[Mailbox]:
@@ -18,8 +19,12 @@ def set_age(message: Message) -> List[Mailbox]:
         return [Mailbox().respond('Sorry bro, only positive whole numbers', temporary=True)]
     new_age = int(new_age)
     if new_age > 2 ** 31 - 1:
-        return [Mailbox().respond(f"Sorry bro, we don't support ages above {2 ** 31 - 1}. "
-                                  f"If you live an eternal life, please contact the GMs", temporary=True)]
+        if new_age < 15556000000:
+            return [Mailbox().respond("You sure, bud? That\'s older than the universe. Time wasn\'t a thing back then. ...there is no such thing as a **BEFORE** the Big Bang.",True)]
+        if new_age < 4560000000:
+            return [Mailbox().respond("Yeah, sure thing! The creation of our planet must\'ve been enjoyable to watch.",True)]
+        return [Mailbox().respond(f"Bruh, I know yo momma's as heavy as Mother Earth, "
+                                  f"but that doesn't make you as old as her.", temporary=True)]
     profile = ProfileModel.get_or_insert(message.author)
     profile.age = new_age
     profile.save()
@@ -50,6 +55,8 @@ def view_profile(message: Message):
     users = check.users(message, amount=1, delete_duplicates=True, must_be_participant=False)
     user: User = message.author
     if users:
+        if isParticipant(message.author.id) and not isParticipant(users[0]):
+            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
         user = message.channel.guild.get_member(users[0])
     model = ProfileModel.get_or_insert(user)
     em = Embed(

@@ -1,13 +1,11 @@
 splash = '''
 
-888       888                                                  888  .d888       888888b.            888
-888   o   888                                                  888 d88P"        888  "88b           888
-888  d8b  888                                                  888 888          888  .88P           888
-888 d888b 888  .d88b.  888d888  .d88b.  888  888  888  .d88b.  888 888888       8888888K.   .d88b.  888888
-888d88888b888 d8P  Y8b 888P"   d8P  Y8b 888  888  888 d88""88b 888 888          888  "Y88b d88""88b 888
-88888P Y88888 88888888 888     88888888 888  888  888 888  888 888 888          888    888 888  888 888
-8888P   Y8888 Y8b.     888     Y8b.     Y88b 888 d88P Y88..88P 888 888          888   d88P Y88..88P Y88b.
-888P     Y888  "Y8888  888      "Y8888   "Y8888888P"   "Y88P"  888 888          8888888P"   "Y88P"   "Y888
+==========================================================
+G H O S T B O T
+==========================================================
+WHAM! SUPER BIG AND IMPRESSIVE AND STUFF!
+I DON'T HAVE ASCII ART!
+DAYUM, THAT'S IMPRESSIVE!
 
                          - = https://github.com/werewolves-devs/werewolf_bot = -
 
@@ -25,16 +23,16 @@ splashes = [
 'Always use a database. What\'s a JSON?',
 'Powered by Electricity',
 'Who still writes docs in 2018?',
-"First normal form? What does that mean?",
-"By using a relational database but with nonrelational practices we get the worst of both worlds!",
-"I haven\'t paid attention or read any comments, therefor it\'s impossible to understand!",
-"Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.",
-"I don\'t wanna explain, just Google it.",
-"What are cogs?",
-"This is MY project. You\'re just freeloaders.",
-"You've got three weeks to fix EVERYTHING.",
-"No-one agrees? Too bad! My idea it is.",
-"The next version will be written in Java only!"
+'First normal form? What does that mean?',
+'By using a relational database with nonrelational practices we get the worst of both worlds!',
+'I haven\'t paid attention or read any comments, therefore it\'s impossible to understand!',
+'Don\'t use that! Oh, you\'re asking why? Well... just don\'t it.',
+'I don\'t wanna explain, just Google it.',
+'What are cogs?',
+'This is MY project. You\'re just freeloaders.',
+'You\'ve got three weeks to fix EVERYTHING.',
+'No-one agrees? Too bad! My idea it is.',
+'The next version will be written in Java only!'
 ]
 
 import discord
@@ -42,6 +40,7 @@ import random
 import asyncio
 
 # Import config data
+# Imports go (folder name).(file name)
 import story_time.cc_creation as creation_messages
 import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
@@ -51,6 +50,12 @@ from interpretation.ghost_head import process
 from interpretation.polls import count_votes
 import config
 import management.db as db
+import management.dynamic as dy
+import management.shop as db_shop
+import management.general as general
+import shop
+import stats
+from emoji import emojize
 
 
 client = discord.Client()
@@ -69,40 +74,131 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
         if role.id == config.suspended:
             await member.remove_roles(role, reason="Updating CC permissions")
+        if role.id == config.participant:
+            await member.remove_roles(role, reason="Updating CC permissions")
+
+already_quoted = []
+
+@client.event
+async def on_reaction_add(reaction, user):
+    if user != client.user and db_shop.is_shop(reaction.message.id):
+        # For shop
+        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
+        await reaction.message.remove_reaction(reaction.emoji, user)
+        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
+    elif user != client.user and reaction.emoji == "⭐":
+        # For Quoting
+        stats.increment_stat("quotes_submitted", 1)
+        if reaction.message.id in already_quoted:
+            return
+        already_quoted.append(reaction.message.id)
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        quote_channel = client.get_channel(int(config.quotes))
+        request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
+        request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+        request_embed.set_footer(text="React with ✅ to accept or ❎ to deny.")
+        request = await botspam_channel.send(embed=request_embed)
+        await request.add_reaction("✅")
+        await request.add_reaction("❎")
+
+        def check(reaction, user):
+            return config.game_master in [y.id for y in user.roles] and reaction.message.id == request.id
+
+        try:
+            reaction_confirm, user = await client.wait_for('reaction_add', timeout=172800, check=check)
+        except asyncio.TimeoutError:
+            request_embed = discord.Embed(title="Quote Request [Timed Out]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+            request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+            await request.edit(embed=request_embed)
+            await reaction_confirm.message.clear_reactions()
+        else:
+            if reaction_confirm.emoji == "✅":
+                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
+                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+                await request.edit(embed=request_embed)
+                await reaction_confirm.message.clear_reactions()
+                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
+                quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
+                quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
+                await quote_channel.send(embed=quote_embed)
+            if reaction_confirm.emoji == "❎":
+                stats.increment_stat("quotes_denied", 1)
+                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
+                await request.edit(embed=request_embed)
+                await reaction_confirm.message.clear_reactions()
+
+
+# Whenever a message is edited
+@client.event
+async def on_message_edit(before, after):
+    if before.author == client.user: # We don't want to respond to our own edits
+        return
+    if before.content == after.content: # Ensure it wasn't just a pin
+        return
+
+    if before.id != after.id:
+        db.add_trash_message(after.id,after.channel.id)
+
+    #check role of sender
+    isGameMaster = False
+    isAdmin = False
+    isPeasant = False
+    try:
+        if after.guild == client.get_channel(int(config.game_log)).guild:
+            role_table = [y.id for y in after.guild.get_member(after.author.id).roles]
+
+            if game_master in role_table:
+                isGameMaster = True
+            if administrator in role_table:
+                isAdmin = True
+            if peasant in role_table and after.author.bot == True:
+                isPeasant = True
+    except Exception:
+        pass
+
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
 # Whenever a message is sent.
 @client.event
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
+        stats.increment_stat("bot_messages_sent", 1)
         return
 
-    gamelog_channel = client.get_channel(int(config.game_log))
-    botspam_channel = client.get_channel(int(config.bot_spam))
-    storytime_channel = client.get_channel(int(config.story_time))
-
+    #check role of sender
     isGameMaster = False
     isAdmin = False
     isPeasant = False
-    try:
-        if message.guild == gamelog_channel.guild:
+    if message.guild == client.get_channel(int(config.game_log)).guild:
+        try:
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
-
+        except Exception:
+            print('Unable to acquire role_table from {}'.format(message.author.display_name))
+        else:
             if game_master in role_table:
                 isGameMaster = True
             if administrator in role_table:
                 isAdmin = True
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
-    except Exception:
-        pass
 
-    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
+async def process_message(message,result):
+    general.add_activity(message.author.id,message.author.name)
+
+    gamelog_channel = client.get_channel(int(config.game_log))
+    botspam_channel = client.get_channel(int(config.bot_spam))
+    storytime_channel = client.get_channel(int(config.story_time))
+
+    # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
 
     for mailbox in result:
 
+        # If a Mailbox says so, all existing polls will be evaluated.
         if mailbox.evaluate_polls == True:
             for poll in db.get_all_polls():
                 # poll.msg_table -> list of message ids
@@ -124,31 +220,77 @@ async def on_message(message):
                             if db.isParticipant(person.id):
                                 user_table.append([person.id,emoji.emoji])
 
-                log, result, chosen_emoji = count_votes(user_table,poll.purpose)
+                log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
                 await gamelog_channel.send(log)
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
+                chosen_one = int(chosen_one)
 
                 if chosen_emoji != '' and chosen_one != None:
                     if poll.purpose == 'lynch':
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
-                        # TODO: give Mayor role and add data to dynamic.json
-                        pass
+                        dy.set_mayor(chosen_one)
+                        # TODO: give Mayor role
                     elif poll.purpose == 'Reporter':
-                        # TODO: give Reporter role and add data to dynamic.json
-                        pass
+                        dy.set_reporter(chosen_one)
+                        # TODO: give Reporter role
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
                         db.add_kill(chosen_one,'Cult Leader',db.random_cult())
                     elif poll.purpose == 'thing':
-                        # TODO: kill poor victim
-                        pass
+                        db.add_kill(chosen_one,'The Thing','')
+
+        for user_id in mailbox.demotions:
+            if user_id == message.author.id and message.guild == gamelog_channel.guild:
+                member = message.author
+            else:
+                member = gamelog_channel.guild.get_member(int(user_id))
+
+            if member != None:
+                for role in member.roles:
+                    if role.id == config.mayor:
+                        await member.remove_roles(role, reason="Demoting the Mayor")
+                    if role.id == config.reporter:
+                        await member.remove_roles(role, reason="Demoting the Reporter")
+
+        # Create a new shop instance
+        for element in mailbox.shops:
+            shop_data = db_shop.get_shop_config(element.shop_config)
+            i = 1
+            j = 0
+            emoji_table = []
+            page_amount = int(len(shop_data["items"])-1/20)+1
 
 
+            for item in shop_data["items"]:
+                if j % 20 == 0:
+                    embed = discord.Embed(title="Shop (Page {}/{})".format(i,page_amount), description=shop_data["shop_description"], color=0x00ff00)
+
+                embed.add_field(name="[{}] {}".format(item["emoji"], item["name"]), value="{} {}\n*{}*\n".format(item["price"], shop_data["currency"], item["description"]), inline=False) # Add item to shop
+                emoji_table.append(emojize(item["emoji"]))
+                j += 1
+
+                if j % 20 == 0:
+                    i += 1
+                    response = await client.get_channel(int(element.destination)).send(embed=embed)
+                    db_shop.add_shop(response.id)
+
+                    for item in emoji_table:
+                        await response.add_reaction(item)
+                    emoji_table = []
+
+            if j % 20 != 0:
+                response = await client.get_channel(int(element.destination)).send(embed=embed)
+                db_shop.add_shop(response.id)
+
+                for item in emoji_table:
+                    await response.add_reaction(item)
+
+        # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)
             for emoji in element.reactions:
@@ -156,6 +298,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the botspam, this is where it's sent.
         for element in mailbox.botspam:
             msg = await botspam_channel.send(element.content)
             for emoji in element.reactions:
@@ -163,6 +306,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # If the Mailbox has a message for the storytime (in-game announcements) channel, this is where it's sent.
         for element in mailbox.storytime:
             msg = await storytime_channel.send(element.content)
             for emoji in element.reactions:
@@ -170,6 +314,7 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages are sent here if they are a direct message to the one sending a command.
         for element in mailbox.answer:
             msg = await message.channel.send(element.content)
             for emoji in element.reactions:
@@ -177,7 +322,10 @@ async def on_message(message):
             if element.temporary == True:
                 temp_msg.append(msg)
 
+        # The messages that are destined for a specific channel, are sent here.
         for element in mailbox.channel:
+
+            # The following code is sent if the message is an embed.
             if element.embed:
                 if element.destination == "spam":
                     msg = await botspam_channel.send(embed=element.content)
@@ -191,6 +339,7 @@ async def on_message(message):
                         await msg.add_reaction(emoji)
                     if element.temporary == True:
                         temp_msg.append(msg)
+            # The following code is sent if the message is a regular message.
             else:
                 msg = await client.get_channel(int(element.destination)).send(element.content)
                 for emoji in element.reactions:
@@ -198,62 +347,97 @@ async def on_message(message):
                 if element.temporary == True:
                     temp_msg.append(msg)
 
+        # DMs are sent here.
         for element in mailbox.player:
-            member = client.get_user(element.destination)
+            member = client.get_user(int(element.destination))
+            main_guild = botspam_channel.guild
+            if member == None:
+                member = main_guild.get_member(int(element.destination))
             if member == None:
                 await message.channel.send("Couldn't send a DM to <@{}>!".format(element.destination))
-                await botspam_channel.send("<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `get_user`.".format(message.author.id,element.destination))
+                await botspam_channel.send(
+                    "<@{}> has attempted to send a DM to <@{}>, but failed, because we couldn't find the specified user via `client.get_user`.".format(
+                        message.author.id, element.destination))
             else:
-                msg = await member.send(element.content)
-                for emoji in element.reactions:
-                    await msg.add_reaction(emoji)
-                if element.temporary == True:
-                    temp_msg.append(msg)
+                try:
+                    msg = await member.send(element.content)
+                    for emoji in element.reactions:
+                        await msg.add_reaction(emoji)
+                    if element.temporary == True:
+                        temp_msg.append(msg)
+                except discord.errors.Forbidden:
+                    botspam_channel.send('I wasn\'t allowed to send a DM to <@{}>! Here\'s the content:'.format(member.id))
+                    botspam_channel.send(element.content)
+                except Exception:
+                    botspam_channel.send('I failed to send a DM to <@{}>! Could somebody send this, please?'.format(member.id))
+                    botspam_channel.send(element.content)
 
+        # Settings of existing channels are altered here.
         for element in mailbox.oldchannels:
             # element.channel - channel to be edited;
             # element.victim - person's permission to be changed;
             # element.number - type of setting to set to: see issue #83 for more info.
 
             channel = client.get_channel(element.channel)
-            user = client.get_user(element.victim)
+            user = client.get_user(int(element.victim))
             main_guild = botspam_channel.guild
-            member = main_guild.get_member(element.victim)
-            await remove_all_game_roles(member)
-            if element.number == 0:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 1:
-                await channel.set_permissions(user, read_messages=True, send_messages=True)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 2:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
-            elif element.number == 3:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 4:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-            elif element.number == 5:
-                await channel.set_permissions(user, read_messages=True, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 6:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 7:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-            elif element.number == 8:
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
-                await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
-            else:
-                await msg.channel.send('Something went wrong! Please contact a Game Master.')
-                return
-            if db.isParticipant(element.victim,True,True):
-                db.set_user_in_channel(element.channel,element.victim,element.number)
+            member = main_guild.get_member(int(element.victim))
+            if member == None:
+                if user == None:
+                    await botspam_channel.send("That\'s problematic! I couldn\'t edit the cc info of <@{0}> *(<#{0}> <@&{0}> ?)*".format(element.victim))
+                    print('Unable to locate member {}.'.format(element.victim))
+                member = user
+            if channel == None:
+                await botspam_channel.send('Unable to edit channel <#{0}> *(<@{0}> <@&{0}> ?)*'.format(int(element.victim)))
+            elif member != None:
+                await remove_all_game_roles(member)
+                if element.number == 0:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    try:
+                        if int(db_get(member.id,'frozen')) == 0:
+                            raise NotImplementedError("This is a purposeful error raise!")
+                    except Exception:
+                        if db.isParticipant(member.id):
+                            await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                        elif db.isParticipant(member.id,True,True,True):
+                            await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                    else:
+                        await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 1:
+                    await channel.set_permissions(user, read_messages=True, send_messages=True)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 2:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
+                elif element.number == 3:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 4:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    if db.isParticipant(member.id,False,True):
+                        await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
+                elif element.number == 5:
+                    await channel.set_permissions(user, read_messages=True, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 6:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 7:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
+                elif element.number == 8:
+                    await channel.set_permissions(user, read_messages=False, send_messages=False)
+                    await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
+                else:
+                    await msg.channel.send('Something went wrong! Please contact a Game Master.')
+                    return
+                if db.isParticipant(element.victim,True,True):
+                    db.set_user_in_channel(element.channel,element.victim,element.number)
 
 
+        # New channels are created here.
         for element in mailbox.newchannels:
             # element.name - name of the channel;
             # element.owner - owner of the channel;
@@ -281,10 +465,18 @@ async def on_message(message):
                 frozones = []
                 abductees = []
                 deadies = []
+
+                # Add dead people & spectators to cc
+                if not element.secret:
+                    for user in [dead_buddy for dead_buddy in db.player_list() if dead_buddy not in db.player_list(True)]:
+                        element.members.append(user)
+
+                # Categorize all players
                 for user in element.members:
                     member = main_guild.get_member(user)
 
                     if member == None:
+                        await botspam_channel.send("That\'s problematic! I couldn\'t add <@{0}> to a cc. *(<#{0}> <@&{0}> ?)*".format(element.victim))
                         await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
                     elif db.isParticipant(user,False,True) == True:
                         if int(db_get(user,'abducted')) == 1:
@@ -299,11 +491,17 @@ async def on_message(message):
                         pass
                     else:
                         deadies.append(member)
-                    
+
+                # Delete any potential duplicates
+                viewers = list(set(viewers))
+                frozones = list(set(frozones))
+                abductees = list(set(abductees))
+                deadies = list(set(deadies))
 
                 # Role objects (based on ID)
                 roles = main_guild.roles # Roles from the guild
                 game_master_role = discord.utils.find(lambda r: r.id == game_master, roles)
+                # TODO: Add read permissions for spectators if element.secret == False
                 default_permissions = {
                     main_guild.default_role: discord.PermissionOverwrite(read_messages=False,send_messages=False),
                     game_master_role: discord.PermissionOverwrite(read_messages=True,send_messages=True),
@@ -353,6 +551,8 @@ async def on_message(message):
                             for member in viewers:
                                 if db_get(member.id,'role') == 'Amulet Holder':
                                     db_set(member.id,'amulet',channel.id)
+                    if element.trashy:
+                        db.add_trash_channel(channel.id)
 
                     await channel.send(intro_msg)
 
@@ -385,6 +585,8 @@ async def on_message(message):
                 msg = await message.channel.send("I\'m terribly sorry, but you can\'t use spaces in your channel name. Try again!")
                 temp_msg.append(msg)
 
+
+        # Polls are created here.
         for element in mailbox.polls:
             # element.channel
             # element.purpose
@@ -410,7 +612,7 @@ async def on_message(message):
                         emoji_table.append(user[1])
 
                     if i % 20 == 19:
-                        msg = await client.get_channel(element.channel).send(msg)
+                        msg = await client.get_channel(int(element.channel)).send(msg)
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)
@@ -427,11 +629,13 @@ async def on_message(message):
             db.add_poll(msg_table,element.purpose,element.channel,element.user_id)
             await botspam_channel.send("A poll has been created in <#{}>!".format(element.channel))
 
+
+        # Categories are deleted here.
         for element in mailbox.deletecategories:
             id = element.channel
             category = client.get_channel(id)
             if category != None:
-                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irrevirsibly delete all channels contained within the specified category. Please use with discretion.')
+                bot_message = await message.channel.send('Please react with 👍 to confirm deletion of category `' + category.name + '`.\n\nNote: This action will irreversibly delete all channels contained within the specified category. Please use with discretion.')
                 await bot_message.add_reaction('👍')
                 def check(reaction, user):
                     return user == message.author and str(reaction.emoji) == '👍'
@@ -439,6 +643,10 @@ async def on_message(message):
                     reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
                 except asyncio.TimeoutError:
                     await message.channel.send('Confirmation timed out.')
+                    try:
+                        await bot_message.delete()
+                    except Exception:
+                        pass
                 else:
                     await message.channel.send('Ok, I\'ll get right on that.\n\n*This might take some time.*')
                     for channel in category.channels:
@@ -448,10 +656,29 @@ async def on_message(message):
             else:
                 await message.channel.send('Sorry, I couldn\'t find that category.')
 
-    # Delete all temporary messages after "five" seconds.
+        clean_time = len(mailbox.cleaners)
+        if clean_time > 0:
+            await botspam_channel.send("Cleaning up {} channels! This may take some time.".format(clean_time))
+
+        for channel in mailbox.cleaners:
+
+            trash_channel = client.get_channel(int(channel))
+
+            if trash_channel != None:
+                for message_id in db.empty_trash_channel(channel):
+                    message = await trash_channel.get_message(int(message_id))
+                    if message != None:
+                        await message.delete()
+
+    # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
-        await msg.delete()
+        try:
+            await msg.delete()
+        except Exception:
+            # Unable to delete the message.
+            # It was probaly already deleted or something.
+            pass
 
 
 # Whenever the bot regains his connection with the Discord API.
@@ -461,12 +688,12 @@ async def on_ready():
     print('   | > ' + client.user.name)
     print('   | > ' + str(client.user.id))
 
-    await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
+    await client.get_channel(welcome_channel).send('Beep *booooo.....*p! I just went online!')
 
 print(splash)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-    client.run(config.WW_TOKEN)
+    client.run(config.GH_TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')
