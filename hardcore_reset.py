@@ -19,6 +19,7 @@ def hard_reset(skip = False):
     # Reset the game table.
     reset.reset(True)
     print('\nDeleting any remaining data...')
+    c.execute("DROP TABLE IF EXISTS 'activity'")
     c.execute("DROP TABLE IF EXISTS 'users'")
     c.execute("DROP TABLE IF EXISTS 'activity'")
     c.execute("DROP TABLE IF EXISTS 'offers'")
