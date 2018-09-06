@@ -19,8 +19,12 @@ def set_age(message: Message) -> List[Mailbox]:
         return [Mailbox().respond('Sorry bro, only positive whole numbers', temporary=True)]
     new_age = int(new_age)
     if new_age > 2 ** 31 - 1:
-        return [Mailbox().respond(f"Sorry bro, we don't support ages above {2 ** 31 - 1}. "
-                                  f"If you live an eternal life, please contact the GMs", temporary=True)]
+        if new_age < 15556000000:
+            return [Mailbox().respond("You sure, bud? That\'s older than the universe. Time wasn\'t a thing back then. ...there is no such thing as a **BEFORE** the Big Bang.",True)]
+        if new_age < 4560000000:
+            return [Mailbox().respond("Yeah, sure thing! The creation of our planet must\'ve been enjoyable to watch.",True)]
+        return [Mailbox().respond(f"Bruh, I know yo momma's as heavy as Mother Earth, "
+                                  f"but that doesn't make you as old as her.", temporary=True)]
     profile = ProfileModel.get_or_insert(message.author)
     profile.age = new_age
     profile.save()
