@@ -478,7 +478,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
             db_set(user_id, 'ccs', num_cc_owned + 1)
             answer = Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members)
-            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))
+            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1].replace('@', '@\u200B')))
             if num_cc_owned + 1 >= max_cc_per_user:
                 answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n".format(user_id))
                 answer.spam_add("Use `" + prefix + "donate` to give them more channels to create!")
@@ -1093,16 +1093,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
-    '''age'''
-    # Allows users to set their age.
-    if is_command(message, ['age']):
-        # TODO
-        return todo()
-    if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age<number>\n\n**Example:** `!age 19`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "age` - Set your age.\n"
-
     '''book'''
     # Gives users info about the game, roles or the game
     if is_command(message,['book']):
@@ -1122,17 +1112,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # TODO: Add more info
         return [Mailbox().respond("No role provided! Please give us a role!",True)]
     help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles\n"
-
-    '''profile'''
-    # This command allows one to view their own profile
-    # When giving another player's name, view that player's profile
-    if is_command(message, ['profile']):
-        # TODO
-        return todo()
-    if is_command(message, ['profile'], True):
-        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "profile` - See a player's profile.\n"
 
     '''shop'''
     # This command creates a new shop instance in the channel it was sent in
@@ -1191,7 +1170,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     '''tip'''
     if is_command(message,['tip']):
-        return [Mailbox().respond(tip.random())]
+        return [Mailbox().respond(tip.random(),True)]
+    if is_command(message['tip'],True):
+        # TODO
+        pass
+    help_msg += "`" + prefix + "tip` - Gain a random game tip.\n"
 
 
     # -----------------------

@@ -3,7 +3,7 @@ night_users = [
     ["Assassin","Aura Teller","Exorcist","Fortune Teller","Hooker","Innkeeper","Priest","Priestess","Raven","Curse Caster",
         "Infected Wolf","Lone Wolf","Warlock","Devil","Ice King","Pyromancer","The Thing","Vampire","Zombie"],
     [],
-    ["Crowd Seeker","Grandma","Tanner"]
+    ["Crowd Seeker","Grandma"]
     ]
 
 day_users = [[],["Barber","Royal Knight"],[],["Tanner"]]
@@ -139,7 +139,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     # Kill abducted players (or The Thing himself)
     if role == "The Thing":
-        answer.log_add(recursive + success + skull + '<@{}> was killed.'.format(user_id))
+        answer.log_add(recursive + success + skull + '<@{}> drowned in the swamp.'.format(user_id))
         # TODO: kill the player (BUT NOT THROUGH THE SUICIDE FUNCTION)
         return answer
 
@@ -174,9 +174,21 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     # Kill whoever stands in the barber's way!
     if role == "Barber":
-        answer.log_add(recursive + success + skull + '<@{}> was cut to death.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
-        return answer.story(barber_kill_story(murderer,user_id))
+        if user_role != 'Idiot':
+            answer.log_add(recursive + success + skull + '<@{}> was cut to death.'.format(user_id))
+            answer = instant_death(user_id, role, answer, recursive+next)
+            answer.story(barber_kill_story(murderer,user_id))
+
+        else:
+            msg = "*\"Tomorrow, at noon, right here. You got that?\"* Yup, it definitely seemed like <@{}> ".format(user_id)
+            msg += "remembered the barber\'s appointment.\nIt was only today that it turned out - they had forgotten "
+            msg += "about it! Good thing for them, for <@{}> had the intent to cut a little far below the hairline...\n".format(murderer)
+            msg += "**<@{0}>, the Barber, has failed to execute <@{1}>, the Idiot! <@{0}> will now continue the game ".format(murderer,user_id)
+            msg += "as a regular Innocent, and <@{}> as an even better Idiot, as they are no longer allowed to vote.**".format(user_id)
+            answer.story(msg).log_add(recursive+success+'<@{}> failed to give <@{}> a \"haircut\".'.format(murderer,user_id))
+            db_set(user_id,'role','Idiot ')
+
+        return answer
     
     # Save users if they have souls to spare.
     souls = int(db_get(user_id,'souls'))
@@ -187,7 +199,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     # End if the user sleeps with another.
     if role == "Hooker" and not demonized:
-        answer.log_add(recursive + success + skull + '<@{}> was hooked.'.format(user_id))
+        answer.log_add(recursive + success + skull + '<@{}> was slept with <@{}>.'.format(user_id,murderer))
         answer = instant_death(user_id, role, answer, recursive+next)
         return answer
     
@@ -224,7 +236,10 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
         if user_role in pos.wolf_team:
             answer.log_add(recursive + success + skull + '<@{}> was holified.'.format(user_id))
             answer = instant_death(user_id, role, answer, recursive+next)
-            return answer
+        else:
+            answer.log_add(recursive + success + skull + '<@{}> holified themselves.'.format(murderer))
+            answer = instant_death(user_id, role, answer, recursive+next)
+        return answer
     if role == 'Witch' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was poisoned.'.format(user_id))
         answer = instant_death(user_id, role, answer, recursive+next)
@@ -352,7 +367,7 @@ def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
 
     answer.spam(unip + 'kill <@{}>'.format(user_id))
 
-    if int(db_get(user_id,'abducted')) != 1:
+    if int(db_get(user_id,'abducted')) != 1 and role not in ["Barber"]:
         db.insert_deadie(user_id)
     
     # Kill all standoffs

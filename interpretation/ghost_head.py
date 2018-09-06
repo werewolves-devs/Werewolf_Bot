@@ -1,26 +1,28 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
 from discord import Embed
 
-import interpretation.check as check
 from config import max_cc_per_user, season, universal_prefix as unip, max_participants
 from config import ghost_prefix as prefix
-from interpretation.check import is_command
+from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from management import db, dynamic as dy
+from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
+def is_command(message,commandtable,isHelp=False):
+    return check.is_command(message,commandtable,isHelp,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
     message_channel = message.channel.id
-    user_role = db_get(user_id, 'role')
 
     help_msg = "**List of commands:**\n"
+
 
 
     # =============================================================
@@ -77,27 +79,14 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
-    '''age'''
-    # Allows users to set their age.
-    if is_command(message, ['age']):
-        numbers = check.numbers(message)
-        if not numbers:
-            return [Mailbox().respond("**INVALID SYNTAX:** No number provided.\n\nPlease provide us with a valid age.")]
-    if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age <number>\n\n**Example:** `!age 69`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "age` - Set your age.\n"
+    profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
+    if profile_commands:
+        return profile_commands
 
-    '''profile'''
-    # This command allows one to view their own profile
-    # When giving another player's name, view that player's profile
-    if is_command(message, ['profile']):
-        # TODO
-        return todo()
-    if is_command(message, ['profile'], True):
-        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "profile` - See a player's profile.\n"
+    help_msg += "`" + prefix + "age` - Set your age\n"
+    help_msg += "`" + prefix + "bio` - Set your bio\n"
+    help_msg += "`" + prefix + "gender` - Set your gender\n"
+    help_msg += "`" + prefix + "profile` - View a player's profilen\n"
 
     # --------------------------------------------------------------
     #                          HELP
