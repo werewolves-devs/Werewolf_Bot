@@ -30,7 +30,7 @@ def hard_reset(skip = False):
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new database....')
-    c.execute("CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, \
+    c.execute("CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, \ ^M
 	'name' TEXT NOT NULL, \
 	'000' INTEGER NOT NULL DEFAULT 0, \
 	'001' INTEGER NOT NULL DEFAULT 0, \
@@ -54,7 +54,7 @@ def hard_reset(skip = False):
 	'103' INTEGER NOT NULL DEFAULT 0, \
 	'104' INTEGER NOT NULL DEFAULT 0, \
 	'105' INTEGER NOT NULL DEFAULT 0, \
-	'106' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
+	'106' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")^M
 
     c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, 'age' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
