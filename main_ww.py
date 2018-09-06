@@ -82,52 +82,7 @@ already_quoted = []
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if user != client.user and db_shop.is_shop(reaction.message.id):
-        # For shop
-        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
-        await reaction.message.remove_reaction(reaction.emoji, user)
-        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
-    elif user != client.user and reaction.emoji == "⭐":
-        # For Quoting
-        stats.increment_stat("quotes_submitted", 1)
-        if reaction.message.id in already_quoted:
-            return
-        already_quoted.append(reaction.message.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        quote_channel = client.get_channel(int(config.quotes))
-        request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
-        request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-        request_embed.set_footer(text="React with ✅ to accept or ❎ to deny.")
-        request = await botspam_channel.send(embed=request_embed)
-        await request.add_reaction("✅")
-        await request.add_reaction("❎")
-
-        def check(reaction, user):
-            return config.game_master in [y.id for y in user.roles] and reaction.message.id == request.id
-
-        try:
-            reaction_confirm, user = await client.wait_for('reaction_add', timeout=172800, check=check)
-        except asyncio.TimeoutError:
-            request_embed = discord.Embed(title="Quote Request [Timed Out]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
-            request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-            await request.edit(embed=request_embed)
-            await reaction_confirm.message.clear_reactions()
-        else:
-            if reaction_confirm.emoji == "✅":
-                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
-                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
-                quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
-                quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
-                await quote_channel.send(embed=quote_embed)
-            if reaction_confirm.emoji == "❎":
-                stats.increment_stat("quotes_denied", 1)
-                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
+    return
 
 
 # Whenever a message is edited
@@ -692,7 +647,12 @@ async def process_message(message,result):
     # Delete all temporary messages after about two minutes.
     await asyncio.sleep(120)
     for msg in temp_msg:
-        await msg.delete()
+        try:
+            await msg.delete()
+        except Exception:
+            # Unable to delete the message.
+            # It was probaly already deleted or something.
+            pass
 
 
 # Whenever the bot regains his connection with the Discord API.
