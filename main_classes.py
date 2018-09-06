@@ -28,6 +28,7 @@ class Mailbox:
         length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
         length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
         length += len(self.cleaners)
+        return length
     
     def __repr__(self):
         answer = "<MAILBOX|"

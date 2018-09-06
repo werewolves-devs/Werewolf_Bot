@@ -16,16 +16,16 @@ def users(message,amount = -1, delete_duplicates = True, must_be_participant = F
     """
     user_table = [person.id for person in message.mentions]
 
-    if must_be_participant == True:
-        for user in user_table:
-            if not isParticipant(user):
-                user_table.remove(user)
-
     for argument in message.content.split(' '):
         response = emoji_to_player(argument)
 
         if response != None:
             user_table.append(int(response))
+
+    if must_be_participant == True:
+        for user in user_table:
+            if not isParticipant(user):
+                user_table.remove(user)
 
     if delete_duplicates == True:
         user_table = list(set(user_table))
