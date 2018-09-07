@@ -19,6 +19,7 @@ def hard_reset(skip = False):
     # Reset the game table.
     reset.reset(True)
     print('\nDeleting any remaining data...')
+    c.execute("DROP TABLE IF EXISTS 'inventory'")
     c.execute("DROP TABLE IF EXISTS 'users'")
     c.execute("DROP TABLE IF EXISTS 'activity'")
     c.execute("DROP TABLE IF EXISTS 'offers'")
@@ -29,6 +30,30 @@ def hard_reset(skip = False):
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new database....')
+    c.execute("CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, \
+	'000' INTEGER NOT NULL DEFAULT 0, \
+	'001' INTEGER NOT NULL DEFAULT 0, \
+	'002' INTEGER NOT NULL DEFAULT 0, \
+	'003' INTEGER NOT NULL DEFAULT 0, \
+	'004' INTEGER NOT NULL DEFAULT 0, \
+	'005' INTEGER NOT NULL DEFAULT 0, \
+	'006' INTEGER NOT NULL DEFAULT 0, \
+	'007' INTEGER NOT NULL DEFAULT 0, \
+	'008' INTEGER NOT NULL DEFAULT 0, \
+	'009' INTEGER NOT NULL DEFAULT 0, \
+	'010' INTEGER NOT NULL DEFAULT 0, \
+	'011' INTEGER NOT NULL DEFAULT 0, \
+	'012' INTEGER NOT NULL DEFAULT 0, \
+	'013' INTEGER NOT NULL DEFAULT 0, \
+	'014' INTEGER NOT NULL DEFAULT 0, \
+	'015' INTEGER NOT NULL DEFAULT 0, \
+	'100' INTEGER NOT NULL DEFAULT 0, \
+	'101' INTEGER NOT NULL DEFAULT 0, \
+	'102' INTEGER NOT NULL DEFAULT 0, \
+	'103' INTEGER NOT NULL DEFAULT 0, \
+	'104' INTEGER NOT NULL DEFAULT 0, \
+	'105' INTEGER NOT NULL DEFAULT 0, \
+	'106' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, 'age' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")

@@ -8,6 +8,7 @@ import random
 import roles_n_rules.role_data as roles
 import story_time.powerup as power
 import story_time.morning as morning
+import story_time.evening as evening
 import config
 
 def pay():
@@ -17,8 +18,8 @@ def pay():
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
 
-    answer_table = [Mailbox(True).log("```Day {}```".format(dy.day_number() + 1))]
     answer = Mailbox()
+    answer_table = [Mailbox(True)]
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -102,7 +103,8 @@ def day():
     db.delete_hookers()
 
     # Add polls
-    answer.new_poll(dy.voting_booth(),'lynch','',story_text('lynch'))
+    if dy.day_number() != 0:
+        answer.new_poll(dy.voting_booth(),'lynch','',story_text('lynch'))
     if dy.get_mayor() == 0:
         answer.new_poll(dy.voting_booth(),'Mayor','',story_text('Mayor'))
     elif dy.get_reporter() == 0:
@@ -110,6 +112,7 @@ def day():
 
     dy.next_day()
     dy.set_stage('Day')
+    answer.log("```Day {}```".format(dy.day_number()))
 
     return answer
 
@@ -120,7 +123,7 @@ def pight():
     if dy.get_stage() == "Night":
         return [Mailbox().respond("Whaddaya mean, `{}pight`? It already **is** night, bud.".format(config.universal_prefix))]
 
-    answer = Mailbox(True).log("```Night {}```".format(dy.day_number()))
+    answer = Mailbox(True)
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
@@ -145,7 +148,7 @@ def night():
     The function assumes all polls have been evaluated, and that looking after attacks can begin.  
     The function returns a Mailbox."""
     threat = db.get_kill()
-    answer = Mailbox().log("**Results from night attacks:**")
+    answer = Mailbox().log("**Results from daily deaths:**")
 
     if dy.get_stage() == "Night":
         return Mailbox().respond("Sure, man. Whatever.")
@@ -170,17 +173,24 @@ def night():
                 answer.msg(power.power(user_role),db_get(player,'channel'))
                 break
 
-    # TODO: Write story time.
+    answer.story(evening.evening(db.get_deadies()))
     db.delete_deadies()
 
     # Add polls
-    for channel_id in db.get_secret_channels('Werewolf'):
-        answer.new_poll(channel_id,'wolf',db.random_wolf(),story_text('wolf'))
-    for channel_id in db.get_secret_channels('Cult_Leader'):
-        answer.new_poll(channel_id,'cult',db.random_cult(),story_text('cult'))
+    for player in db.player_list():
+        if db_get(player,'role') in pos.wolf_pack:
+            for channel_id in db.get_secret_channels('Werewolf'):
+                answer.new_poll(channel_id,'wolf',db.random_wolf(),story_text('wolf'))
+            break
+    for player in db.player_list():
+        if db_get(player,'role') == 'Cult Leader':
+            for channel_id in db.get_secret_channels('Cult_Leader'):
+                answer.new_poll(channel_id,'cult',db.random_cult(),story_text('cult'))
+            break
     for channel_id in db.get_secret_channels('Swamp'):
         answer.new_poll(channel_id,'thing','',story_text('thing'))
 
+    answer.log("```Night {}```".format(dy.day_number()))
     dy.set_stage("Night")
 
     return answer
@@ -217,6 +227,9 @@ def start_game():
 
         if pos.valid_distribution(chosen_roles,True) == True:
 
+            answer.create_cc("Graveyard",0,[],[],True)
+            answer.create_cc("Market",0,[],[],True)
+            answer.create_cc("Reporter",0,[],[],True)
 
             # Assign the roles to all users.
             user_list = db.player_list()
@@ -229,6 +242,7 @@ def start_game():
                 db_set(user_id,'fakerole',user_role)
                 db_set(user_id,'channel',config.game_log)
 
+                answer.log("{} - <@{}> has received the role of the `{}`!".format(db_get(user_id,'emoji'),user_id,user_role))
                 answer.dm("This message is giving you your role for season `{}` of the *Werewolves* game.\n\n".format(config.season),user_id)
                 answer.dm_add('Your role is `{}`.\n\n'.format(user_role))
                 answer.dm_add("**You are not allowed to share a screenshot of this message!** ")
@@ -247,7 +261,7 @@ def start_game():
                 if user_role in pos.wolf_pack:
                     answer.add_to_sc(user_id,"Werewolf")
                 if user_role == "Bloody Butcher":
-                    answer.add_to_sc(user_id,"Baker")
+                    answer.add_to_sc(user_id,"Butcher")
                 if user_role == "Devil":
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
@@ -256,11 +270,10 @@ def start_game():
                     db_set(user_id,'uses',3)
             
             answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
-            answer.story('I know, I know. That looks ugly as hell.')
+            answer.story('I know, I know. That looks ugly as hell. We\'re trying to make it look good!')
 
             if "Flute Player" in chosen_roles:
                 answer.create_cc("Flute_Victims",0,[],[],True)
-            answer.create_cc("Graveyard",0,[],[],True)
 
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:
