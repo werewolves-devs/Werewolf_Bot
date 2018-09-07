@@ -9,8 +9,7 @@ app = Flask(__name__)
 @app.route('/create/<token>')
 def create_lootbox(token):
     #return 'Nice try, bud. Ya can\'t create your own lootboxes this way. ;)'
-    from management.boxes import add_token
-    if  add_token(token,12345) == None:
+    if box.add_token(token,12345) == None:
         return 'ERROR: This token already existed!'
     return 'The token {} has successfully been created.'.format(token)
 
