@@ -1,12 +1,19 @@
 {% extends "index.html" %}
 
 {% block body %}
+<div id="middlebox">
     {% for choice in options %}
-        <div>
-            <p>You can choose the following option: {{ choice }}</p>
-            <form action="/unbox/{{token}}/{{choice}}">
-                <input type="submit" value="Choose reward!">
-            </form>
+    <a href="/unbox/{{ token }}/{{ choice }}">
+        <div id="nextcard">
+            <div class="card">
+                <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
+                <div class="container">
+                    <h4><b>{{ choice }}: an awesome number</b></h4> 
+                    <p>Click here to choose option {{ choice }}!</p> 
+                </div>
+            </div>
         </div>
+    </a>
     {% endfor %}
+</div>
 {% endblock %}
