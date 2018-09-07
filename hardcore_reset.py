@@ -1,6 +1,8 @@
 import reset
 import config
 import sqlite3
+import os
+from shutil import copy
 
 conn = sqlite3.connect(config.general_database)
 c = conn.cursor()
@@ -15,6 +17,21 @@ def hard_reset(skip = False):
         if confirm != 'Yes':
             print('Resetting canceled.')
             return
+
+    # Despite confirmations, make one last back-up
+    newpath = 'backup/last_reset'
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+    open('backup/last_reset/backup_game.db', 'a').close()
+    open('backup/last_reset/backup_general.db', 'a').close()
+    open('backup/last_reset/backup_stats.json', 'a').close()
+    open('backup/last_reset/backup_dynamic.json', 'a').close()
+    open('backup/last_reset/backup_config.py', 'a').close()
+    copy('game.db','backup/last_reset/backup_game.db')
+    copy('general.db','backup/last_reset/backup_general.db')
+    copy('stats.json','backup/last_reset/backup_stats.json')
+    copy('dynamic.json','backup/last_reset/backup_dynamic.json')
+    copy('config.py','backup/last_reset/backup_config.py')
 
     # Reset the game table.
     reset.reset(True)
