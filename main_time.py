@@ -78,8 +78,14 @@ async def check_time():
                 os.makedirs(newpath)
             open('backup/{}_{}/{}_{}h{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
             open('backup/{}_{}/{}_{}h{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
             copy('game.db','backup/{}_{}/{}_{}h{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
             copy('general.db','backup/{}_{}/{}_{}h{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy('stats.json','backup/{}_{}/{}_{}h{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy('dynamic.json','backup/{}_{}/{}_{}h{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy('config.py','backup/{}_{}/{}_{}h{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute))
 
             await asyncio.sleep(45)
 
