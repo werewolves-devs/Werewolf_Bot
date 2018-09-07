@@ -227,6 +227,9 @@ def start_game():
 
         if pos.valid_distribution(chosen_roles,True) == True:
 
+            answer.create_cc("Graveyard",0,[],[],True)
+            answer.create_cc("Market",0,[],[],True)
+            answer.create_cc("Reporter",0,[],[],True)
 
             # Assign the roles to all users.
             user_list = db.player_list()
@@ -239,6 +242,7 @@ def start_game():
                 db_set(user_id,'fakerole',user_role)
                 db_set(user_id,'channel',config.game_log)
 
+                answer.log("{} - <@{}> has received the role of the `{}`!".format(db_get(user_id,'emoji'),user_id,user_role))
                 answer.dm("This message is giving you your role for season `{}` of the *Werewolves* game.\n\n".format(config.season),user_id)
                 answer.dm_add('Your role is `{}`.\n\n'.format(user_role))
                 answer.dm_add("**You are not allowed to share a screenshot of this message!** ")
@@ -257,7 +261,7 @@ def start_game():
                 if user_role in pos.wolf_pack:
                     answer.add_to_sc(user_id,"Werewolf")
                 if user_role == "Bloody Butcher":
-                    answer.add_to_sc(user_id,"Baker")
+                    answer.add_to_sc(user_id,"Butcher")
                 if user_role == "Devil":
                     answer.add_to_sc(user_id,"Demon")
                 if user_role == "Vampire":
@@ -266,11 +270,10 @@ def start_game():
                     db_set(user_id,'uses',3)
             
             answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
-            answer.story('I know, I know. That looks ugly as hell.')
+            answer.story('I know, I know. That looks ugly as hell. We\'re trying to make it look good!')
 
             if "Flute Player" in chosen_roles:
                 answer.create_cc("Flute_Victims",0,[],[],True)
-            answer.create_cc("Graveyard",0,[],[],True)
 
             # If the four horsemen are part of the game, assign numbers to all players.
             if "Horseman" in chosen_roles:

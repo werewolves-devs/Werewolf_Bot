@@ -4,7 +4,7 @@ from discord import Embed
 import interpretation.check as check
 import roles_n_rules.functions as func
 from config import max_cc_per_user, season, universal_prefix as unip, max_participants
-from config import ww_prefix as prefix
+from config import ww_prefix as prefix, bot_spam
 from interpretation.check import is_command
 from main_classes import Mailbox
 from management.position import valid_distribution
@@ -135,11 +135,15 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''start'''
         # This command is used to start a game.
         if is_command(message, ['start']):
-            return [switch.start_game()]
+            answer = switch.start_game()
+            print(answer)
+            print('This start command Mailbox had length {}!'.format(len(answer)))
+            return [answer]
         if is_command(message, ['start'], True):
             return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+    help_msg += "`" + prefix + "start` - Start the game.\n"
 
 
     # =============================================================
@@ -319,7 +323,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "open_signup` - Allow users to sign up.\n"
 
-        '''testpoll'''
+        '''poll'''
         # Create a poll if the bot has failed to.
         if is_command(message,['poll']):
             commands = message.content.split(' ',2)
@@ -333,6 +337,33 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "The types are case sensitive."
             return [Mailbox().respond(msg,True)]
         help_msg += "`" + prefix + "poll` - Create a poll\n"
+
+        '''stats'''
+        # Returns the game's stats in embed form
+        if is_command(message, ['stats']):
+            if "today" in message.content.lower():
+                embed = Embed(color=0x00cdcd, title='Game Stats')
+                embed.add_field(name='Total Messages Sent Today', value=stats.get_stat_day("messages_sent"))
+                embed.add_field(name='Total Messages Edited Today', value=stats.get_stat_day("messages_edited"))
+                embed.add_field(name='Total Messages Sent by Bot Today', value=stats.get_stat_day("bot_messages_sent"))
+                embed.set_footer(text='Game Stats requested by ' + message.author.display_name)
+            elif check.users(message):
+                users = check.users(message)
+                embed = Embed(color=0x00cdcd, title='User Stats')
+                embed.add_field(name='Total Messages Sent', value=stats.get_user_stat(users[0], "messages_sent"))
+                embed.add_field(name='Total Messages Edited', value=stats.get_user_stat(users[0], "messages_edited"))
+                embed.set_footer(text='User Stats requested by ' + message.author.display_name)
+            else:
+                embed = Embed(color=0x00cdcd, title='Game Stats')
+                embed.add_field(name='Total Messages Sent', value=stats.get_stat("messages_sent"))
+                embed.add_field(name='Total Messages Edited', value=stats.get_stat("messages_edited"))
+                embed.add_field(name='Total Messages Sent by Bot', value=stats.get_stat("bot_messages_sent"))
+                embed.set_footer(text='Game Stats requested by ' + message.author.display_name)
+            return [Mailbox().embed(embed, bot_spam, True)]
+        if is_command(message, ['stats'],True):
+            # TODO
+            return []
+        help_msg += "`" + prefix + "stats` - Show statistics."
 
         '''whois'''
         # This command reveals the role of a player.
@@ -396,7 +427,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             msg += "to prevent any accidental spoilers from occurring. This command can only be used by Game Masters."
             return [Mailbox().respond(msg, True)]
         help_msg += "`" + prefix + "whois` - Gain a user's information\n"
-    elif is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+    elif is_command(message, ['addrole','assign','day','night','open_signup','poll','stats','whois']):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
@@ -463,7 +494,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
             db_set(user_id, 'ccs', num_cc_owned + 1)
             answer = Mailbox().create_cc(message.content.split(' ')[1], user_id, channel_members)
-            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1]))
+            answer.spam("<@{}> has created a *conspiracy channel* called {}!".format(user_id, message.content.split(' ')[1].replace('@', '@\u200B')))
             if num_cc_owned + 1 >= max_cc_per_user:
                 answer.spam("**Warning:** <@{}> has reached the maximum amount of conspiracy channels!\n".format(user_id))
                 answer.spam_add("Use `" + prefix + "donate` to give them more channels to create!")
@@ -567,14 +598,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         # =======================================================
         #                ROLE SPECIFIC COMMANDS
         # =======================================================
-        if personal_channel(user_id, message_channel) == True:
-            help_msg += "\n"
-
-            # This is going to have to be moved. This can't stay here.
+        if message_channel in db.get_secret_channels('Amulet_Holder'):
             '''give_amulet'''
             # This command can be executed by everyone, but only in one channel.
             # That's the amulet channel.
-            # To be worked out how exactly.
             if is_command(message, ['give_amulet']):
                 # TODO
                 return todo()
@@ -582,6 +609,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 # TODO
                 return todo()
             help_msg += "`" + prefix + "give_amulet`\n"
+
+        if personal_channel(user_id, message_channel) == True:
+            help_msg += "\n"
 
             '''assassinate'''
             # Assassin's command; kill a victim
@@ -1094,10 +1124,10 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 answer.respond(book.find_role_rules(role),True) # CHANGE IN FUNCTION
 
             return [answer]
-        
+
         # TODO: Add more info
-        return [Mailbox()]
-    help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles"
+        return [Mailbox().respond("No role provided! Please give us a role!",True)]
+    help_msg += "`" + prefix + "book` - Gain info about the game, its rules and the roles\n"
 
     '''shop'''
     # This command creates a new shop instance in the channel it was sent in
@@ -1168,8 +1198,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message,['randiumlooks','whatdoesrandiumlooklike']):
         answer = Mailbox()
         for phrase in eggs.randiumlooks():
-            answer.respond(phrase)
+            answer.respond(phrase,True)
         return [answer]
+    help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
         return [answer.respond('Ayyyy!')]

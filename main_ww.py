@@ -190,7 +190,7 @@ async def process_message(message,result):
 
                 log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
-                await gamelog_channel.send(log)
+                await botspam_channel.send(log)
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
@@ -201,10 +201,16 @@ async def process_message(message,result):
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
                         dy.set_mayor(chosen_one)
-                        # TODO: give Mayor role
+                        member = gamelog_channel.guild.get_member(int(chosen_one))
+                        if member != None:
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".format(member.display_name))
                     elif poll.purpose == 'Reporter':
                         dy.set_reporter(chosen_one)
-                        # TODO: give Reporter role
+                        for channel_id in db.get_secret_channels("Reporter"):
+                            mailbox.edit_cc(channel_id,chosen_one,1)
+                        member = gamelog_channel.guild.get_member(int(chosen_one))
+                        if member != None:
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Mayor".fprmat(member.display_name))
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
