@@ -154,6 +154,22 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
+        '''forcesignup'''
+        if is_command(message,['forcesignup']):
+            emoji = check.emojis(message)
+            user = check.users(message)
+            if not user:
+                return [Mailbox().respond("No user provided!",True)]
+            if not emoji:
+                return [Mailbox().respond("No emoji provided!",True)]
+            emoji = [emo for emo in emoji if emoji_to_player(emo) == None]
+            if emoji == []:
+                return [Mailbox().respond("That emoji is already occupied.",True)]
+            user = user[0]
+            choice_emoji = emoji[0]
+            signup(user, message.author.name, choice_emoji)
+            return [Mailbox().spam("You have successfully signed up {} with the emoji {}!".format(message.author.name,choice_emoji))]
+
         '''addrole'''
         # Before the game starts, a list of roles is kept track of.
         # That list is the list of roles that will be dealt among the participants.
