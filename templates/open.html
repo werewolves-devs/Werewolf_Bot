@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+
+{% block title %}Ooh, a box!{% endblock %}
+
+{% block body %}
+<h1>Free Lootbox!</h1>
+<form action="/open/{{token}}">
+    <input type="submit" value="Open it!">
+</form>
+{% endblock %}

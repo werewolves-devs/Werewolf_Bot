@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+
+{% block body %}
+    {% for choice in options %}
+        <div>
+            <p>You can choose the following option: {{ choice }}</p>
+            <form action="/unbox/{{token}}/{{choice}}">
+                <input type="submit" value="Choose reward!">
+            </form>
+        </div>
+    {% endfor %}
+{% endblock %}
