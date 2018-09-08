@@ -5,7 +5,7 @@
 {% block body %}
 <div id="part1">
     <h1>Free Lootbox!</h1>
-    <button onclick="unPack()">Click me to open!</button>
+    <button onclick="unPack('{{ token }}')">Click me to open!</button>
 </div>
 <div hidden id="part2">
     <h2>Opening lootbox...</h2>
@@ -14,42 +14,42 @@
 </div>
 <div hidden id="part3">
     <div id="middlebox">
-            <a id="link_1" href="/unbox/{{ token }}">
-                <div id="nextcard">
-                    <div class="card">
-                        <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
-                        <div class="container">
-                            <h4><b>Option 1: NOT FOUND</b></h4> 
-                            <p>Click here to choose option 1!</p>
-                            <p><b>COMMON</b></p> 
-                        </div>
+        <div id="nextcard">
+            <a id="link_1" href="/unbox/{{ token }}" class="nav-link">
+                <div class="card">
+                    <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
+                    <div class="container">
+                        <h4><b id="title_1">Option 1: NOT FOUND</b></h4> 
+                        <p id="desc_1">Click here to choose option 1!</p>
+                        <p><b id="rarity_1">COMMON</b></p> 
                     </div>
                 </div>
             </a>
-            <a id="link_2" href="/unbox/{{ token }}">
-                <div id="nextcard">
-                    <div class="card">
-                        <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
-                        <div class="container">
-                            <h4><b>Option 2: NOT FOUND</b></h4> 
-                            <p>Click here to choose option 2!</p> 
-                            <p><b>RARE</b></p>
-                        </div>
+        </div>
+        <div id="nextcard">
+            <a id="link_2" href="/unbox/{{ token }}" class="nav-link">
+                <div class="card">
+                    <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
+                    <div class="container">
+                        <h4><b id="title_2">Option 2: NOT FOUND</b></h4> 
+                        <p id="desc_2">Click here to choose option 2!</p> 
+                        <p><b id="rarity_2">RARE</b></p>
                     </div>
                 </div>
             </a>
-            <a id="link_3" href="/unbox/{{ token }}">
-                <div id="nextcard">
-                    <div class="card">
-                        <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
-                        <div class="container">
-                            <h4><b>Option 3: NOT FOUND</b></h4> 
-                            <p>Click here to choose option 3!</p> 
-                            <p style="color:rgb(146, 146, 29);"><b>LEGENDARY</b></p>
-                        </div>
+        </div>
+        <div id="nextcard">
+            <a id="link_3" href="/unbox/{{ token }}" class="nav-link">
+                <div class="card">
+                    <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
+                    <div class="container">
+                        <h4><b id="title_3">Option 3: NOT FOUND</b></h4> 
+                        <p id="desc_3">Click here to choose option 3!</p> 
+                        <p><b id="rarity_3" >LEGENDARY</b></p>
                     </div>
                 </div>
             </a>
+        </div>
     </div>
 </div>
 {% endblock %}
