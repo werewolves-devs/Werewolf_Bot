@@ -27,7 +27,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.min.js"></script>
         <script>
             var open_sound = new Howl({
-              src: ['/static/audio/open_chest.mp3'],
+              src: ['audio/open_chest.mp3'],
               preload: true
             });
         </script>
@@ -81,32 +81,13 @@
                             document.getElementById("desc_1").innerHTML = results.option1.description;
                             document.getElementById("desc_2").innerHTML = results.option2.description;
                             document.getElementById("desc_3").innerHTML = results.option3.description;
-                            showTitle("title_1",results.option1);
-                            showTitle("title_2",results.option2);
-                            showTitle("title_3",results.option3);
+                            document.getElementById("title_1").innerHTML = results.option1.name;
+                            document.getElementById("title_2").innerHTML = results.option2.name;
+                            document.getElementById("title_3").innerHTML = results.option3.name;
                             fancyAnimation(results);
                         });
                     })
                 }
-            }
-
-            function showTitle(element,option) {
-                if (option.code > 4000000-1) {
-                    document.getElementById(element).style.color = "#808000";
-                    document.getElementById(element).innerHTML = "[LEGENDARY] " + option.name;
-                    return;
-                }
-                if (option.code > 3000000-1) {
-                    document.getElementById(element).style.color = "#ff00ff";
-                    document.getElementById(element).innerHTML = "[EPIC]" + option.name;
-                    return;
-                }
-                if (option.code > 2000000-1) {
-                    document.getElementById(element).style.color = "#0080ff";
-                    document.getElementById(element).innerHTML = "[RARE] " + option.name;
-                    return;
-                }
-                document.getElementById(element).innerHTML = "[COMMON] " + option.name;
             }
             
             function fancyAnimation(items) {
@@ -124,12 +105,78 @@
                  setTimeout(function(){ $(".message-body").text("Scroll down to see other reward choices!"); }, 8050)
                 }
             }
-
+            
             function updateLbFrame(items) {
+                $('.rt-1').text("[" + items[0].split(":")[2] + "] " + items[0].split(":")[0])
+                $('.rd-1').text(items[0].split(":")[1])
+                $('.rt-2').text("[" + items[1].split(":")[2] + "] " + items[1].split(":")[0])
+                $('.rd-2').text(items[1].split(":")[1])
+                $('.rt-3').text("[" + items[2].split(":")[2] + "] " + items[2].split(":")[0])
+                $('.rd-3').text(items[2].split(":")[1])
+                if(items[0].split(":")[2] == "Common") {
+                    $('.rt-1').addClass('has-text-grey')
+                } else if (items[0].split(":")[2] == "Uncommon") {
+                    $('.rt-1').addClass('has-text-success')
+                } else if (items[0].split(":")[2] == "Rare") {
+                    $('.rt-1').addClass('has-text-primary')
+                } else if (items[0].split(":")[2] == "LEGENDARY") {
+                    $('.rt-1').addClass('has-text-warning')
+                } else if (items[0].split(":")[2] == "MYTHIC") {
+                    $('.rt-1').addClass('has-text-danger')
+                }
+                
+                if(items[1].split(":")[2] == "Common") {
+                    $('.rt-2').addClass('has-text-grey')
+                } else if (items[1].split(":")[2] == "Uncommon") {
+                    $('.rt-2').addClass('has-text-success')
+                } else if (items[1].split(":")[2] == "Rare") {
+                    $('.rt-2').addClass('has-text-primary')
+                } else if (items[1].split(":")[2] == "LEGENDARY") {
+                    $('.rt-2').addClass('has-text-warning')
+                } else if (items[1].split(":")[2] == "MYTHIC") {
+                    $('.rt-2').addClass('has-text-danger')
+                }
+                
+                if(items[2].split(":")[2] == "Common") {
+                    $('.rt-3').addClass('has-text-grey')
+                } else if (items[2].split(":")[2] == "Uncommon") {
+                    $('.rt-3').addClass('has-text-success')
+                } else if (items[2].split(":")[2] == "Rare") {
+                    $('.rt-3').addClass('has-text-primary')
+                } else if (items[2].split(":")[2] == "LEGENDARY") {
+                    $('.rt-3').addClass('has-text-warning')
+                } else if (items[2].split(":")[2] == "MYTHIC") {
+                    $('.rt-3').addClass('has-text-danger')
+                }
                 $('.rewards').show()
                 $('#lootbox-splash').hide()
             }
-
+            
+            function claimReward(reward_num) {
+                // This entire file is the worst thing I have ever written and I think it's too far gone to save
+                $.get("api/claim_reward.php?key=development_YNkd3aYiRkMMuV0428UX18ZavHhrb32lDE2sswSdgMNNq9zaIaTjjy1IQRr1qCMT&reward=" + reward_num, function(data) {
+                    if ((data) == "200") {
+                        if(reward_num == 0) {
+                            $(".card2").fadeOut();
+                            $(".card3").fadeOut();
+                            $(".card1-buttn").text("Claimed Successfully!")
+                            $(".card1-buttn").toggleClass("is-static", true)
+                        } else if(reward_num == 1) {
+                            $(".card1").fadeOut();
+                            $(".card3").fadeOut();
+                            $(".card2-buttn").text("Claimed Successfully!")
+                            $(".card2-buttn").toggleClass("is-static", true)
+                        } else if(reward_num == 2) {
+                            $(".card1").fadeOut();
+                            $(".card2").fadeOut();
+                            $(".card3-buttn").text("Claimed Successfully!")
+                            $(".card3-buttn").toggleClass("is-static", true)
+                        }
+                    } else {
+                        alert("There was an error");
+                    }
+                })
+            }
         </script>
     </head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -143,9 +190,9 @@
                 </div>
             </article>
             <div id='lootbox-splash'>
-                <img onclick="updateLootBoxes('{{ token }}')" src='/static/chest1.png' />
+                <img onclick="updateLootBoxes()" src='static/chest1.png' />
                 <br />
-                <button onclick="updateLootBoxes('{{ token }}')" id="open-button" class="button" type="submit" value="Open loot crate">Open loot crate</button>
+                <button onclick='updateLootBoxes()' id="open-button" class="button" type="submit" value="Open loot crate">Open loot crate</button>
         </center>
         </div>
         <center>
