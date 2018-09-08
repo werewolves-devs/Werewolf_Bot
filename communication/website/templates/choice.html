@@ -1,19 +1,56 @@
 {% extends "index.html" %}
 
+{% block script %}
+<script src="{{url_for('static', filename='animations.js')}}"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" 
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script>
+    function codeAddress() {
+        showRarity("{{ choices[0]['code'] }}","rarity_1");
+        showRarity("{{ choices[1]['code'] }}","rarity_2");
+        showRarity("{{ choices[2]['code'] }}","rarity_3");
+    }
+    window.onload = codeAddress;
+</script>
+{% endblock %}
+
 {% block body %}
-<div id="middlebox">
-    {% for choice in options %}
-    <a href="/unbox/{{ token }}/{{ choice }}">
-        <div id="nextcard">
-            <div class="card">
-                <img src="/static/werewolf.jpg" alt="Avatar" style="width:100%">
-                <div class="container">
-                    <h4><b>{{ choice }}: an awesome number</b></h4> 
-                    <p>Click here to choose option {{ choice }}!</p> 
-                </div>
+        <div id="middlebox">
+            <div id="nextcard">
+                <a id="link_1" href="/unbox/{{ token }}/{{ choices[0]['code'] }}" class="nav-link">
+                    <div class="card">
+                        <img src="/static/{{ choices[0]['code'] }}.jpg" alt="Avatar" style="width:100%">
+                        <div class="container">
+                            <h4><b id="title_1">{{ choices[0]['name'] }}</b></h4> 
+                            <p id="desc_1">{{ choices[0]['description'] }}</p>
+                            <p><b id="rarity_1">COMMON</b></p> 
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div id="nextcard">
+                <a id="link_2" href="/unbox/{{ token }}/{{ choices[1]['code'] }}" class="nav-link">
+                    <div class="card">
+                        <img src="/static/{{ choices[1]['code'] }}.jpg" alt="Avatar" style="width:100%">
+                        <div class="container">
+                            <h4><b id="title_2">{{ choices[1]['name'] }}</b></h4> 
+                            <p id="desc_2">{{ choices[1]['description'] }}</p> 
+                            <p><b id="rarity_2">RARE</b></p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div id="nextcard">
+                <a id="link_3" href="/unbox/{{ token }}/{{ choices[2]['code'] }}" class="nav-link">
+                    <div class="card">
+                        <img src="/static/{{ choices[2]['code'] }}.jpg" alt="Avatar" style="width:100%">
+                        <div class="container">
+                            <h4><b id="title_3">{{ choices[2]['name'] }}</b></h4> 
+                            <p id="desc_3">{{ choices[2]['description'] }}</p> 
+                            <p><b id="rarity_3" >LEGENDARY</b></p>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
-    </a>
-    {% endfor %}
-</div>
 {% endblock %}

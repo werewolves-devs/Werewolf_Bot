@@ -1,61 +1,12 @@
 <!doctype html>
 <html>
     <head>
-        <style>
-            body{
-                background-color: black;
-                background-image: url("/static/chest1.png");
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: cover;
-                background-attachment: fixed;
-                color: white;
-            }
-
-            .card {
-                color: black;
-                background-color: white;
-                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-                transition: 0.3s;
-                width: 50%;
-            }
-
-            .card:hover {
-                box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-            }
-
-            .container {
-                padding: 2px 16px;
-            }
-
-            #nextcard {
-                display: inline-block;
-                width: 26em;
-            }
-
-            #middlebox {
-                position:fixed;
-                top: 25%;
-                left: 25%;
-                width:80em;
-                height:36em;
-                margin-top: -9em; /*set to a negative number 1/2 of your height*/
-                margin-left: -15em; /*set to a negative number 1/2 of your width*/
-            }
-
-            #smallmiddlebox {
-                position:fixed;
-                top: 25%;
-                left: 25%;
-                width:25em;
-                height:36em;
-                margin-top: -9em; /*set to a negative number 1/2 of your height*/
-                margin-left: -15em; /*set to a negative number 1/2 of your width*/
-            }
-
-            {% block styling %}{% endblock %}
-        </style>
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='lootbox.css')}}">
+        {% block script %}
         <script src="{{url_for('static', filename='animations.js')}}"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" 
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        {% endblock %}
         {% block head %}
         <title>{% block title %}Lootbox website{% endblock %}</title>
         {% endblock %}

@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
+import management.items as items
 import management.boxes as box
 import random
 
@@ -49,8 +50,10 @@ def open_lootbox(token):
     if validity == 1:
         # The user can make a choice.
         data = box.get_token_data(token)
-        choices = [data[3],data[4],data[5]]
-        return render_template('choice.html', options=choices, token=token)
+        choices = [int(data[3]),int(data[4]),int(data[5])]
+        choices = [items.import_reward(option) for option in choices]
+
+        return render_template('choice.html', choices=choices, token=token)
     
     return 'This is strange! How did you get here?'
 
@@ -68,6 +71,19 @@ def open(token):
 
     return render_template('unpack.html', token=token)
 
+@app.route('/api/v1/<token>/rewards')
+def get_rewards(token):
+    validity = box.token_status(token)
+    if validity != 0:
+        return jsonify(option1={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},
+            option2={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},
+            option3={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},)
+    
+    given_options = items.get_rewards()
+    box.add_source1(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
+    box.add_options(token,given_options[0]["code"],given_options[1]["code"],given_options[2]["code"])
+
+    return jsonify(option1=given_options[0],option2=given_options[1],option3=given_options[2])
 
 if __name__ == '__main__':
     app.run(debug=True)
