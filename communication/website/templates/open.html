@@ -84,10 +84,15 @@
                             showTitle("title_1",results.option1);
                             showTitle("title_2",results.option2);
                             showTitle("title_3",results.option3);
-                            fancyAnimation(results);
                         });
+                        return;
                     })
+                    
+                    fancyAnimation();
+                    return;
                 }
+
+                alert("ERROR: This lootbox has already been opened!")
             }
 
             function showTitle(element,option) {
@@ -109,7 +114,7 @@
                 document.getElementById(element).innerHTML = "[COMMON] " + option.name;
             }
             
-            function fancyAnimation(items) {
+            function fancyAnimation() {
                 console.log(items)
                 open_sound.play();
             	shake(125, 10, 15);
@@ -119,13 +124,13 @@
                 setTimeout(function(){ $(".overlay").fadeIn(1750); }, 6300)
                 setTimeout(function(){ $(".overlay").hide(); }, 8250)
                 $("#open-button").hide()
-                setTimeout(function(){ updateLbFrame(items); }, 8050);
+                setTimeout(function(){ updateLbFrame(); }, 8050);
                 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
                  setTimeout(function(){ $(".message-body").text("Scroll down to see other reward choices!"); }, 8050)
                 }
             }
 
-            function updateLbFrame(items) {
+            function updateLbFrame() {
                 $('.rewards').show()
                 $('#lootbox-splash').hide()
             }
