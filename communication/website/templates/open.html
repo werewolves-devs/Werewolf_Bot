@@ -4,8 +4,10 @@
 
 {% block body %}
 <div id="part1">
-    <h1>Free Lootbox!</h1>
-    <button onclick="unPack('{{ token }}')">Click me to open!</button>
+    <div id="middlebox">
+        <h1>Free Lootbox!</h1>
+        <button onclick="unPack('{{ token }}')">Click me to open!</button>
+    </div>
 </div>
 <div hidden id="part2">
     <h2>Opening lootbox...</h2>
