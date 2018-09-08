@@ -22,6 +22,7 @@ general_database = 'storage/general.db'
 database = 'storage/game.db'
 shop_file = 'storage/shop.json'
 stats_file = 'storage/stats.json'
+item_file = 'storage/items.json'
 max_channels_per_category = 50
 
 # List of specific channels
