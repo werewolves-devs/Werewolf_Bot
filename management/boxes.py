@@ -86,6 +86,7 @@ def add_choice(token,choice):
 
     c.execute("UPDATE 'tokens' SET choice =? WHERE token =?",(choice,token))
     c.execute("UPDATE 'tokens' SET status =2 WHERE token =?",(token,))
+    c.execute("UPDATE 'tokens' SET redeemed =DateTime('now') WHERE token =?",(token,))
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
