@@ -84,27 +84,29 @@
               $('.rewards').hide()
               $('.overlay').hide()
             });
-            
-            function updateLootBoxes() {
-                // This is very lazy code, TODO: Refactor
+
+            function updateLootBoxes(token) {
                 if (window.claiming == false) {
-                window.claiming = true
-                $.get( "api/generate_rewards.php?key=" + getUrlParameter("key"), function( data ) {
-                    var items = data;
-                    items = items.split(";")
-                    fancyAnimation(items)
-                });
+                    window.claiming = true;
+                    $(document).ready(function() {
+                        $.getJSON("/api/v1/" + token + "/rewards",function(results) {
+                            document.getElementById("link_1").href = ("/unbox/" + token + "/" + results.option1.code);
+                            document.getElementById("link_2").href = ("/unbox/" + token + "/" + results.option2.code);
+                            document.getElementById("link_3").href = ("/unbox/" + token + "/" + results.option3.code);
+                            document.getElementById("desc_1").innerHTML = results.option1.description;
+                            document.getElementById("desc_2").innerHTML = results.option2.description;
+                            document.getElementById("desc_3").innerHTML = results.option3.description;
+                            document.getElementById("title_1").innerHTML = results.option1.name;
+                            document.getElementById("title_2").innerHTML = results.option2.name;
+                            document.getElementById("title_3").innerHTML = results.option3.name;
+                            fancyAnimation(results);
+                        });
+                    })
                 }
             }
             
-            function showClaimedRewards() {
-                $.get( "api/get_claimed_rewards.php?key=" + getUrlParameter("key"), function( data ) {
-                    items = data.split(";")
-                    updateLbFrame(items)
-                });
-            }
-            
             function fancyAnimation(items) {
+                console.log(items)
                 open_sound.play();
             	shake(125, 10, 15);
             	setTimeout(function(){ shake(100, 12, 18); }, 1800)
@@ -203,7 +205,7 @@
                 </div>
             </article>
             <div id='lootbox-splash'>
-                <img onclick="updateLootBoxes()" src='img/chest-epic.jpg' />
+                <img onclick="updateLootBoxes()" src='static/chest1.png' />
                 <br />
                 <button onclick='updateLootBoxes()' id="open-button" class="button" type="submit" value="Open loot crate">Open loot crate</button>
         </center>
