@@ -27,10 +27,10 @@ def hard_reset(skip = False):
     open('backup/last_reset/backup_stats.json', 'a').close()
     open('backup/last_reset/backup_dynamic.json', 'a').close()
     open('backup/last_reset/backup_config.py', 'a').close()
-    copy('game.db','backup/last_reset/backup_game.db')
-    copy('general.db','backup/last_reset/backup_general.db')
-    copy('stats.json','backup/last_reset/backup_stats.json')
-    copy('dynamic.json','backup/last_reset/backup_dynamic.json')
+    copy(config.database,'backup/last_reset/backup_game.db')
+    copy(config.general_database,'backup/last_reset/backup_general.db')
+    copy(config.stats_file,'backup/last_reset/backup_stats.json')
+    copy(config.dynamic_config,'backup/last_reset/backup_dynamic.json')
     copy('config.py','backup/last_reset/backup_config.py')
 
     # Reset the game table.
