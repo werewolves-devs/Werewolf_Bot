@@ -1,9 +1,9 @@
 # Discord API / Login settings
-WW_TOKEN = "yo_mommas_token"
+WW_TOKEN = "NDAxNzE2MzgwODAzNTMwNzUy.Dm2kxA.r_PwUl5gZE0P9EFDZHu-7XKyyss"
 TM_TOKEN = "yo_poppas_token"
 DV_TOKEN = "yo_devils_token"
 GH_TOKEN = "yo_deadies_token"
-
+discord_webhook = "https://discordapp.com/api/webhooks/488075058536490522/a0bNalwX7yeci-mBAHaiSjkOmnRfxErBBmrfvSTv6_C2Ey89j00jhkcKWfBbp-Uf8l_Y"
 
 # Rules 'n' settings
 max_channels_per_category = 50
