@@ -64,21 +64,6 @@
                     }                                                                                                          
                     $(div).animate({ left: 0 }, interval);
                 }
-            	
-            var getUrlParameter = function getUrlParameter(sParam) {
-                var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-                    sURLVariables = sPageURL.split('&'),
-                    sParameterName,
-                    i;
-            
-                for (i = 0; i < sURLVariables.length; i++) {
-                    sParameterName = sURLVariables[i].split('=');
-            
-                    if (sParameterName[0] === sParam) {
-                        return sParameterName[1] === undefined ? true : sParameterName[1];
-                    }
-                }
-            };
             
             $( document ).ready(function() {
               $('.rewards').hide()
@@ -224,7 +209,7 @@
                                 <div class="card-content">
                                     <p id="title_1" class="title rt-1">Loading...</p>
                                     <p id="desc_1" class="subtitle rd-1">Loading...</p>
-                                    <a id="link_1" href="/unbox/{{ token }}/{{ choices[0]['code'] }}">
+                                    <a id="link_1" href="/unbox/{{ token }}/">
                                     <button class="button is-primary">Claim this reward</button>
                                     </a>
                                 </div>
@@ -240,7 +225,7 @@
                                 <div class="card-content">
                                     <p id="title_2" class="title rt-2">Loading...</p>
                                     <p id="desc_2" class="subtitle rd-2">Loading...</p>
-                                    <a id="link_2" href="/unbox/{{ token }}/{{ choices[0]['code'] }}">
+                                    <a id="link_2" href="/unbox/{{ token }}/">
                                     <button class="button is-primary card2-buttn">Claim this reward</button>
                                     </a>
                                 </div>
@@ -256,7 +241,7 @@
                                 <div class="card-content">
                                     <p id="title_3" class="title rt-3">Loading...</p>
                                     <p id="desc_3" class="subtitle rd-3">Loading...</p>
-                                    <a id="link_3" href="/unbox/{{ token }}/{{ choices[0]['code'] }}">
+                                    <a id="link_3" href="/unbox/{{ token }}/">
                                     <button class="button is-primary card3-buttn">Claim this reward</button>
                                     </a>
                                 </div>
