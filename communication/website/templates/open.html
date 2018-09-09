@@ -21,7 +21,6 @@
         </style>
         <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css' />
         <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
-        <script src='js/open.js'></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.min.js"></script>
@@ -75,6 +74,7 @@
                     window.claiming = true;
                     $(document).ready(function() {
                         $.getJSON("/api/v1/" + token + "/rewards",function(results) {
+                            console.log(results)
                             document.getElementById("link_1").href = ("/unbox/" + token + "/" + results.option1.code);
                             document.getElementById("link_2").href = ("/unbox/" + token + "/" + results.option2.code);
                             document.getElementById("link_3").href = ("/unbox/" + token + "/" + results.option3.code);
