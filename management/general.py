@@ -79,3 +79,14 @@ def gain_leaderboard(user_id,amount=50):
                     msg += "**{}. {}** - {} points\n".format(i+3,result_table[i+2][1],int(result_table[i+2][2]))
     
     return msg
+
+def get_user(user_id):
+    """Get all info about a user."""
+    c.execute("SELECT * FROM 'users' WHERE id=?",(user_id,))
+    return c.fetchone()
+
+def get_credits(user_id):
+    value = get_user(user_id)
+    if value == None:
+        return None
+    return value[2]

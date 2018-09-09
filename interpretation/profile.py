@@ -6,6 +6,7 @@ from discord import Message, User, Embed
 from interpretation import check
 from interpretation.ghost_head import is_command
 from main_classes import Mailbox
+from management.general import get_credits
 from management.profile import ProfileModel
 from management.db import isParticipant
 
@@ -77,6 +78,7 @@ def view_profile(message: Message):
     em.set_author(name=user.display_name, icon_url=user.avatar_url)
     em.add_field(name="Age", value=str(model.display_age))
     em.add_field(name="Gender", value=model.gender)
+    em.add_field(name="Credits", value=get_credits(user.id))
     return [Mailbox().embed(em, destination=message.channel.id)]
 
 
