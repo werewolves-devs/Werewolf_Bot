@@ -34,3 +34,48 @@ def deal_credits():
     c.execute("UPDATE users SET credits = credits + CAST( activity/500 AS INTEGER);")
     conn.commit()
 
+def gain_leaderboard(user_id,amount=50):
+    """Show a leaderboard for all players"""
+    amount = min(amount,50)
+    amount = max(1,amount)
+    c.execute("SELECT * FROM 'activity' ORDER BY activity+spam_activity DESC;")
+    result_table = []
+    next_layer = c.fetchmany(amount)
+
+    def is_in_table():
+        """Return if the user is in the next layer of users"""
+        for user in next_layer:
+            if user[0] == user_id:
+                return True
+        return False
+    
+    user_found = is_in_table()
+    while next_layer != [] and not user_found:
+        result_table.extend(next_layer)
+
+        next_layer = c.fetchmany(amount)
+        user_found = is_in_table()
+    result_table.extend(next_layer)
+    result_table.extend(c.fetchmany(2))
+
+    msg = "**Most active users:**\n\n"
+
+    for i in range(min(amount,len(result_table))):
+        element = result_table[i]
+        msg += "**{}. {}** - {} points\n".format(i+1,element[1],int(element[2]))
+
+    if len(result_table) > amount + 2:
+        for i in range(len(result_table)):
+            if result_table[i][0] == user_id:
+                msg += "\n\n**__Your position:__**\n"
+                if i > 1:
+                    msg += "**{}. {}** - {} points\n".format(i-1,result_table[i-2][1],int(result_table[i-2][2]))
+                if i > 0:
+                    msg += "**{}. {}** - {} points\n".format(i,result_table[i-1][1],int(result_table[i-1][2]))
+                msg += "**{}. {}** - {} points\n".format(i+1,result_table[i][1],int(result_table[i][2]))
+                if i < len(result_table) - 1:
+                    msg += "**{}. {}** - {} points\n".format(i+2,result_table[i+1][1],int(result_table[i+1][2]))
+                if i < len(result_table) - 2:
+                    msg += "**{}. {}** - {} points\n".format(i+3,result_table[i+2][1],int(result_table[i+2][2]))
+    
+    return msg

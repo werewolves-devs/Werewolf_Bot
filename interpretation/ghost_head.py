@@ -7,7 +7,7 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy
+from management import db, dynamic as dy, general as gen
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -79,6 +79,17 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
+    if is_command(message, ['lead']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().respond(gen.gain_leaderboard(user_id))]
+        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)))]
+    if is_command(message, ['lead'], True):
+        msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
+        msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
+    help_msg += "`" + prefix + "lead` - See an activity leaderboard."
+
+    # Profile commands
     profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
     if profile_commands:
         return profile_commands
