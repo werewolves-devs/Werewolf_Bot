@@ -53,7 +53,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
-    elif is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+    elif is_command(message, []):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
