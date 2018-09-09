@@ -207,5 +207,6 @@
             "name": "dagger",
             "code": 106
         }
-    ]
+    ],
+    "add_command": "ALTER TABLE 'channels' ADD COLUMN '{}' INTEGER NOT NULL DEFAULT 0"
 }
