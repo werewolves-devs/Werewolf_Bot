@@ -4,7 +4,7 @@ from typing import List, Optional
 from discord import Message, User, Embed
 
 from interpretation import check
-from interpretation.check import is_command
+from interpretation.ghost_head import is_command
 from main_classes import Mailbox
 from management.profile import ProfileModel
 from management.db import isParticipant
