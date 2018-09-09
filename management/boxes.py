@@ -1,3 +1,4 @@
+from communication import webhook
 import sqlite3
 import config
 import random
@@ -31,6 +32,7 @@ def add_source1(token,source):
 
     conn = sqlite3.connect(config.general_database)
     c = conn.cursor()
+    insert_source(get_token_data(token)[1],source)
 
     c.execute("UPDATE 'tokens' SET source1 =? WHERE token =?",(source,token))
     conn.commit()
@@ -46,12 +48,31 @@ def add_source2(token,source):
 
     conn = sqlite3.connect(config.general_database)
     c = conn.cursor()
+    insert_source(get_token_data(token)[1],source)
 
     c.execute("UPDATE 'tokens' SET source2 =? WHERE token =?",(source,token))
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
     return c.fetchone()
+
+def insert_source(user_id,source):
+    """Add a source to a given user."""
+    conn = sqlite3.connect(config.general_database)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM 'sources' WHERE user=? AND source=?",(user_id,source))
+    if c.fetchone() != None:
+        c.execute("UPDATE 'sources' SET amount = amount+1 WHERE user=? AND source=?",(user_id,source))
+        conn.commit()
+        return
+    
+    c.execute("SELECT * FROM 'sources' WHERE source=?",(source,))
+    if c.fetchone() != None:
+        webhook.send_private_message("Found source {} for <@{}>".format(source,user_id))
+
+    c.execute("INSERT INTO 'sources'('user','source') VALUES (?,?);",(user_id,source))
+    conn.commit()
 
 def add_options(token,choice1,choice2,choice3):
     """Register the three options into the database.  

@@ -44,6 +44,7 @@ def hard_reset(skip = False):
     c.execute("DROP TABLE IF EXISTS 'tokens'")
     c.execute("DROP TABLE IF EXISTS 'prizes'")
     c.execute("DROP TABLE IF EXISTS 'shops'")
+    c.execute("DROP TABLE IF EXISTS 'sources'")
     if skip == False:
         print('Progress deleted!\n')
         print('Creating space for a new database....')
@@ -78,6 +79,7 @@ def hard_reset(skip = False):
     c.execute("CREATE TABLE 'tokens' ('token' TEXT NOT NULL, 'owner' INTEGER NOT NULL, 'status' INTEGER NOT NULL DEFAULT 0, 'opt1' TEXT, 'opt2' TEXT, 'opt3' TEXT, 'choice' TEXT, 'source1' TEXT, 'source2' TEXT, 'creation' TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, 'redeemed' TEXT, PRIMARY KEY('token'));")
     c.execute("CREATE TABLE 'prizes' ('prize' INTEGER NOT NULL, 'option' INTEGER NOT NULL DEFAULT 0, 'choice' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('prize'));")
     c.execute("CREATE TABLE 'shops' ('message' INTEGER NOT NULL, 'age' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('message'));")
+    c.execute("CREATE TABLE 'sources' ('user' INTEGER NOT NULL, 'source' TEXT NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 1);")
     print('Formatting completed! The bot is now ready for a new game!\n')
 
     if skip == False:
