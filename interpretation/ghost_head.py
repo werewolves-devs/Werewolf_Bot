@@ -97,7 +97,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     help_msg += "`" + prefix + "age` - Set your age\n"
     help_msg += "`" + prefix + "bio` - Set your bio\n"
     help_msg += "`" + prefix + "gender` - Set your gender\n"
-    help_msg += "`" + prefix + "profile` - View a player's profilen\n"
+    help_msg += "`" + prefix + "profile` - View a player's profile\n"
 
     # --------------------------------------------------------------
     #                          HELP
