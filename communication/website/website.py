@@ -75,9 +75,9 @@ def open(token):
 def get_rewards(token):
     validity = box.token_status(token)
     if validity != 0:
-        return jsonify(option1={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},
-            option2={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},
-            option3={"code": 0, "description": "NOT FOUND", "name": "NOT FOUND"},)
+        return jsonify(option1={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},
+            option2={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},
+            option3={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},)
     
     given_options = items.get_rewards()
     box.add_source1(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
