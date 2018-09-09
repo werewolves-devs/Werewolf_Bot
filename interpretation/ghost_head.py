@@ -14,7 +14,7 @@ PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}**
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
-def is_command(message,commandtable,isHelp=False):
+def is_command(message,commandtable,help=False):
     return check.is_command(message,commandtable,isHelp,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):

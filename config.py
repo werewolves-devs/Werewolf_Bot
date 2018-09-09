@@ -3,8 +3,11 @@ WW_TOKEN = "NDAxNzE2MzgwODAzNTMwNzUy.Dm2kxA.r_PwUl5gZE0P9EFDZHu-7XKyyss"
 TM_TOKEN = "yo_poppas_token"
 DV_TOKEN = "yo_devils_token"
 GH_TOKEN = "yo_deadies_token"
-WEBHOOK_ID = "488075058536490522"
-WEBHOOK_TOKEN = "a0bNalwX7yeci-mBAHaiSjkOmnRfxErBBmrfvSTv6_C2Ey89j00jhkcKWfBbp-Uf8l_Y"
+
+WEBHOOK_PUBLIC_ID = "488075058536490522"
+WEBHOOK_PUBLIC_TOKEN = "a0bNalwX7yeci-mBAHaiSjkOmnRfxErBBmrfvSTv6_C2Ey89j00jhkcKWfBbp-Uf8l_Y"
+WEBHOOK_PRIVATE_ID = ""
+WEBHOOK_PRIVATE_TOKEN = ""
 
 # Rules 'n' settings
 max_channels_per_category = 50
