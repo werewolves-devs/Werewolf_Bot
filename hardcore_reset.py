@@ -51,7 +51,7 @@ def hard_reset(skip = False):
         print('Creating space for a new database....')
     inventory_table = "CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, "
     for item in jget("items"):
-        inventory_table += "'{}' INTEGER NOT NULL DEFAULT 0, "
+        inventory_table += "'{}' INTEGER NOT NULL DEFAULT 0, ".format(item["code"])
     inventory_table +="PRIMARY KEY('id'));"
     c.execute(inventory_table)
     
