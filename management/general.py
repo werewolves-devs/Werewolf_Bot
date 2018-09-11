@@ -34,7 +34,7 @@ def deal_credits():
     c.execute("UPDATE users SET credits = credits + CAST( activity/500 AS INTEGER);")
     conn.commit()
 
-def gain_leaderboard(user_id,amount=50):
+def gain_leaderboard(user_id,amount=10):
     """Show a leaderboard for all players"""
     amount = min(amount,50)
     amount = max(1,amount)
