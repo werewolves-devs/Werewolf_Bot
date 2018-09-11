@@ -59,7 +59,7 @@ def hard_reset(skip = False):
     c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'requests' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
-    c.execute("CREATE TABLE 'tokens' ('token' TEXT NOT NULL, 'owner' INTEGER NOT NULL, 'status' INTEGER NOT NULL DEFAULT 0, 'opt1' TEXT, 'opt2' TEXT, 'opt3' TEXT, 'choice' TEXT, 'source1' TEXT, 'source2' TEXT, 'creation' TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, 'redeemed' TEXT, PRIMARY KEY('token'));")
+    c.execute("CREATE TABLE 'tokens' ( `token` TEXT NOT NULL, `owner` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `opt1` NUMERIC, `opt2` TEXT, `opt3` TEXT, `choice` TEXT, `source1` TEXT, `source2` TEXT, `creation` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, `redeemed` TEXT, `message` INTEGER NOT NULL, PRIMARY KEY(`token`,`message`) )")
     c.execute("CREATE TABLE 'prizes' ('prize' INTEGER NOT NULL, 'option' INTEGER NOT NULL DEFAULT 0, 'choice' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('prize'));")
     c.execute("CREATE TABLE 'shops' ('message' INTEGER NOT NULL, 'age' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('message'));")
     c.execute("CREATE TABLE 'sources' ('user' INTEGER NOT NULL, 'source' TEXT NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 1);")

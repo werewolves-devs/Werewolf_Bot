@@ -4,7 +4,7 @@ import config
 import random
 
 
-def add_token(token,user_id):
+def add_token(token,user_id,message):
     """Add a new token to the database.  
       
     Keyword arguments:  
@@ -18,7 +18,7 @@ def add_token(token,user_id):
     if c.fetchone() != None:
         return None
     
-    c.execute("INSERT INTO 'tokens' ('token','owner') VALUES (?,?)",(token,user_id))
+    c.execute("INSERT INTO 'tokens'('token','owner','message') VALUES (?,?,?);",(token,user_id,message))
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
