@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html, 
+            body {
+            height: 100% !important;
+            background-color: black;
+            }
+        </style>
+        <style>
+            .overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: rgba(240,240,240,1);
+            z-index: 10;
+            }
+        </style>
+        <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css' />
+        <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.min.js"></script>
+    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <body bgcolor='black' height="100%">
+        <center>
+            <article class="message is-dark" style="background-color: red;color: white">
+                <div class="message-body">
+                    <strong>ERROR: </strong>{{ reason }} 
+                </div>
+            </article>
+            <div id='lootbox-splash'>
+                <img src='/static/chest1.png' />
+                <br />
+            </div>
+        </center>
+        </div>
+    </body>
+</html>

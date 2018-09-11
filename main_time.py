@@ -6,11 +6,15 @@ import management.db as db
 import discord
 import asyncio
 import datetime
+import config
+import os
 
 # Import config data
+from shutil import copy
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel
 from management.shop import age_shop
 from management.general import purge_activity, deal_credits
+
 
 client = discord.Client()
 
@@ -68,6 +72,21 @@ async def check_time():
                     await client.get_channel(bot_spam).send(prefix + "night")
                 else:
                     await client.get_channel(bot_spam).send("Beep boop! The night has started!")
+
+            # Make a backup of the database
+            newpath = 'backup/{}_{}'.format(time.year,time.month)
+            if not os.path.exists(newpath):
+                os.makedirs(newpath)
+            open('backup/{}_{}/{}_{}h{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            copy(config.database,'backup/{}_{}/{}_{}h{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.general_database,'backup/{}_{}/{}_{}h{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.stats_file,'backup/{}_{}/{}_{}h{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.dynamic_config,'backup/{}_{}/{}_{}h{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy('config.py','backup/{}_{}/{}_{}h{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute))
 
             await asyncio.sleep(45)
 

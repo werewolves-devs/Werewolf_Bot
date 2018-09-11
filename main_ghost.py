@@ -48,13 +48,16 @@ from config import ghost_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ghost_head import process
 from interpretation.polls import count_votes
+from interpretation.basecode import create_token
 import config
+import random
+import shop
+import stats
 import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
 import management.general as general
-import shop
-import stats
+import management.boxes as box
 from emoji import emojize
 
 
@@ -166,6 +169,12 @@ async def on_message(message):
     if message.author == client.user:
         stats.increment_stat("bot_messages_sent", 1)
         return
+
+    if random.randint(0,249) == 1:
+        token = create_token(message.author.id)
+        msg = await message.author.send("Hey, so... this doesn\'t work well yet - but give this code to the Game Masters for a small reward! *(If it works.)* ```" + token + "```")
+        box.add_token(token,message.author.id,msg)
+        await message.add_reaction('🎁')
 
     #check role of sender
     isGameMaster = False

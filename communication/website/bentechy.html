@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body-background-color: hsl(0, 0%, 100%);
+            html, 
+            body {
+            height: 100% !important;
+            }
+        </style>
+        <style>
+            .overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background: rgba(240,240,240,1);
+            z-index: 10;
+            }
+        </style>
+        <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css' />
+        <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+        <script src='js/open.js'></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.14/howler.min.js"></script>
+        <script>
+            var open_sound = new Howl({
+              src: ['audio/open_chest.mp3'],
+              preload: true
+            });
+        </script>
+        <script>
+            window.claiming = false
+            function shake(interval, distance, times) {
+                    var div = document.getElementById('lootbox-splash');
+                    //var interval = 100;
+                    //var distance = 10;
+                    //var times = 60;
+            
+                    $(div).css('position', 'relative');
+            
+                    for (var iter = 0; iter < (times + 1) ; iter++) {
+                        $(div).animate({
+                            left: ((iter % 2 == 0 ? distance : distance * -1))
+                        }, interval);
+                    }                                                                                                          
+                    $(div).animate({ left: 0 }, interval);
+                }
+            
+            function shake2() {
+                    var div = document.getElementById('lootbox-splash');
+                    var interval = 50;
+                    var distance = 15;
+                    var times = 40;
+            
+                    $(div).css('position', 'relative');
+            
+                    for (var iter = 0; iter < (times + 1) ; iter++) {
+                        $(div).animate({
+                            left: ((iter % 2 == 0 ? distance : distance * -1))
+                        }, interval);
+                    }                                                                                                          
+                    $(div).animate({ left: 0 }, interval);
+                }
+            
+            $( document ).ready(function() {
+              $('.rewards').hide()
+              $('.overlay').hide()
+            });
+
+            function updateLootBoxes(token) {
+                if (window.claiming == false) {
+                    window.claiming = true;
+                    $(document).ready(function() {
+                        $.getJSON("/api/v1/" + token + "/rewards",function(results) {
+                            document.getElementById("link_1").href = ("/unbox/" + token + "/" + results.option1.code);
+                            document.getElementById("link_2").href = ("/unbox/" + token + "/" + results.option2.code);
+                            document.getElementById("link_3").href = ("/unbox/" + token + "/" + results.option3.code);
+                            document.getElementById("desc_1").innerHTML = results.option1.description;
+                            document.getElementById("desc_2").innerHTML = results.option2.description;
+                            document.getElementById("desc_3").innerHTML = results.option3.description;
+                            document.getElementById("title_1").innerHTML = results.option1.name;
+                            document.getElementById("title_2").innerHTML = results.option2.name;
+                            document.getElementById("title_3").innerHTML = results.option3.name;
+                            fancyAnimation(results);
+                        });
+                    })
+                }
+            }
+            
+            function fancyAnimation(items) {
+                console.log(items)
+                open_sound.play();
+            	shake(125, 10, 15);
+            	setTimeout(function(){ shake(100, 12, 18); }, 1800)
+            	setTimeout(function(){ shake(75, 12, 26.66667); }, 3800)
+            	setTimeout(function(){ shake(50, 12, 40); }, 5500)
+                setTimeout(function(){ $(".overlay").fadeIn(1750); }, 6300)
+                setTimeout(function(){ $(".overlay").hide(); }, 8250)
+                $("#open-button").hide()
+                setTimeout(function(){ updateLbFrame(items); }, 8050);
+                if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+                 setTimeout(function(){ $(".message-body").text("Scroll down to see other reward choices!"); }, 8050)
+                }
+            }
+            
+            function updateLbFrame(items) {
+                $('.rt-1').text("[" + items[0].split(":")[2] + "] " + items[0].split(":")[0])
+                $('.rd-1').text(items[0].split(":")[1])
+                $('.rt-2').text("[" + items[1].split(":")[2] + "] " + items[1].split(":")[0])
+                $('.rd-2').text(items[1].split(":")[1])
+                $('.rt-3').text("[" + items[2].split(":")[2] + "] " + items[2].split(":")[0])
+                $('.rd-3').text(items[2].split(":")[1])
+                if(items[0].split(":")[2] == "Common") {
+                    $('.rt-1').addClass('has-text-grey')
+                } else if (items[0].split(":")[2] == "Uncommon") {
+                    $('.rt-1').addClass('has-text-success')
+                } else if (items[0].split(":")[2] == "Rare") {
+                    $('.rt-1').addClass('has-text-primary')
+                } else if (items[0].split(":")[2] == "LEGENDARY") {
+                    $('.rt-1').addClass('has-text-warning')
+                } else if (items[0].split(":")[2] == "MYTHIC") {
+                    $('.rt-1').addClass('has-text-danger')
+                }
+                
+                if(items[1].split(":")[2] == "Common") {
+                    $('.rt-2').addClass('has-text-grey')
+                } else if (items[1].split(":")[2] == "Uncommon") {
+                    $('.rt-2').addClass('has-text-success')
+                } else if (items[1].split(":")[2] == "Rare") {
+                    $('.rt-2').addClass('has-text-primary')
+                } else if (items[1].split(":")[2] == "LEGENDARY") {
+                    $('.rt-2').addClass('has-text-warning')
+                } else if (items[1].split(":")[2] == "MYTHIC") {
+                    $('.rt-2').addClass('has-text-danger')
+                }
+                
+                if(items[2].split(":")[2] == "Common") {
+                    $('.rt-3').addClass('has-text-grey')
+                } else if (items[2].split(":")[2] == "Uncommon") {
+                    $('.rt-3').addClass('has-text-success')
+                } else if (items[2].split(":")[2] == "Rare") {
+                    $('.rt-3').addClass('has-text-primary')
+                } else if (items[2].split(":")[2] == "LEGENDARY") {
+                    $('.rt-3').addClass('has-text-warning')
+                } else if (items[2].split(":")[2] == "MYTHIC") {
+                    $('.rt-3').addClass('has-text-danger')
+                }
+                $('.rewards').show()
+                $('#lootbox-splash').hide()
+            }
+            
+            function claimReward(reward_num) {
+                // This entire file is the worst thing I have ever written and I think it's too far gone to save
+                $.get("api/claim_reward.php?key=development_YNkd3aYiRkMMuV0428UX18ZavHhrb32lDE2sswSdgMNNq9zaIaTjjy1IQRr1qCMT&reward=" + reward_num, function(data) {
+                    if ((data) == "200") {
+                        if(reward_num == 0) {
+                            $(".card2").fadeOut();
+                            $(".card3").fadeOut();
+                            $(".card1-buttn").text("Claimed Successfully!")
+                            $(".card1-buttn").toggleClass("is-static", true)
+                        } else if(reward_num == 1) {
+                            $(".card1").fadeOut();
+                            $(".card3").fadeOut();
+                            $(".card2-buttn").text("Claimed Successfully!")
+                            $(".card2-buttn").toggleClass("is-static", true)
+                        } else if(reward_num == 2) {
+                            $(".card1").fadeOut();
+                            $(".card2").fadeOut();
+                            $(".card3-buttn").text("Claimed Successfully!")
+                            $(".card3-buttn").toggleClass("is-static", true)
+                        }
+                    } else {
+                        alert("There was an error");
+                    }
+                })
+            }
+        </script>
+    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <body bgcolor='black' height="100%">
+        <div class='overlay'>&nbsp;</div>
+        <div id="fadeOut" bgcolor='white'></div>
+        <center>
+            <article class="message is-dark">
+                <div class="message-body">
+                    <strong>Thanks for being active today.</strong> Here's a reward for your participation. 
+                </div>
+            </article>
+            <div id='lootbox-splash'>
+                <img onclick="updateLootBoxes()" src='static/chest1.png' />
+                <br />
+                <button onclick='updateLootBoxes()' id="open-button" class="button" type="submit" value="Open loot crate">Open loot crate</button>
+        </center>
+        </div>
+        <center>
+            <div class="rewards">
+                <div class="container">
+                    <div class='columns'>
+                        <div class='column is-4'>
+                            <div class="card card1">
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Reward image">
+                                    </figure>
+                                </div>
+                                <div class="card-content">
+                                    <p id="title_1" class="title rt-1">Loading...</p>
+                                    <p id="desc_1" class="subtitle rd-1">Loading...</p>
+                                    <a id="link_1" href="/unbox/{{ token }}/">
+                                    <button class="button is-primary">Claim this reward</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='column is-4'>
+                            <div class="card card2">
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Reward image">
+                                    </figure>
+                                </div>
+                                <div class="card-content">
+                                    <p id="title_2" class="title rt-2">Loading...</p>
+                                    <p id="desc_2" class="subtitle rd-2">Loading...</p>
+                                    <a id="link_2" href="/unbox/{{ token }}/">
+                                    <button class="button is-primary card2-buttn">Claim this reward</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='column is-4'>
+                            <div class="card card3">
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Reward image">
+                                    </figure>
+                                </div>
+                                <div class="card-content">
+                                    <p id="title_3" class="title rt-3">Loading...</p>
+                                    <p id="desc_3" class="subtitle rd-3">Loading...</p>
+                                    <a id="link_3" href="/unbox/{{ token }}/">
+                                    <button class="button is-primary card3-buttn">Claim this reward</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+        </center>
+    </body>
+</html>

@@ -7,14 +7,14 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy
+from management import db, dynamic as dy, general as gen
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
-def is_command(message,commandtable,isHelp=False):
+def is_command(message,commandtable,help=False):
     return check.is_command(message,commandtable,isHelp,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
@@ -53,7 +53,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
-    elif is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+    elif is_command(message, []):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
@@ -79,6 +79,17 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
+    if is_command(message, ['lead']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().respond(gen.gain_leaderboard(user_id))]
+        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)))]
+    if is_command(message, ['lead'], True):
+        msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
+        msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
+    help_msg += "`" + prefix + "lead` - See an activity leaderboard."
+
+    # Profile commands
     profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
     if profile_commands:
         return profile_commands
@@ -86,7 +97,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     help_msg += "`" + prefix + "age` - Set your age\n"
     help_msg += "`" + prefix + "bio` - Set your bio\n"
     help_msg += "`" + prefix + "gender` - Set your gender\n"
-    help_msg += "`" + prefix + "profile` - View a player's profilen\n"
+    help_msg += "`" + prefix + "profile` - View a player's profile\n"
 
     # --------------------------------------------------------------
     #                          HELP

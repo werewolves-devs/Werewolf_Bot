@@ -1,9 +1,13 @@
 # Discord API / Login settings
-WW_TOKEN = "yo_mommas_token"
+WW_TOKEN = "NDAxNzE2MzgwODAzNTMwNzUy.Dm2kxA.r_PwUl5gZE0P9EFDZHu-7XKyyss"
 TM_TOKEN = "yo_poppas_token"
 DV_TOKEN = "yo_devils_token"
 GH_TOKEN = "yo_deadies_token"
 
+WEBHOOK_PUBLIC_ID = "488220391391887362"
+WEBHOOK_PUBLIC_TOKEN = "2fp9iH072W48g0QbSo0us0zo5v0qQvKGzo618aOq_uryjUrV1r7Bn_pIhQL0Nu9E-nNC"
+WEBHOOK_PRIVATE_ID = "488075058334400522"
+WEBHOOK_PRIVATE_TOKEN = "a0bNalwX7yeci-mBAk50WjCtl2OfxErBBmrfvSTv6_C2Ey89j00jhkcKWfBbp-Uf8l_Y"
 
 # Rules 'n' settings
 max_channels_per_category = 50
@@ -17,11 +21,12 @@ ghost_prefix = '$'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
-dynamic_config = "dynamic.json"
-general_database = 'general.db'
-database = 'game.db'
-shop_file = 'shop.json'
-stats_file = 'stats.json'
+dynamic_config = "storage/dynamic.json"
+general_database = 'storage/general.db'
+database = 'storage/game.db'
+shop_file = 'storage/shop.json'
+stats_file = 'storage/stats.json'
+item_file = 'storage/items.json'
 max_channels_per_category = 50
 
 # List of specific channels
