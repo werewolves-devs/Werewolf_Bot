@@ -39,14 +39,14 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             if box.token_status(token) != 2:
                 return []
             
-        data = box.get_token_data(token)
-        given_options = [int(data[3]),int(data[4]),int(data[5])]
-    
-        if choice not in given_options:
-            return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
+            data = box.get_token_data(token)
+            given_options = [int(data[3]),int(data[4]),int(data[5])]
+        
+            if choice not in given_options:
+                return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
 
-        box.add_choice(token,choice)
-        return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
+            box.add_choice(token,choice)
+            return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
 
     # =============================================================
     #
