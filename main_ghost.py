@@ -164,7 +164,7 @@ async def on_message_edit(before, after):
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
-        stats.increment_stat("bot_messages_sent", 1)
+        #stats.increment_stat("bot_messages_sent", 1)
         return
 
     #check role of sender
