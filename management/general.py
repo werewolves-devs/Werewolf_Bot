@@ -11,9 +11,9 @@ def add_activity(user_id,user_name):
     """Increase the activity score of a player."""
     c.execute("SELECT * FROM 'activity' WHERE id =?",(user_id,))
     if c.fetchone() == None:
-        c.execute("INSERT INTO 'inventory'('id','name') VALUES (?,'?');",(user_id,user_name))
-        c.execute("INSERT INTO 'activity'('id','name') VALUES (?,'?');",(user_id,user_name))
-        c.execute("INSERT INTO 'users'('id','name') VALUES (?,'?');",(user_id,user_name))
+        c.execute("INSERT INTO 'inventory'('id','name') VALUES (?,?);",(user_id,user_name))
+        c.execute("INSERT INTO 'activity'('id','name') VALUES (?,?);",(user_id,user_name))
+        c.execute("INSERT INTO 'users'('id','name') VALUES (?,?);",(user_id,user_name))
     c.execute("UPDATE 'activity' SET spam_activity = spam_activity + 1 WHERE id =?",(user_id,))
     conn.commit()
     db_set(user_id,'name',user_name)
