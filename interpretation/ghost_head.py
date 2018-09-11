@@ -15,7 +15,7 @@ def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
 def is_command(message,commandtable,help=False):
-    return check.is_command(message,commandtable,isHelp,prefix)
+    return check.is_command(message,commandtable,help,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id

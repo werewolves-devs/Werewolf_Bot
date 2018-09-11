@@ -42,19 +42,17 @@ def gain_leaderboard(user_id,amount=50):
     result_table = []
     next_layer = c.fetchmany(amount)
 
-    def is_in_table():
-        """Return if the user is in the next layer of users"""
-        for user in next_layer:
-            if user[0] == user_id:
-                return True
-        return False
-    
-    user_found = is_in_table()
+    user_found = False
+    for user in next_layer:
+        if user[0] == user_id:
+            user_found = True
     while next_layer != [] and not user_found:
         result_table.extend(next_layer)
 
         next_layer = c.fetchmany(amount)
-        user_found = is_in_table()
+        for user in next_layer:
+            if user[0] == user_id:
+                user_found = True
     result_table.extend(next_layer)
     result_table.extend(c.fetchmany(2))
 
@@ -62,22 +60,22 @@ def gain_leaderboard(user_id,amount=50):
 
     for i in range(min(amount,len(result_table))):
         element = result_table[i]
-        msg += "**{}. {}** - {} points\n".format(i+1,element[1],int(element[2]))
+        msg += "**{}. {}** - {} points\n".format(i+1,element[1],int(element[2]) + int(element[3]))
 
     if len(result_table) > amount + 2:
         for i in range(len(result_table)):
             if result_table[i][0] == user_id:
                 msg += "\n\n**__Your position:__**\n"
                 if i > 1:
-                    msg += "**{}. {}** - {} points\n".format(i-1,result_table[i-2][1],int(result_table[i-2][2]))
+                    msg += "**{}. {}** - {} points\n".format(i-1,result_table[i-2][1],int(result_table[i-2][2])+int(result_table[i-2][3]))
                 if i > 0:
-                    msg += "**{}. {}** - {} points\n".format(i,result_table[i-1][1],int(result_table[i-1][2]))
-                msg += "**{}. {}** - {} points\n".format(i+1,result_table[i][1],int(result_table[i][2]))
+                    msg += "**{}. {}** - {} points\n".format(i,result_table[i-1][1],int(result_table[i-1][2])+int(result_table[i-1][3]))
+                msg += "**{}. {}** - {} points\n".format(i+1,result_table[i][1],int(result_table[i][2])+int(result_table[i][3]))
                 if i < len(result_table) - 1:
-                    msg += "**{}. {}** - {} points\n".format(i+2,result_table[i+1][1],int(result_table[i+1][2]))
+                    msg += "**{}. {}** - {} points\n".format(i+2,result_table[i+1][1],int(result_table[i+1][2])+int(result_table[i+1][3]))
                 if i < len(result_table) - 2:
-                    msg += "**{}. {}** - {} points\n".format(i+3,result_table[i+2][1],int(result_table[i+2][2]))
-    
+                    msg += "**{}. {}** - {} points\n".format(i+3,result_table[i+2][1],int(result_table[i+2][2])+int(result_table[i+2][3]))
+
     return msg
 
 def get_user(user_id):

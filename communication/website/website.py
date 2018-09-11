@@ -10,8 +10,8 @@ app = Flask(__name__)
 # This commands is for debugging only
 @app.route('/create/<token>')
 def create_lootbox(token):
-    #return 'Nice try, bud. Ya can\'t create your own lootboxes this way. ;)'
-    if box.add_token(token,248158876799729664) == None:
+    return 'Nice try, bud. Ya can\'t create your own lootboxes this way. ;)'
+    if box.add_token(token,248158876799729664,random.randint(0,9999999)) == None:
         return 'ERROR: This token already existed!'
     return 'The token {} has successfully been created.'.format(token)
 
