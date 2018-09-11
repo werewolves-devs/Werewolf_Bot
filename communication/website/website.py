@@ -11,7 +11,7 @@ app = Flask(__name__)
 # This commands is for debugging only
 @app.route('/create/<token>')
 def create_lootbox(token):
-    return 'Nice try, bud. Ya can\'t create your own lootboxes this way. ;)'
+    return render_template('notoken.html', reason='ERROR: This part of the API is only opened in testing stages.')
     if box.add_token(token,248158876799729664,random.randint(0,9999999)) == None:
         return 'ERROR: This token already existed!'
     return 'The token {} has successfully been created.'.format(token)
@@ -26,7 +26,7 @@ def choose_reward(token,choice):
     given_options = [int(data[3]),int(data[4]),int(data[5])]
 
     if choice not in given_options:
-        return 'I am sorry! {} is not a valid option.'.format(choice)
+        return render_template('notoken.html', reason='ERROR: {} is not a valid option.'.format(choice))
     
     box.add_source2(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
     webhook.send_private_message(config.universal_prefix + "SUCCESS {} {}".format(token,choice))
@@ -57,21 +57,7 @@ def open_lootbox(token):
 
         return render_template('choice.html', choices=choices, token=token)
     
-    return 'This is strange! How did you get here?'
-
-
-@app.route('/open/<token>')
-def open(token):
-    validity = box.token_status(token)
-    if validity != 0:
-        return redirect(url_for('open_lootbox',token=token))
-    
-    # Add random rewards to lootbox: TODO
-    prizes = random.sample(range(100,200),3)
-    box.add_options(token,prizes[0],prizes[1],prizes[2])
-    box.add_source1(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
-
-    return render_template('unpack.html', token=token)
+    return 'This is strange! How did you get here?\nPlease report this to the Game Masters!'
 
 @app.route('/api/v1/<token>/rewards')
 def get_rewards(token):
