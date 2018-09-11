@@ -170,10 +170,13 @@ async def on_message(message):
         #stats.increment_stat("bot_messages_sent", 1)
         return
 
-    if random.randint(0,249) == 1:
+    if random.randint(0,249) == 1 and not message.author.bot:
         token = create_token(message.author.id)
-        msg = await message.author.send("Hey, so... this doesn\'t work well yet - but give this code to the Game Masters for a small reward! *(If it works.)* ```" + token + "```")
-        box.add_token(token,message.author.id,msg)
+        try:
+            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+            box.add_token(token,message.author.id,msg.id)
+        except:
+            message.channel.send('Ey, {}, I can\' DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
         await message.add_reaction('🎁')
 
     #check role of sender

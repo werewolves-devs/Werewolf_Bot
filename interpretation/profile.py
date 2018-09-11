@@ -3,12 +3,15 @@ from typing import List, Optional
 
 from discord import Message, User, Embed
 
+from config import ghost_prefix as prefix
 from interpretation import check
-from interpretation.ghost_head import is_command
 from main_classes import Mailbox
 from management.general import get_credits
 from management.profile import ProfileModel
 from management.db import isParticipant
+
+def is_command(message,commandtable,help=False):
+    return check.is_command(message,commandtable,help,prefix)
 
 
 def set_age(message: Message) -> List[Mailbox]:
