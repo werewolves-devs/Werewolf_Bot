@@ -116,7 +116,7 @@ async def on_reaction_add(reaction, user):
             await reaction_confirm.message.clear_reactions()
         else:
             if reaction_confirm.emoji == "✅":
-                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
+                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0x00ff00)
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
                 await reaction_confirm.message.clear_reactions()
@@ -126,7 +126,7 @@ async def on_reaction_add(reaction, user):
                 await quote_channel.send(embed=quote_embed)
             if reaction_confirm.emoji == "❎":
                 stats.increment_stat("quotes_denied", 1)
-                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0xff0000)
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
                 await reaction_confirm.message.clear_reactions()
