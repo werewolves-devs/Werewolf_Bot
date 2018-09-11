@@ -3,6 +3,7 @@ from communication import webhook
 import management.items as items
 import management.boxes as box
 import random
+import config
 
 
 app = Flask(__name__)
@@ -28,7 +29,7 @@ def choose_reward(token,choice):
         return 'I am sorry! {} is not a valid option.'.format(choice)
     
     box.add_source2(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
-    box.add_choice(token,choice)
+    webhook.send_private_message(config.universal_prefix + "SUCCESS {} {}".format(token,choice))
     return render_template('finish.html')
 
 

@@ -7,7 +7,7 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy, general as gen
+from management import db, dynamic as dy, general as gen, boxes as box
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -23,7 +23,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg = "**List of commands:**\n"
 
-
+    args = message.content.split(' ')
 
     # =============================================================
     #
@@ -31,7 +31,22 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
     if isPeasant == True:
-        pass
+        
+        if is_command(message,['success']):
+            token = args[1]
+            choice = args[2]
+
+            if box.token_status(token) != 2:
+                return []
+            
+        data = box.get_token_data(token)
+        given_options = [int(data[3]),int(data[4]),int(data[5])]
+    
+        if choice not in given_options:
+            return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
+
+        box.add_choice(token,choice)
+        return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
 
     # =============================================================
     #
