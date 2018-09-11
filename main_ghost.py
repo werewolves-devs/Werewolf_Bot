@@ -158,7 +158,8 @@ async def on_message_edit(before, after):
             if peasant in role_table and after.author.bot == True:
                 isPeasant = True
     except Exception:
-        pass
+        # We want the Ghost Bot to listen to the webhooks, who send data from the website.
+        isAdmin = True
 
     await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
