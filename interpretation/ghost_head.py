@@ -7,7 +7,7 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy, general as gen
+from management import db, dynamic as dy, general as gen, boxes as box
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -15,7 +15,7 @@ def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
 def is_command(message,commandtable,help=False):
-    return check.is_command(message,commandtable,isHelp,prefix)
+    return check.is_command(message,commandtable,help,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
@@ -23,7 +23,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg = "**List of commands:**\n"
 
-
+    args = message.content.split(' ')
 
     # =============================================================
     #
@@ -31,7 +31,22 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
     if isPeasant == True:
-        pass
+        
+        if is_command(message,['success']):
+            token = args[1]
+            choice = args[2]
+
+            if box.token_status(token) != 2:
+                return []
+            
+            data = box.get_token_data(token)
+            given_options = [int(data[3]),int(data[4]),int(data[5])]
+        
+            if choice not in given_options:
+                return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
+
+            box.add_choice(token,choice)
+            return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
 
     # =============================================================
     #
@@ -83,11 +98,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         number = check.numbers(message)
         if not number:
             return [Mailbox().respond(gen.gain_leaderboard(user_id))]
-        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)))]
+        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)),True)]
     if is_command(message, ['lead'], True):
         msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
         msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
-    help_msg += "`" + prefix + "lead` - See an activity leaderboard."
+    help_msg += "`" + prefix + "lead` - See an activity leaderboard.\n"
 
     # Profile commands
     profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)

@@ -247,7 +247,7 @@ def valid_distribution(role_table,just_checking=False):
         answer += "The claimspace among wolves is "
 
         if counter_claimspace_wolf == 0:
-            answer += "so small, that the white werewolf will be caught alsmost immediately.\n"
+            answer += "so small, that the white werewolf will be caught almost immediately.\n"
         elif counter_claimspace_wolf < 3:
             answer += "awkwardly small.\n"
         elif counter_claimspace_wolf < 6:

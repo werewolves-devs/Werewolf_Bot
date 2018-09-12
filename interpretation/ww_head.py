@@ -1203,7 +1203,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
-        return [answer.respond('Ayyyy!')]
+        return [Mailbox().respond('Ayyyy!')]
 
     # --------------------------------------------------------------
     #                          HELP

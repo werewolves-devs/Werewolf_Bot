@@ -116,7 +116,7 @@ async def on_reaction_add(reaction, user):
             await reaction_confirm.message.clear_reactions()
         else:
             if reaction_confirm.emoji == "✅":
-                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x00ff00)
+                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0x00ff00)
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
                 await reaction_confirm.message.clear_reactions()
@@ -126,7 +126,7 @@ async def on_reaction_add(reaction, user):
                 await quote_channel.send(embed=quote_embed)
             if reaction_confirm.emoji == "❎":
                 stats.increment_stat("quotes_denied", 1)
-                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
+                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0xff0000)
                 request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
                 await request.edit(embed=request_embed)
                 await reaction_confirm.message.clear_reactions()
@@ -171,11 +171,18 @@ async def on_message(message):
         #stats.increment_stat("bot_messages_sent", 1)
         return
 
-    if random.randint(0,249) == 1:
+    if random.randint(0,249) == 1 and not message.author.bot:
         token = create_token(message.author.id)
-        msg = await message.author.send("Hey, so... this doesn\'t work well yet - but give this code to the Game Masters for a small reward! *(If it works.)* ```" + token + "```")
-        box.add_token(token,message.author.id,msg)
-        await message.add_reaction('🎁')
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        try:
+            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+        except:
+            message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
+            botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
+        else:
+            box.add_token(token,message.author.id,msg.id,msg.channel.id)
+            await message.add_reaction('🎁')
+            botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
     #check role of sender
     isGameMaster = False
