@@ -1,4 +1,8 @@
 from flask import Blueprint, jsonify
+from communication import webhook
+import management.items as items
+import management.boxes as box
+import config
 
 bp = Blueprint(__name__, __name__)
 
@@ -29,6 +33,9 @@ def get_rewards(token):
         webhook.send_public_message("<@{}> just found a legendary item in a lootbox!".format(box.get_token_data(token)[1]))
 
     return jsonify(option1=given_options[0],option2=given_options[1],option3=given_options[2])
+
+
+# Archive
 
 @bp.route('/version/')
 def show_version():
