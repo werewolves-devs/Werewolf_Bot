@@ -51,6 +51,7 @@ async def check_time():
 
             # Give free credits in the middle of the night.
             if str(time.hour) == "0":
+                await client.get_channel(welcome_channel).send('Gonna send some credits! Get ready!')
                 deal_credits()
 
             # Give the day signal
@@ -74,7 +75,7 @@ async def check_time():
                     await client.get_channel(bot_spam).send("Beep boop! The night has started!")
 
             # Make a backup of the database
-            newpath = 'backup/{}_{}h/{}_{}h'.format(time.year,time.month,time.day,time.hour)
+            newpath = 'backup/{}_{}/{}_{}h/'.format(time.year,time.month,time.day,time.hour)
             if not os.path.exists(newpath):
                 os.makedirs(newpath)
             open('backup/{}_{}/{}_{}h/{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
@@ -82,7 +83,7 @@ async def check_time():
             open('backup/{}_{}/{}_{}h/{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
             open('backup/{}_{}/{}_{}h/{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
             open('backup/{}_{}/{}_{}h/{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            copy(config.database,'backup/{}_{}/{}_{}/h{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.database,'backup/{}_{}/{}_{}h/{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
             copy(config.general_database,'backup/{}_{}/{}_{}h/{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute))
             copy(config.stats_file,'backup/{}_{}/{}_{}h/{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute))
             copy(config.dynamic_config,'backup/{}_{}/{}_{}h/{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))

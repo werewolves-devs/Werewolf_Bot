@@ -98,11 +98,11 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         number = check.numbers(message)
         if not number:
             return [Mailbox().respond(gen.gain_leaderboard(user_id))]
-        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)))]
+        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)),True)]
     if is_command(message, ['lead'], True):
         msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
         msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
-    help_msg += "`" + prefix + "lead` - See an activity leaderboard."
+    help_msg += "`" + prefix + "lead` - See an activity leaderboard.\n"
 
     # Profile commands
     profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
