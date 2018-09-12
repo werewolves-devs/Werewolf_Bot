@@ -242,7 +242,7 @@ def channel_change_all(user_id,old,new):
 
     conn.commit()
 
-    return [element[0] for element in change_list]
+    return [int(element[0]) for element in change_list]
 
 # Gain all information of a channel
 # If the channel does not exist, it returns None
@@ -400,8 +400,8 @@ def has_amulet(user_id):
 
 def insert_deadie(user_id):
     """Add a new deadie to the list. This list will be evaluated for the storytime."""
-    c.execute("SELECT * FROM 'deadies' WHERE 'user_id' =?",(user_id,))
-    if c.fetchall == []:
+    c.execute("SELECT * FROM 'deadies' WHERE user_id =?",(user_id,))
+    if c.fetchall() == []:
         c.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);",(user_id,))
     conn.commit()
 
@@ -436,8 +436,8 @@ def add_poll(msg_table,purpose,channel_id,user_id = 0):
     if len(msg_table) > amount:
         raise IndexError("Poll needed more space in database than expected!")
 
-    request_msg = "INSERT INTO 'polls' ('purpose','user_id','channel'"
-    request2_msg = ") VALUES ('{}',{},{}".format(purpose,user_id,channel_id)
+    request_msg = "INSERT INTO 'polls'('purpose','user_id','channel'"
+    request2_msg = ") VALUES ('{}','{}',{}".format(purpose,user_id,channel_id)
 
     for i in range(len(msg_table)):
 

@@ -76,4 +76,6 @@ def random_emoji(unicode_version = 8):
 
     return (emoji, emoji_codepoint, emoji_name)
 
-print(*random_emoji(UNICODE_VERSION), sep='\t')
+if __name__ == "__main__":
+    for i in range(5):
+        print(*random_emoji(UNICODE_VERSION), sep='\t')

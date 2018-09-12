@@ -6,7 +6,9 @@ from main_classes import Mailbox
 import roles_n_rules.switch as switch
 import interpretation.check as check
 import management.db as db
+import management.boxes as box
 import reset
+import hardcore_reset
 
 # Sanity checks
 def test_universe_is_working_properly():
@@ -61,13 +63,13 @@ def test_database():
   db.add_channel('12211',1)
   assert db.get_category() == 24
   assert db.channel_get('1234555') == (u'1234555',u'1',u'0')
-  assert db.channel_change_all(1,0,1) == [u'1234555',u'12211']
+  assert db.channel_change_all(1,0,1) == [1234555,12211]
   assert db.channel_get('1234555') == (u'1234555',u'1',u'1')
   assert db.channel_get('12211') == (u'12211',u'1',u'1')
   db.set_user_in_channel('1234555',1,2)
   assert db.channel_get('1234555') == (u'1234555',u'1',u'2')
   assert db.channel_get('1234555',1) == '2'
-  assert db.channel_change_all(1,2,3) == [u'1234555']
+  assert db.channel_change_all(1,2,3) == [1234555]
   db.signup(420,"BenTechy66",":poop:")
   assert db.channel_get('12211') == (u'12211',u'1',u'1',u'0')
 
@@ -162,3 +164,17 @@ def test_amulets():
   assert db.has_amulet(1) == True
   assert db.has_amulet(3) == False
   reset.reset(True)
+
+def test_box_system():
+  hardcore_reset.hard_reset(True)
+  assert box.add_token("BenTechyFTW",123456) == ('BenTechyFTW',123456,0,None,None,None,None,None,None)
+  assert box.add_token("BenTechyFTW",123456) == None
+  assert box.get_token_data("BenTechyFTW") == ('BenTechyFTW',123456,0,None,None,None,None,None,None)
+  assert box.add_token("Randiboom",88) == ('Randiboom',88,0,None,None,None,None,None,None)
+  assert box.add_source1("BenTechyFTW","Shrewsbury") == ('BenTechyFTW',123456,0,None,None,None,None,"Shrewsbury",None)
+  assert box.add_options("BenTechyFTW","001","002","003") == ('BenTechyFTW',123456,1,"001","002","003",None,"Shrewsbury",None)
+  assert box.get_token_data("BenTechyFTW") == ('BenTechyFTW',123456,1,"001","002","003",None,"Shrewsbury",None)
+  assert box.add_source2("BenTechyFTW","Shrewsbury too.") == ('BenTechyFTW',123456,1,"001","002","003",None,"Shrewsbury","Shrewsbury too.")
+  assert box.add_source2("BenTechyFTW","Whoops, nevermind.") == ('BenTechyFTW',123456,1,"001","002","003",None,"Shrewsbury","Whoops, nevermind.")
+  assert box.add_choice("BenTechyFTW","003") == ('BenTechyFTW',123456,2,"001","002","003","003","Shrewsbury","Whoops, nevermind.")
+  hardcore_reset.hard_reset(True)

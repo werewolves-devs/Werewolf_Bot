@@ -1,26 +1,21 @@
 # This is the main file that cuts the message into pieces and transfers the info the the map roles_n_rules.
 from discord import Embed
 
-import interpretation.check as check
-import roles_n_rules.functions as func
-from config import max_cc_per_user, season, universal_prefix as unip
+from config import max_cc_per_user, season, universal_prefix as unip, max_participants
 from config import ghost_prefix as prefix
-from interpretation.check import is_command as old_is_command
+from interpretation import check
 from main_classes import Mailbox
-from management.position import valid_distribution
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from story_time.commands import cc_goodbye, cc_welcome
-import story_time.eastereggs as eggs
+from management import db, dynamic as dy, general as gen, boxes as box
+from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
-
 def todo():
     return [Mailbox().respond("I am terribly sorry! This command doesn't exist yet!", True)]
 
-def is_command(message,list,bool=False,std_prefix=prefix):
-    return old_is_command(message,list,bool,std_prefix)
-
+def is_command(message,commandtable,help=False):
+    return check.is_command(message,commandtable,help,prefix)
 
 def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     user_id = message.author.id
@@ -28,19 +23,30 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg = "**List of commands:**\n"
 
+    args = message.content.split(' ')
+
     # =============================================================
     #
     #                         BOT COMMANDS
     #
     # =============================================================
     if isPeasant == True:
-        if is_command(message,['kill'],False,unip):
-            answer = Mailbox()
-            for member in message.mentions:
-                answer.dm("Hey there, buddy!\n",member.id)
-                answer.dm_add("I\'m sorry for you that you died, that you lost the game! ")
-                answer.dm_add("But don't worry, there\'s still a lot to do in the afterlife!\n")
-                answer.dm_add("This story isn\'t finished, but it does need more explanation.")
+        
+        if is_command(message,['success']):
+            token = args[1]
+            choice = args[2]
+
+            if box.token_status(token) != 2:
+                return []
+            
+            data = box.get_token_data(token)
+            given_options = [int(data[3]),int(data[4]),int(data[5])]
+        
+            if choice not in given_options:
+                return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
+
+            box.add_choice(token,choice)
+            return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
 
     # =============================================================
     #
@@ -50,8 +56,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isAdmin == True:
         help_msg += "\n __Admin commands:__\n"
 
-    elif is_command(message, ['delete_category']):
+    elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
+
 
     # =============================================================
     #
@@ -61,19 +68,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
-    elif is_command(message, ['addrole','assign','day','night','open_signup','whois']):
+    elif is_command(message, []):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
     # =============================================================
     #
-    #                         DEAD PARTICIPANTS
+    #                         PARTICIPANTS
     #
     # =============================================================
 
-    if not isParticipant(user_id):
+    if isParticipant(user_id):
         help_msg += "\n__Participant commands:__\n"
 
         user_undead = int(db_get(user_id,'undead'))
+
+    elif is_command(message, []):
+        return [Mailbox().respond(PERMISSION_MSG.format("Participant"), True)]
+
 
     # =============================================================
     #
@@ -83,26 +94,25 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
-    '''age'''
-    # Allows users to set their age.
-    if is_command(message, ['age']):
-        # TODO
-        return todo()
-    if is_command(message, ['age'], True):
-        msg = "**USAGE:** This command is used to set your age. \n\n`" + prefix + "age<number>\n\n**Example:** `!age 19`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "age` - Set your age.\n"
+    if is_command(message, ['lead']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().respond(gen.gain_leaderboard(user_id))]
+        return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)),True)]
+    if is_command(message, ['lead'], True):
+        msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
+        msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
+    help_msg += "`" + prefix + "lead` - See an activity leaderboard.\n"
 
-    '''profile'''
-    # This command allows one to view their own profile
-    # When giving another player's name, view that player's profile
-    if is_command(message, ['profile']):
-        # TODO
-        return todo()
-    if is_command(message, ['profile'], True):
-        msg = "**USAGE:** The use of this command is to check your own profile, you can check other peoples profiles by adding their name. \n\n`" + prefix + "profile <user>`\n\n**Example:** `!profile @Randium#6521`"
-        return [Mailbox().respond(msg,True)]
-    help_msg += "`" + prefix + "profile` - See a player's profile.\n"
+    # Profile commands
+    profile_commands = process_profile(message=message, is_game_master=isGameMaster, is_admin=isAdmin, is_peasant=isPeasant)
+    if profile_commands:
+        return profile_commands
+
+    help_msg += "`" + prefix + "age` - Set your age\n"
+    help_msg += "`" + prefix + "bio` - Set your bio\n"
+    help_msg += "`" + prefix + "gender` - Set your gender\n"
+    help_msg += "`" + prefix + "profile` - View a player's profile\n"
 
     # --------------------------------------------------------------
     #                          HELP

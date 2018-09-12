@@ -22,6 +22,106 @@ def power(role,user_id=0):
         msg = exclamate('ARROOOO')
         msg += 'Dear Dog, it is time to see where your true loyalty lies; with your friends from town or where nature calls you!\n'
         msg += 'Time to make a choice! What will you be? An **Innocent**, a **Cursed Civilian** or a **Werewolf**?'
+    elif role == 'Exorcist':
+        msg = exclamate('Exorcist')
+        msg += 'Every night you are haunted by the memory of your first exorcism. That poor girl... Tonight is no different.'
+        msg += 'Who do you choose to undoom tonight?'
+    elif role == 'Fortune Teller':
+        msg = exclamate('Fortune Teller')
+        msg += 'You stare into your crystal ball, finally able to focus on the mystic smoke after a long day of work in the field.'
+        msg += 'Who\'s role will you check tonight?'
+    elif role == 'Grandma':
+        msg = exclamate('Oh Wise One,')
+        msg += 'Which children have been naughty today?'
+        msg += 'Who will you prevent from voting tomorrow?'
+    elif role == 'Hooker':
+        msg = exclamate('Hooker')
+        msg += 'After a long day of work, most people get to rest. But for you, work is just beginning.'
+        msg += 'Who will you pay a special visit to tonight?'
+    elif role == 'Innkeeper':
+        msg = exclamate('Inkeeper')
+        msg += 'You have polished the bar for the 20th time today and the last patron has retired to their room.'
+        msg += 'Who do you wish to unfreeze tonight?'
+    elif role == 'Look-Alike':
+        msg = exclamate('Master of Illusion')
+        msg += 'You have spent all day studying the townspeople, and are ready to make your choice.'
+        msg += 'Who\'s role will you take on going forward?'
+    elif role == 'Priest':
+        msg = exclamate('Holy One')
+        msg += 'The holy water is prepared. You are purified and sanctified. The task is at hand.'
+        msg += 'Is someone worthy of being sanctified? Who will recieve the blessing of the holy water?'
+    elif role == 'Priestess':
+        msg = exclamate('Priestess')
+        msg += 'The gods are kind! You have completed your daily rituals and the purification ceremony is upon us.'
+        msg += 'Who will you purify tonight?'
+    elif role == 'Raven':
+        msg = exclamate('Cacaww!')
+        msg += 'Men are punny! They should fear our cries!'
+        msg += 'Who shall you threaten tonight?'
+    elif role == 'Witch': #this role does't exist yet, but still, it's in the book.
+        msg = exclamate('Witch')
+        msg += 'Your cauldron is bubbling. Your potions gurggle.'
+        msg += 'Will you use the Potion of Life? Or perhaps the Potion of Death?'
+    elif role == 'Barber':
+        msg = exclamate('Barber')
+        msg += 'Cutomers come and go, but once in a while, an accident could happen. Decisions, decisions...'
+        msg += 'Do you wish to kill someone today? Who will bleed out in your chair? Do you wish to reveal yourself?'
+    elif role == 'Royal Knight':
+        msg = exclamate('Royal Knight')
+        msg += 'The royal proclamation you carry, for forgiving any lynchee-to-be, weighs heavily in your satchel every day.'
+        msg += 'Do you wish to forgive the lynchee-to-be today?'
+    elif role == 'Curse Caster':
+        msg = exclamate('Curse Caster')
+        msg += 'Mankind is evil! You should turn everyone into a werewolf for ultimate revenge.'
+        msg += 'Who shall you curse tonight?'
+    elif role == 'Infected Wolf':
+        msg = exclamate('Infected Wolf')
+        msg += 'Your fangs drip poison, ready to turn someone to your team at any moment.'
+        msg += 'Do you wish to infect someone? Who will fall to your fangs and join the Wolf team?'
+    elif role == 'Lone Wolf':
+        msg = exclamate('AROOOOO')
+        msg += 'The moon rises and you feel the call of the pack. But it is not time to join them yet.'
+        msg += 'Who will you consume tonight?'
+    elif role == 'Warlock':
+        msg = exclamate('Warlock')
+        msg += 'Your blackened and warped crystal ball still functions as well as ever. It is ready to obey the power of the Warlock.'
+        msg += 'Who\'s role will you check tonight?'
+    elif role == 'Tanner':
+        msg = exclamate('Tanner')
+        msg += 'The disguises you made last night are prepared. You will fool the fortune teller!'
+        msg += 'Who do you wish to disguise today?'
+    elif role == 'White Wolf':
+        msg = exclamate('White Werewolf')
+        msg += 'Your pack mates are just as tasty as the townspeople.'
+        msg += 'Which werewolf will you snack on tonight?'
+    elif role == 'Devil':
+        msg = exclamate('Devil')
+        msg += 'The fires of hell are ever hungry, never satisfied.'
+        msg += 'Who will you give the wager to tonight?'
+    elif role == 'Flute Player':
+        msg = exclamate('Flute Player')
+        msg += 'All rats follow the piper. All townspeople will one day be enchanted.'
+        msg += 'Who shall you enchant tonight?'
+    elif role == 'Ice King':
+        msg = exclamate('Ice King')
+        msg += 'The seeping cold slowly freezes all. The world will be frozen, soon enough.'
+        msg += 'Who\'s roles will you guess tonight, and what will they be?'
+    elif role == 'Pyromancer':
+        msg = exclamate('Burn Baby, Burn!')
+        msg += 'Your powder is ready, and of course your lighter is too. You are ready to light a *fiyah*.'
+        msg += 'Who will you powder tonight? ...Or perhaps you wish to ignite and watch the world burn?'
+    elif role == 'The Thing': #apparently this is a night user too?
+        msg = exclamate('Monster!')
+        msg += ''
+        msg += 'Who will you do the thing to tonight?'
+    elif role == 'Vampire':
+        msg = exclamate('Vampire')
+        msg += 'The army of the dead will rise!'
+        msg += 'Who shall you demonize tonight?'
+    elif role == 'Zombie':
+        msg = exclamate('BRAINZZZZZ')
+        msg += 'Tasty, tasty brains. Must eat more.'
+        msg += 'Who will you bite tonight?'
     else:
         msg = "Hey bud! Time to do something!"
     # TODO
@@ -90,5 +190,13 @@ def creation(role,user_id=0):
         msg += "town accept to be tortured!"
         msg += "**You are the Barber! You can kill a player at any time during the day. Choose wisely, however! "
         msg += "You can only use this power once.**"
+
+    if role == 'Crowd Seeker':
+        msg = exclamate('Seek and thou shall find')
+        msg += "Your powers do not allow you to sense specific players too well, but you are capable of following your "
+        msg += "senses and finding specific roles among the crowd! This is why you've given yourself the task to find "
+        msg += "and kill the evil geings in your town!\n"
+        msg += "**You are the Crowd Seeker! Use your powers to confirm or debunk people who claim their roles. "
+        msg += "Make sure to kill everything that does not belong here!**"
 
     return msg

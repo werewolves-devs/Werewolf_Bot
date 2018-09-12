@@ -30,7 +30,70 @@ shared_secrets = ["Baker","Butcher","Cult Leader","Werewolf","Hell Hound","Demon
 pretenders = ["Baker","Butcher","Cult Leader","Cult Member","Werewolf","Bloody Butcher","Hell Hound",
 "Infected Wolf","Sacred Wolf","White Werewolf","Wolf's Cub","Flute Player","Ice King","Psychopath","Pyromancer"]
 
+# Converts the required string to its position in the SQLite database.
+# Raises an error if it cannot find the string.
+def positionof(column):
+    if column == "id":
+        return 0
+    if column == "name":
+        return 1
+    if column == "emoji":
+        return 2
+    if column == "activity":
+        return 3
+    if column == "channel":
+        return 4
+    if column == "role":
+        return 5
+    if column == "fakerole":
+        return 6
+    if column == "uses":
+        return 7
+    if column == "votes":
+        return 8
+    if column == "threatened":
+        return 9
+    if column == "enchanted":
+        return 10
+    if column == "demonized":
+        return 11
+    if column == "powdered":
+        return 12
+    if column == "frozen":
+        return 13
+    if column == "undead":
+        return 14
+    if column == "bites":
+        return 15
+    if column == "bitten":
+        return 16
+    if column == "souls":
+        return 17
+    if column == "sleepingover":
+        return 18
+    if column == "lastwords":
+        return 19
+    if column == "abducted":
+        return 20
+    if column == "ccs":
+        return 21
+    if column == 'horseman':
+        return 22
+    if column == 'amulet':
+        return 23
 
+    raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
+
+def gen_position(column):
+    if column == "id":
+        return 0
+    if column == "name":
+        return 1
+    if column == "credits":
+        return 2    
+
+
+    raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
 
 def valid_distribution(role_table,just_checking=False):
     hasVillage = 0
@@ -184,7 +247,7 @@ def valid_distribution(role_table,just_checking=False):
         answer += "The claimspace among wolves is "
 
         if counter_claimspace_wolf == 0:
-            answer += "so small, that the white werewolf will be caught alsmost immediately.\n"
+            answer += "so small, that the white werewolf will be caught almost immediately.\n"
         elif counter_claimspace_wolf < 3:
             answer += "awkwardly small.\n"
         elif counter_claimspace_wolf < 6:
@@ -196,60 +259,6 @@ def valid_distribution(role_table,just_checking=False):
     
     return answer
 
-
-# Converts the required string to its position in the SQLite database.
-# Raises an error if it cannot find the string.
-def positionof(column):
-    if column == "id":
-        return 0
-    if column == "name":
-        return 1
-    if column == "emoji":
-        return 2
-    if column == "activity":
-        return 3
-    if column == "channel":
-        return 4
-    if column == "role":
-        return 5
-    if column == "fakerole":
-        return 6
-    if column == "uses":
-        return 7
-    if column == "votes":
-        return 8
-    if column == "threatened":
-        return 9
-    if column == "enchanted":
-        return 10
-    if column == "demonized":
-        return 11
-    if column == "powdered":
-        return 12
-    if column == "frozen":
-        return 13
-    if column == "undead":
-        return 14
-    if column == "bites":
-        return 15
-    if column == "bitten":
-        return 16
-    if column == "souls":
-        return 17
-    if column == "sleepingover":
-        return 18
-    if column == "lastwords":
-        return 19
-    if column == "abducted":
-        return 20
-    if column == "ccs":
-        return 21
-    if column == 'horseman':
-        return 22
-    if column == 'amulet':
-        return 23
-
-    raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))
 
 def check_for_int(s):
     """Returns True if the value s is or can be converted to an integer. Returns False otherwise."""

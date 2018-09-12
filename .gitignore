@@ -55,3 +55,8 @@ docs/_build/
 
 # Custom
 *.db
+
+config\.py
+stats\.json
+
+backup/
