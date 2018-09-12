@@ -1,7 +1,10 @@
 # Discord API / Login settings
-WW_TOKEN = "yo_mommas_token"
-TM_TOKEN = "yo_poppas_token"
-SHOP_TOKEN = "yo_devils_token"
+DV_TOKEN = "yo_devils_token"
+GH_TOKEN = "yo_deadies_token"
+WEBHOOK_PUBLIC_ID = "488220391391887362"
+WEBHOOK_PUBLIC_TOKEN = "2fp9iH072W48g0QbSo0us0zo5v0qQvKGzo618aOq_uryjUrV1r7Bn_pIhQL0Nu9E-nNC"
+WEBHOOK_PRIVATE_ID = "488075058334400522"
+WEBHOOK_PRIVATE_TOKEN = "a0bNalwX7yeci-mBAk50WjCtl2OfxErBBmrfvSTv6_C2Ey89j00jhkcKWfBbp-Uf8l_Y"
 
 # Rules 'n' settings
 max_channels_per_category = 50
@@ -15,31 +18,32 @@ ghost_prefix = '$'
 universal_prefix = "#!003-88-6521"
 
 # Database settings
-dynamic_config = "dynamic.json"
-general_database = 'general.db'
-database = 'game.db'
-shop_file = 'shop.json'
-stats_file = 'stats.json'
+dynamic_config = "storage/dynamic.json"
+general_database = 'storage/general.db'
+database = 'storage/game.db'
+shop_file = 'storage/shop.json'
+stats_file = 'storage/stats.json'
+item_file = 'storage/items.json'
 max_channels_per_category = 50
 
 # List of specific channels
-welcome_channel = 446046437114118145
-game_log = 456880259636396034
-bot_spam = 482219246177222657
-story_time = 477533978547453972
-shop_channel = 482660799626608640
-quotes = 484090767254749215
+welcome_channel = 425036088239980544
+game_log = 485843514379337748
+bot_spam = 394541968689987584
+story_time = 485843933625188352
+shop_channel = 394541968689987584
+quotes = 487354468606803968
 
 # List of specific roles
-administrator = 446235596722012160
-game_master = 456884637638328332
-participant = 456881451745411089
-dead_participant = 457498358077063170
-frozen_participant = 457498631344357387
-suspended = 0 # TODO
-peasant = 0 # TODO
-mayor = 0 # TODO
-reporter = 0 # TODO
+administrator = 400956179561447425
+game_master = 375651524950360075
+participant = 380494164627816448
+dead_participant = 380493972100874242
+frozen_participant = 432146998762668033
+suspended = 382947666935414784
+peasant = 396041262836351006
+mayor = 382103216105717760
+reporter = 382103338550034442
 
 # Box
 base_url = 'https://example.com/box'
