@@ -37,6 +37,16 @@ def get_rewards(token):
 
 # Archive
 
+@bp.route('/archive/list_seasons')
+def list_seasons():
+    return(jsonify({'status': '500', 'reason': 'Work-In-Progress'}))
+
+@bp.route('/archive/get_messages/<season>/<channel_id>/<chunk>')
+def get_messages(season, channel_id, chunk=0):
+    return(jsonify({'status': '500', 'reason': 'Work-In-Progress'}))
+
+# General
+
 @bp.route('/version/')
 def show_version():
     return jsonify({
