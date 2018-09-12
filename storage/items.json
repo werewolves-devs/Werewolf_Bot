@@ -1,8 +1,8 @@
 {
-    "common": 0.74,
-    "rare": 0.10,
-    "epic": 0.05,
-    "legendary": 0.01,
+    "common": 74,
+    "rare": 10,
+    "epic": 5,
+    "legendary": 1,
     
     "rewards": [
         [
@@ -207,5 +207,6 @@
             "name": "dagger",
             "code": 106
         }
-    ]
+    ],
+    "add_command": "ALTER TABLE 'channels' ADD COLUMN '{}' INTEGER NOT NULL DEFAULT 0"
 }

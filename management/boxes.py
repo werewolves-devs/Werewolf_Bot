@@ -1,9 +1,10 @@
+from communication import webhook
 import sqlite3
 import config
 import random
 
 
-def add_token(token,user_id):
+def add_token(token,user_id,message):
     """Add a new token to the database.  
       
     Keyword arguments:  
@@ -17,7 +18,7 @@ def add_token(token,user_id):
     if c.fetchone() != None:
         return None
     
-    c.execute("INSERT INTO 'tokens' ('token','owner') VALUES (?,?)",(token,user_id))
+    c.execute("INSERT INTO 'tokens'('token','owner','message') VALUES (?,?,?);",(token,user_id,message))
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
@@ -31,6 +32,7 @@ def add_source1(token,source):
 
     conn = sqlite3.connect(config.general_database)
     c = conn.cursor()
+    insert_source(get_token_data(token)[1],source)
 
     c.execute("UPDATE 'tokens' SET source1 =? WHERE token =?",(source,token))
     conn.commit()
@@ -46,12 +48,31 @@ def add_source2(token,source):
 
     conn = sqlite3.connect(config.general_database)
     c = conn.cursor()
+    insert_source(get_token_data(token)[1],source)
 
     c.execute("UPDATE 'tokens' SET source2 =? WHERE token =?",(source,token))
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
     return c.fetchone()
+
+def insert_source(user_id,source):
+    """Add a source to a given user."""
+    conn = sqlite3.connect(config.general_database)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM 'sources' WHERE user=? AND source=?",(user_id,source))
+    if c.fetchone() != None:
+        c.execute("UPDATE 'sources' SET amount = amount+1 WHERE user=? AND source=?",(user_id,source))
+        conn.commit()
+        return
+    
+    c.execute("SELECT * FROM 'sources' WHERE source=?",(source,))
+    if c.fetchone() != None:
+        webhook.send_private_message("Found source {} for <@{}>".format(source,user_id))
+
+    c.execute("INSERT INTO 'sources'('user','source') VALUES (?,?);",(user_id,source))
+    conn.commit()
 
 def add_options(token,choice1,choice2,choice3):
     """Register the three options into the database.  
@@ -90,6 +111,7 @@ def add_choice(token,choice):
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
+    webhook.send_private_message(config.universal_prefix + 'SUCCESS {}'.format(token))
     return c.fetchone()
 
 def get_token_data(token):
