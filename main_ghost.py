@@ -48,13 +48,16 @@ from config import ghost_prefix as prefix
 from management.db import db_set, db_get
 from interpretation.ghost_head import process
 from interpretation.polls import count_votes
+from interpretation.basecode import create_token
 import config
+import random
+import shop
+import stats
 import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
 import management.general as general
-import shop
-import stats
+import management.boxes as box
 from emoji import emojize
 
 
@@ -155,7 +158,8 @@ async def on_message_edit(before, after):
             if peasant in role_table and after.author.bot == True:
                 isPeasant = True
     except Exception:
-        pass
+        # We want the Ghost Bot to listen to the webhooks, who send data from the website.
+        isAdmin = True
 
     await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
@@ -164,8 +168,21 @@ async def on_message_edit(before, after):
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
-        stats.increment_stat("bot_messages_sent", 1)
+        #stats.increment_stat("bot_messages_sent", 1)
         return
+
+    if random.randint(0,249) == 1 and not message.author.bot:
+        token = create_token(message.author.id)
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        try:
+            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+        except:
+            message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
+            botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
+        else:
+            box.add_token(token,message.author.id,msg.id,msg.channel.id)
+            await message.add_reaction('🎁')
+            botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
     #check role of sender
     isGameMaster = False
