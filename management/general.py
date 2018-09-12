@@ -31,7 +31,7 @@ def purge_activity():
 
 def deal_credits():
     """Give all players a small portion of credits based on their activity."""
-    c.execute("UPDATE users SET credits = credits + CAST( activity/500 AS INTEGER);")
+    c.execute("UPDATE users SET credits = credits + CAST( activity/250 AS INTEGER);")
     conn.commit()
 
 def gain_leaderboard(user_id,amount=10):
