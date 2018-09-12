@@ -266,7 +266,7 @@ def ignite(user_id):
 
     # Ignite all living players.
     for user in db.player_list(True,True):
-        if db.isParticipant(user) and user_role != 'Pyromancer':
+        if db.isParticipant(user) and db_get(user,'role') != 'Pyromancer':
             db.add_kill(int(user),'Pyromancer',user_id)
 
     answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
@@ -667,7 +667,7 @@ def seek(user_id,victim_id,role):
     user_channel = int(db_get(user_id,'channel'))
     user_undead = int(db_get(user_id,'undead'))
 
-    victim_role = db_get(victim_id,'role')
+    victim_role = db_get(victim_id,'fakerole')
     victim_frozen = int(db_get(victim_id,'frozen'))
     victim_abducted = int(db_get(victim_id,'abducted'))
 

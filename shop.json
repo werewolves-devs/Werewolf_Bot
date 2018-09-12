@@ -1,9 +1,0 @@
-{
-  "items": [
-    {"name": "Dagger", "description": "Kill one player", "price": 750, "emoji": ":dagger:"},
-    {"name": "Randium Face Reveal", "description": "Randium will send a picture of his face", "price": 9999999999, "emoji": ":grinning_face_with_big_eyes:"},
-    {"name": "Seductive Picture of Regicide", "description": "A seductive picture of regicide", "price": 1000, "emoji": ":eggplant:"}
-  ],
-  "currency": "WBucks",
-  "shop_description": "Here you can spend the credits you earnt from being active\nReact with the specified emoji to buy an item"
-}

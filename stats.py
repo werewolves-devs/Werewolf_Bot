@@ -97,12 +97,25 @@ def increment_stat(stat, amount):
 
 def get_stat(stat):
     """Returns the value of {stat}"""
-    return get_stats()[stat]
+    try:
+        return get_stats()[stat]
+    except:
+        return "0"
+
+def get_stat_day(stat):
+    """Returns the value of {stat} for the current d/n cycle"""
+    try:
+        return get_stats()["current_day"][stat]
+    except:
+        return "0"
 
 def get_user_stat(user_id, stat):
     """Returns {user_id}'s {stat}"""
-    user_id = str(user_id)
-    return get_stats()["users"][user_id][stat]
+    try:
+        user_id = str(user_id)
+        return get_stats()["users"][user_id][stat]
+    except:
+        return "0"
 
 def increment_user_stat(user_id, stat, value):
     """Returns {user_id}'s {stat}"""

@@ -1,0 +1,13 @@
+{
+  "items": [
+    {"name": "Invisibility cloak", "description": "Gain protection for one night.", "price": 0, "emoji": "", "code": "100"},
+    {"name": "Bucket of water", "description": "Lose the powdered effect.", "price": 0, "emoji": "", "code": "101"},
+    {"name": "Royal Sword", "description": "Cancel the lynch.", "price": 0, "emoji": "", "code": "102"},
+    {"name": "Disguise", "description": "Disguise yourself", "price": 0, "emoji": "", "code": "103"},
+    {"name": "Name Tag", "description": "Change a Game Master's nickname", "price": 0, "emoji": "", "code": "104"},
+    {"name": "Med Kit", "description": "Give another player protection for one night.", "price": 0, "emoji": "", "code": "105"},
+    {"name": "Dagger", "description": "Assassinate another player.", "price": 0, "emoji": "", "code": "106"}
+  ],
+  "currency": "credits",
+  "shop_description": "Here you can spend the credits you earnt from being active\nReact with the specified emoji to buy an item!"
+}
