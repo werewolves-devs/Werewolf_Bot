@@ -1,8 +1,9 @@
 from typing import Union
 
-from config import general_database
 from discord import User, Member
 from peewee import Model, SqliteDatabase, BigIntegerField, IntegerField, CharField
+
+from config import general_database
 
 general_database = SqliteDatabase(general_database)
 
@@ -15,11 +16,12 @@ class GeneralBaseModel(Model):
 class ProfileModel(GeneralBaseModel):
     uid = BigIntegerField(primary_key=True)
     age = IntegerField(default=0)
-    bio = CharField(max_length=2012, default="Hey there! This is my bio!\nI am a happy villager who enjoys killing werewolves!")
+    bio = CharField(max_length=2012,
+                    default="Hey there! This is my bio!\nI am a happy villager who enjoys killing werewolves!")
     gender = CharField(max_length=255, default="Unknown")
 
     @classmethod
-    def get_or_insert(cls, user: Union[User, Member, int]) -> 'profiles':
+    def get_or_insert(cls, user: Union[User, Member, int]) -> 'ProfileModel':
         if hasattr(user, 'id'):
             user = user.id
         model, created = cls.get_or_create(uid=user)
@@ -39,6 +41,9 @@ class ProfileModel(GeneralBaseModel):
                 return f'{last_age+1}-{next_age}'
             last_age = next_age
         return '130+'
+
+    class Meta:
+        db_table = 'profiles'
 
 
 ProfileModel.create_table(safe=True)
