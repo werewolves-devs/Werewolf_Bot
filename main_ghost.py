@@ -171,7 +171,7 @@ async def on_message(message):
         #stats.increment_stat("bot_messages_sent", 1)
         return
 
-    if random.randint(0,249) == 1 and not message.author.bot:
+    if random.randint(0,249+general.spam_activity(message.author.id)) == 1 and not message.author.bot:
         token = create_token(message.author.id)
         botspam_channel = client.get_channel(int(config.bot_spam))
         try:
