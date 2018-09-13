@@ -177,12 +177,12 @@ async def on_message(message):
         try:
             msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
         except:
-            message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
-            botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
+            await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
+            await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
         else:
-            box.add_token(token,message.author.id,msg.id,msg.channel.id)
+            box.add_token(token,message.author.id,msg.id)
             await message.add_reaction('🎁')
-            botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
+            await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
     #check role of sender
     isGameMaster = False
