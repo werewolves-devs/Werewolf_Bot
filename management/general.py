@@ -18,6 +18,15 @@ def add_activity(user_id,user_name):
     conn.commit()
     db_set(user_id,'name',user_name)
 
+def spam_activity(user_id):
+    """Gain info about the user's spam activity. This is supposed to fight the encouragement to spam the channels 
+    in order to get more lootboxes."""
+    c.execute("SELECT * FROM 'activity' WHERE id=?",(user_id,))
+    answer = c.fetchone()
+    if answer == None:
+        return 0
+    return int(answer[3])
+
 def purge_activity():
     """Purge the activity score of all players."""
     c.execute("UPDATE activity SET spam_activity = 0 WHERE spam_activity > 2*spam_filter;")
