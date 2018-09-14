@@ -91,7 +91,7 @@ async def check_time():
             copy(config.dynamic_config,'backup/{}_{}/{}_{}h/{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))
             copy('config.py','backup/{}_{}/{}_{}h/{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute))
 
-            await asyncio.sleep(45)
+            await asyncio.sleep(75)
 
         await asyncio.sleep(10)
         roulette.surrender(True)
