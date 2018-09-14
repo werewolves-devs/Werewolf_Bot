@@ -59,6 +59,17 @@ def get_messages(season, channel_id, chunk=0):
         chunk_of_messages = messages[chunk:]
         return jsonify(chunk_of_messages)
 
+@bp.route('/archive/get_channels/<season>/')
+def get_channels(season):
+    with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
+        data = json.loads(f.read())
+        guild = get_property_by_id(data["Guilds"], config.main_guild)
+        channels = []
+        for channel in guild["Channels"]:
+            del channel["Messages"]
+            channels.append(channel)
+        return jsonify(channels)
+
 # General
 
 @bp.route('/version/')
