@@ -214,7 +214,7 @@ def profile(user):
     global winners
     global deadies
 
-    answer = '**__Profile of <@{}>:__**\n'
+    answer = '**__Profile of <@{}>:__**\n'.format(user.id)
     user_class = None
 
     for good_guy in winners:
