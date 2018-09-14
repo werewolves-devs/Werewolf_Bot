@@ -18,6 +18,15 @@ def add_activity(user_id,user_name):
     conn.commit()
     db_set(user_id,'name',user_name)
 
+def spam_activity(user_id):
+    """Gain info about the user's spam activity. This is supposed to fight the encouragement to spam the channels 
+    in order to get more lootboxes."""
+    c.execute("SELECT * FROM 'activity' WHERE id=?",(user_id,))
+    answer = c.fetchone()
+    if answer == None:
+        return 0
+    return int(answer[3])
+
 def purge_activity():
     """Purge the activity score of all players."""
     c.execute("UPDATE activity SET spam_activity = 0 WHERE spam_activity > 2*spam_filter;")
@@ -88,3 +97,8 @@ def get_credits(user_id):
     if value == None:
         return None
     return value[2]
+
+def update_roulette_score(user_id,value):
+    """Üpdate the player's roulette highscore. It is set to the highest score present, and will not update if the latest score is lower."""
+    c.execute("UPDATE 'users' SET roulette_record =? WHERE id=? AND roulette_record <?",(value,user_id,value))
+    conn.commit()
