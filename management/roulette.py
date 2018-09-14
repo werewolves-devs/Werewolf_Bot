@@ -4,7 +4,7 @@ import config
 import random
 import time
 
-class User:
+class Ruser:
     def __init__(self,user_class,alive=True):
         self.user = user_class
         self.victims = []
@@ -120,9 +120,9 @@ def take_shot(message):
                     winners.remove(victim)
 
             if victim == None:
-                victim = User(challenger)
+                victim = Ruser(challenger)
             if user == None:
-                user = User(acceptant)
+                user = Ruser(acceptant)
                 winners.append(user)
             user.kill(victim)
             deadies.append(victim)
@@ -183,10 +183,10 @@ def surrender(need_for_check=True,user=None):
             victim = player
 
     if victim == None:
-        victim = User(challenger)
+        victim = Ruser(challenger)
         winners.append(victim)
     if user == None:
-        user = User(acceptant)
+        user = Ruser(acceptant)
         winners.append(user)
     user.kill(victim)
     
@@ -196,7 +196,7 @@ def surrender(need_for_check=True,user=None):
     update_roulette_score(victim.user.id,victim.score)
 
     answer = Mailbox().respond("It seems like <@{}> has chickened out! Boo!".format(victim.id),False,['🍅'])
-    answer.respond("**{} WINS!**".format(user.display_name))
+    answer.respond("**<@{}> WINS!**".format(user.id))
 
     challenger = None
     acceptant = None
