@@ -50,29 +50,35 @@ def list_seasons():
 
 @bp.route('/archive/get_messages/<season>/<int:channel_id>/<int:chunk>')
 def get_messages(season, channel_id, chunk=0):
-    with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
-        data = json.loads(f.read())
-        guild = get_property_by_id(data["Guilds"], config.main_guild)
-        channel = get_property_by_id(guild["Channels"], channel_id)
-        if channel == None:
-            return jsonify({"status": 404, "reason": "Unknown Channel ID"})
-        messages = channel["Messages"]
-        chunk = -50 * chunk
-        chunk_of_messages = messages[chunk:]
-        return jsonify(chunk_of_messages)
+    try:
+        with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
+            data = json.loads(f.read())
+            guild = get_property_by_id(data["Guilds"], config.main_guild)
+            channel = get_property_by_id(guild["Channels"], channel_id)
+            if channel == None:
+                return jsonify({"status": 404, "reason": "Unknown Channel ID"})
+            messages = channel["Messages"]
+            chunk = -50 * chunk
+            chunk_of_messages = messages[chunk:]
+            return jsonify(chunk_of_messages)
+    except:
+        return jsonify({"status": 404, "reason": "Unknown Season"})
 
 @bp.route('/archive/get_channels/<season>/')
 def get_channels(season):
-    with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
-        data = json.loads(f.read())
-        guild = get_property_by_id(data["Guilds"], config.main_guild)
-        if guild == None:
-            return jsonify({"status": 404, "reason": "Unknown Guild ID"})
-        channels = []
-        for channel in guild["Channels"]:
-            del channel["Messages"]
-            channels.append(channel)
-        return jsonify(channels)
+    try:
+        with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
+            data = json.loads(f.read())
+            guild = get_property_by_id(data["Guilds"], config.main_guild)
+            if guild == None:
+                return jsonify({"status": 404, "reason": "Unknown Guild ID"})
+            channels = []
+            for channel in guild["Channels"]:
+                del channel["Messages"]
+                channels.append(channel)
+            return jsonify(channels)
+    except:
+        return jsonify({"status": 404, "reason": "Unknown Season"})
 
 # General
 
