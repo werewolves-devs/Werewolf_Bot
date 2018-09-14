@@ -73,6 +73,7 @@ def take_shot(message):
                 return [Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)]
         challenger = user
         game_channel = channel
+        timeout = time.time()
         return Mailbox().respond("<@{}> has grabbed the pistol and loaded a bullet in it! Who wants to play a dangerous game?".format(user.id))
 
     # Redirect wrong channel
@@ -143,6 +144,7 @@ def take_shot(message):
         switch = challenger
         challenger = acceptant
         acceptant = switch
+        timeout = time.time()
         return Mailbox().respond("You pull the trigger, and you hear a small **CLICK!** It's <@{}>'s turn now.".format(challenger.id))
     
     return Mailbox().spam("I got a strange event during the Russian Roulette! Can somebody check this out?").respond("**ERROR:** Invalid if-statwments. Please report this to the Game Masters!")
@@ -164,14 +166,18 @@ def surrender(need_for_check=True,user=None):
         return Mailbox()
 
     if acceptant == None:
-        challenger = None
         game_channel = None
         if user == None:
-            return Mailbox().respond("It has taken too long for anyone to accept your challenge, <@{}>! If you're still here, please rejoin the challenge.")
+            if time.time() - timeout > 600:
+                answer = Mailbox().respond("It has taken too long for anyone to accept your challenge, <@{}>! If you're still here, please rejoin the challenge.".format(challenger.id))
+                challenger = None
+                return answer
+            return Mailbox()
+        challenger = None
         return Mailbox().respond("<@{}> fired the round in the air, and put down the gun. Let's play this game later!".format(user.display_name))
 
     if need_for_check:
-        if time.time() - timeout < 1800:
+        if time.time() - timeout < 600:
             return Mailbox()
         
     # Reset the game
