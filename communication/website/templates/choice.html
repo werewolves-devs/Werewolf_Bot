@@ -30,6 +30,33 @@
               preload: true
             });
         </script>
+        <script>
+            function showTitle(element,code,name) {
+                if (Number(code) > 4000000-1) {
+                    document.getElementById(element).style.color = "#808000";
+                    document.getElementById(element).innerHTML = "[LEGENDARY] " + name;
+                    return;
+                }
+                if (Number(code) > 3000000-1) {
+                    document.getElementById(element).style.color = "#ff00ff";
+                    document.getElementById(element).innerHTML = "[EPIC]" + name;
+                    return;
+                }
+                if (Number(code) > 2000000-1) {
+                    document.getElementById(element).style.color = "#0080ff";
+                    document.getElementById(element).innerHTML = "[RARE] " + name;
+                    return;
+                }
+                document.getElementById(element).innerHTML = "[COMMON] " + name;
+            }
+
+            $( document ).ready(function() {
+                showTitle("title_1","{{ choices[0].code }}","{{ choices[0].name }}");
+                showTitle("title_2","{{ choices[1].code }}","{{ choices[1].name }}");
+                showTitle("title_3","{{ choices[2].code }}","{{ choices[2].name }}");
+            });        
+        </script>
+
     </head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <body bgcolor='black' height="100%">

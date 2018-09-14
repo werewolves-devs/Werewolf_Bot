@@ -53,7 +53,7 @@ def open_lootbox(token):
         # The user can make a choice.
         data = box.get_token_data(token)
         choices = [int(data[3]),int(data[4]),int(data[5])]
-        choices = [items.import_reward(option) for option in choices]
+        choices = [items.import_reward(option) for option in choices]            
 
         return render_template('choice.html', choices=choices, token=token)
     

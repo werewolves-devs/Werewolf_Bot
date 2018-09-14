@@ -141,7 +141,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [answer]
         if is_command(message, ['start'], True):
             return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
-    elif is_command(message, ['delete_category','start']):
+
+
+        '''publish_all_channels'''
+        if is_command(message, ['publish_all_channels']):
+            answer = Mailbox().respond("This is gonna take a while! I'll let ya know when I'm finished.")
+            for channel in db.get_columns():
+                channel_id = int(channel[0])
+                for user in db.player_list():
+                    answer.edit_cc(channel_id,user,4)
+            return [answer,Mailbox().respond("Done! All channels are now open to be spectated!")]
+        if is_command(message,['publish_all_channels'],True):
+            msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
+            msg += "`"+ prefix + "publish_all_channels`\n\nThis command can only be used by Administrators."
+
+    elif is_command(message, ['delete_category','start','publish_all_channels']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
     help_msg += "`" + prefix + "start` - Start the game.\n"
 
