@@ -224,7 +224,7 @@ def profile(user):
         if user == bad_boy.user:
             user_class = bad_boy
     
-    if user == None:
+    if user_class == None:
         answer += "**Score: 0 points.\n*Play a game to get some points!*"
     else:
         answer += "**Score: {} point".format(user_class.score)
