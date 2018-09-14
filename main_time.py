@@ -12,6 +12,7 @@ import os
 # Import config data
 from shutil import copy
 from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel
+from interpretation.check import is_command
 from management.shop import age_shop
 from management.general import purge_activity, deal_credits
 
@@ -92,6 +93,23 @@ async def check_time():
             await asyncio.sleep(45)
 
         await asyncio.sleep(10)
+
+# Whenever a message is sent.
+@client.event
+async def on_message(message):
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return
+
+    time = datetime.datetime.now()
+
+    if is_command(message, ['time','whattime']):
+        await message.channel.send("It's currently {}:{}.".format(time.hour,time.minute))
+
+        if int(time.hour) > 7 and int(time.hour) < 21:
+            await message.channel.send("That's {} hours and {} minutes left till the night starts.".format(20-time.hour,59-time.minute))
+        else:
+            await message.channel.send("That's {} hours and {} minutes left until the morning starts.".format((31-time.hour)%24,59-time.minute))
 
 
 # Whenever the bot regains his connection with the Discord API.
