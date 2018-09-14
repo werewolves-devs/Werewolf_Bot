@@ -73,8 +73,8 @@ def take_shot(message):
                 return [Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)]
         challenger = user
         game_channel = channel
-        return Mailbox().respond("<@{}> has grabbed the pistol and loaded a bullet in it! Who wants to play a dangerous game?")
-    
+        return Mailbox().respond("<@{}> has grabbed the pistol and loaded a bullet in it! Who wants to play a dangerous game?".format(user.id))
+
     # Redirect wrong channel
     if game_channel != channel:
         return Mailbox().respond("I'm sorry! There's currently a game going on in <#{}>, go check it out!".format(game_channel.id),True)
