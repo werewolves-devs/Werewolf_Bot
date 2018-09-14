@@ -54,6 +54,8 @@ def get_messages(season, channel_id, chunk=0):
         data = json.loads(f.read())
         guild = get_property_by_id(data["Guilds"], config.main_guild)
         channel = get_property_by_id(guild["Channels"], channel_id)
+        if channel == None:
+            return jsonify({"status": 404, "reason": "Unknown Channel ID"})
         messages = channel["Messages"]
         chunk = -50 * chunk
         chunk_of_messages = messages[chunk:]
@@ -64,6 +66,8 @@ def get_channels(season):
     with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
         data = json.loads(f.read())
         guild = get_property_by_id(data["Guilds"], config.main_guild)
+        if guild == None:
+            return jsonify({"status": 404, "reason": "Unknown Guild ID"})
         channels = []
         for channel in guild["Channels"]:
             del channel["Messages"]
