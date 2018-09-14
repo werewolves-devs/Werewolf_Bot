@@ -26,7 +26,8 @@ stats_file = 'storage/stats.json'
 item_file = 'storage/items.json'
 max_channels_per_category = 50
 
-# List of specific channels
+# List of specific channels / Guilds
+main_guild = 375597071094382603
 welcome_channel = 425036088239980544
 game_log = 485843514379337748
 bot_spam = 394541968689987584

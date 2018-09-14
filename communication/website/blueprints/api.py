@@ -52,7 +52,7 @@ def list_seasons():
 def get_messages(season, channel_id, chunk=0):
     with open("./archives/season_{}.json".format(season), encoding="utf8") as f:
         data = json.loads(f.read())
-        guild = get_property_by_id(data["Guilds"], 375597071094382603)
+        guild = get_property_by_id(data["Guilds"], config.main_guild)
         channel = get_property_by_id(guild["Channels"], channel_id)
         messages = channel["Messages"]
         chunk = -50 * chunk
