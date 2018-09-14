@@ -167,11 +167,13 @@ def surrender(need_for_check=True,user=None):
         challenger = None
         game_channel = None
         if user == None:
-            return Mailbox().respond("It has taken too long for anyone to accept your challenge, <@{}>! If you're still here, please rejoin the challenge.")
+            if time.time() - timeout > 600:
+                return Mailbox().respond("It has taken too long for anyone to accept your challenge, <@{}>! If you're still here, please rejoin the challenge.")
+            return Mailbox()
         return Mailbox().respond("<@{}> fired the round in the air, and put down the gun. Let's play this game later!".format(user.display_name))
 
     if need_for_check:
-        if time.time() - timeout < 1800:
+        if time.time() - timeout < 600:
             return Mailbox()
         
     # Reset the game
