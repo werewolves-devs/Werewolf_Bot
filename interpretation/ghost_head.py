@@ -111,9 +111,20 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "rr` - Play some Russian roulette!\n"
 
+    if is_command(message, ['rs','roulscore','rscore']):
+        target = check.users(message,1)
+        if not target:
+            return [roulette.profile(message.author)]
+        return [roulette.profile(target[0])]
+    if is_command(message, ['rs','roulscore','rscore'],True):
+        msg = "**Usage:** Check your current game progress.\n\n`" + prefix + "rs <user>`\n\n"
+        msg += "**Example:** `" + prefix + "rs @Randium#6521`\nMentioning a user is optional."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "rs` - See Russian Roulette score.\n"
+
     if roulette.is_playing(message.author):
         if is_command(message, ['surrender']):
-            return [roulette.surrender(False)]
+            return [roulette.surrender(False,message.author)]
         if is_command(message, ['surrender'], True):
             msg = "**Usage:** Leave the game if you think you're gonna die.\n\n`" + prefix + "surrender`\n\nLeaving the game counts as a loss, but not as a death."
         help_msg += "`" + prefix + "surrender` - Leave the Russian roulette game.\n"
