@@ -1,6 +1,7 @@
 # This file controls a seperate bot, but for some reason Randium wants it in the same directory with the same config file specified (?)
 # Anyhow, here it is
 
+import management.roulette as roulette
 import management.dynamic as dy
 import management.db as db
 import discord
@@ -93,6 +94,7 @@ async def check_time():
             await asyncio.sleep(45)
 
         await asyncio.sleep(10)
+        roulette.surrender(True)
 
 # Whenever a message is sent.
 @client.event
@@ -103,7 +105,7 @@ async def on_message(message):
 
     time = datetime.datetime.now()
 
-    if is_command(message, ['time','whattime']):
+    if is_command(message, ['time','whattime', 'what time'], False, '') or is_command(message, ['time','whattime', 'what time'], True, ''):
         await message.channel.send("It's currently {}:{}.".format(time.hour,time.minute))
 
         if int(time.hour) > 7 and int(time.hour) < 21:
