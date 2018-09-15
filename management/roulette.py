@@ -9,13 +9,11 @@ class Ruser:
         self.user = user_class
         self.victims = []
         self.alive = alive
-        self.score = 0
     
     def kill(self,victim):
         self.victims.append(victim)
         victim.alive = False
-        self.score += 2
-        update_roulette_score(self.user.id,self.score)
+        update_roulette_score(self.user.id,len(self))
         return self
     
     def __str__(self,recursive='\n'):
@@ -33,6 +31,15 @@ class Ruser:
         for victim in self.victims:
             answer += victim.__str__(recursive+next)
         return answer
+    
+    def __len__(self):
+        number = 0
+        for victim in self.victims:
+            number += len(victim)
+        
+        number += 2*len(self.victims)
+
+        return int(number//2)
 
 deadies = []
 winners = []
@@ -198,10 +205,8 @@ def surrender(need_for_check=True,user=None):
         winners.append(user)
     user.kill(victim)
     
-    user.score += 1
-    victim.score += -2
-    update_roulette_score(user.user.id,user.score)
-    update_roulette_score(victim.user.id,victim.score)
+    update_roulette_score(user.user.id,len(user))
+    update_roulette_score(victim.user.id,len(victim))
 
     answer = Mailbox().respond("It seems like <@{}> has chickened out! Boo!".format(victim.user.id),False,['🍅'])
     answer.respond("**<@{}> WINS!**".format(user.user.id))
