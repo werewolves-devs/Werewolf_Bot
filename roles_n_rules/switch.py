@@ -169,6 +169,9 @@ def night():
                         db_set(player,'uses',1)
                     break
 
+                if user_role in ['White Werewolf'] and dy.day_number() % 2 == 0:
+                    i = 1
+
                 db_set(player,'uses',i)
                 answer.msg(power.power(user_role),db_get(player,'channel'))
                 break
