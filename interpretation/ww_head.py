@@ -154,6 +154,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['publish_all_channels'],True):
             msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
             msg += "`"+ prefix + "publish_all_channels`\n\nThis command can only be used by Administrators."
+            return [Mailbox().respond(msg,True)]
+        help_msg += "`" + prefix + "publish_all_channels` - Spoiler all channels.\n"
 
     elif is_command(message, ['delete_category','start','publish_all_channels']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]

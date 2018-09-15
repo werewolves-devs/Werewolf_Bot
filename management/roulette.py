@@ -70,7 +70,7 @@ def take_shot(message):
     if challenger == None:
         for deadie in deadies:
             if deadie.user == user:
-                return [Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)]
+                return Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)
         challenger = user
         game_channel = channel
         timeout = time.time()
@@ -88,7 +88,7 @@ def take_shot(message):
     if acceptant == None and user != challenger:
         for deadie in deadies:
             if deadie.user == user:
-                return [Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)]
+                return Mailbox().respond("Sorry, bud. Ya can't play if you're dead.",True)
         acceptant = user
         timeout = time.time()
         bullet = random.randint(1,6)
@@ -99,7 +99,7 @@ def take_shot(message):
     if user not in [challenger,acceptant]:
         for deadie in deadies:
             if deadie.user == user:
-                return [Mailbox().respond("You attempted to grab the pistol, but then you realised you were already dead!",True)]
+                return Mailbox().respond("You attempted to grab the pistol, but then you realised you were already dead!",True)
         return Mailbox().respond("The pistol was out of your reach. You failed to grab it.",True)
     
     # Hold the other from shooting twice.
@@ -129,7 +129,7 @@ def take_shot(message):
             deadies.append(victim)
             
             answer = Mailbox().respond("You pull the trigger, and your brains get splattered all over the place.",False,['💀'])
-            answer.respond("**{} WINS!**".format(user.display_name))
+            answer.respond("**{} WINS!**".format(user.user.display_name))
 
             challenger = None
             acceptant = None
@@ -203,8 +203,8 @@ def surrender(need_for_check=True,user=None):
     update_roulette_score(user.user.id,user.score)
     update_roulette_score(victim.user.id,victim.score)
 
-    answer = Mailbox().respond("It seems like <@{}> has chickened out! Boo!".format(victim.id),False,['🍅'])
-    answer.respond("**<@{}> WINS!**".format(user.id))
+    answer = Mailbox().respond("It seems like <@{}> has chickened out! Boo!".format(victim.user.id),False,['🍅'])
+    answer.respond("**<@{}> WINS!**".format(user.user.id))
 
     challenger = None
     acceptant = None
