@@ -1,73 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css' />
-<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script>
-// Toggles
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
 
-$(document).ready(function() {
-
- // Check for click events on the navbar burger icon
- $(".navbar-burger").click(function() {
-
-     // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-     $(".navbar-burger").toggleClass("is-active");
-     $(".navbar-menu").toggleClass("is-active");
-
- });
-});
-</script>
-</head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<body class="has-navbar-fixed-top">
-
-  <nav class="navbar is-fixed-top is-clearfix is-link" style="position: absolute">
-  <div class="navbar-brand">
-  <a class="navbar-item" href="/">
-  <img src="/static/images/logo.png" alt="Werewolves" size="28">
-  </a>
-  <div class="navbar-burger burger" data-target="navbarExampleTransparentExample">
-  <span></span>
-  <span></span>
-  <span></span>
-  </div>
-  </div>
-  <div id="navbarExampleTransparentExample" class="navbar-menu">
-  <div class="navbar-start">
-  <a class="navbar-item" href="/personal-projects/quotes">
-  Vote
-  </a>
-  </div>
-  <div class="navbar-end">
-  <div class="navbar-item">
-  <div class="field is-grouped">
-  <p class="control">
-  {% if logged_in == True %}
-    <a class="button is-primary login_link" href="/profile">
-    <span class="icon">
-    <i class="login_icon fas fa-user"></i>
-    </span>
-    <span class="login_button">My Profile</span>
-    </a>
-  {% else %}
-    <a class="button is-primary login_link" href="/api/v1/auth/login">
-    <span class="icon">
-    <i class="login_icon fas fa-sign-in-alt"></i>
-    </span>
-    <span class="login_button">Login with Discord</span>
-    </a>
-  {% endif %}
-  </p>
-  </div>
-  </div>
-  </div>
-  </div>
-  </nav>
-
+{% block content %}
 <center>
   <h1>Coming soon</h1>
   <p><i>Please Hold</i></p>
 </center>
-</body>
+{% endblock %}

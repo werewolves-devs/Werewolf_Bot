@@ -93,7 +93,7 @@ def is_user_logged_in():
 
 @app.route('/')
 def main():
-    return render_template('main-index.html', logged_in=is_user_logged_in())
+    return render_template('main-index.html', loggedin=is_user_logged_in())
 
 @app.route('/profile')
 def profile():
