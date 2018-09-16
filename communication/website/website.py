@@ -60,6 +60,10 @@ def open_lootbox(token):
 
     return 'This is strange! How did you get here?\nPlease report this to the Game Masters!'
 
+@app.route('/')
+def main():
+    return render_template('main-index.html')
+
 app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
 if __name__ == '__main__':
