@@ -85,10 +85,70 @@ def get_channels(season):
 # Auth
 
 api_base = 'https://discordapp.com/api'
+TOKEN_URL = api_base + '/oauth2/token'
 
-@bp.route('/auth/redirect')
+def token_updater(token):
+    session['oauth2_token'] = token
+
+
+def make_session(token=None, state=None, scope=None):
+    return OAuth2Session(
+        client_id=config.oauth_id,
+        token=token,
+        state=state,
+        scope=scope,
+        redirect_uri=config.oauth_callback,
+        auto_refresh_kwargs={
+            'client_id': config.oauth_id,
+            'client_secret': config.oauth_secret,
+        },
+        auto_refresh_url=TOKEN_URL,
+        token_updater=token_updater)
+
+if 'http://' in config.oauth_callback:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
+
+@bp.route('/auth/login')
 def redirect_to_auth():
-        return jsonify({"status": 500, "reason": "Unimplemented"})
+    scope = request.args.get(
+        'scope',
+        'identify'
+    )
+    discord = make_session(scope=scope.split(' '))
+    auth_url, state = discord.authorization_url(api_base + '/oauth2/authorize')
+    session['oauth2_state'] = state
+    return redirect(auth_url)
+
+@bp.route('/auth/callback')
+def calllback():
+    if request.values.get('error'):
+        return request.values['error']
+    discord = make_session(state=session.get('oauth2_state'))
+    token = discord.fetch_token(
+        TOKEN_URL,
+        client_secret=config.oauth_secret,
+        authorization_response=request.url
+    )
+    session['oauth2_token'] = token
+    return redirect('/api/v1/auth/user_data')
+
+@bp.route('/user/data')
+def me():
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(api_base + '/users/@me').json()
+    return jsonify(user)
+
+@bp.route('/user/is_logged_in')
+def is_logged_in():
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(api_base + '/users/@me').json()
+    try:
+        if user["code"] == 0:
+            json = jsonify({'is_logged_in': False})
+    except KeyError:
+        json = jsonify({'is_logged_in': True})
+
+    return json
 
 # General
 
