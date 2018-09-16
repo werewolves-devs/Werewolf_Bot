@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
+from requests_oauthlib import OAuth2Session
 from communication import webhook
 import management.items as items
 import management.boxes as box
@@ -60,9 +61,43 @@ def open_lootbox(token):
 
     return 'This is strange! How did you get here?\nPlease report this to the Game Masters!'
 
+api_base = 'https://discordapp.com/api'
+TOKEN_URL = api_base + '/oauth2/token'
+
+def token_updater(token):
+    session['oauth2_token'] = token
+
+
+def make_session(token=None, state=None, scope=None):
+    return OAuth2Session(
+        client_id=config.oauth_id,
+        token=token,
+        state=state,
+        scope=scope,
+        redirect_uri=config.oauth_callback,
+        auto_refresh_kwargs={
+            'client_id': config.oauth_id,
+            'client_secret': config.oauth_secret,
+        },
+        auto_refresh_url=TOKEN_URL,
+        token_updater=token_updater)
+
+def is_user_logged_in():
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(api_base + '/users/@me').json()
+    try:
+        if user["code"] == 0:
+            return False
+    except KeyError:
+        return True
+
 @app.route('/')
 def main():
-    return render_template('main-index.html')
+    return render_template('main-index.html', logged_in=is_user_logged_in())
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
