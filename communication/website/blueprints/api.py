@@ -80,6 +80,14 @@ def get_channels(season):
     except:
         return jsonify({"status": 404, "reason": "Unknown Season"})
 
+# Auth
+
+api_base = 'https://discordapp.com/api'
+
+@bp.route('/auth/redirect')
+def redirect_to_auth():
+        return jsonify({"status": 500, "reason": "Unimplemented"})
+
 # General
 
 @bp.route('/version/')
