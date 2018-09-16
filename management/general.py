@@ -98,7 +98,12 @@ def get_credits(user_id):
         return None
     return value[2]
 
+def set_credits(user_id,amount):
+    """Add/remove a given amount of credits from a user."""
+    c.execute("UPDATE 'users' SET credits = credits + ? WHERE id=?",(amount,user_id))
+    conn.commit()
+
 def update_roulette_score(user_id,value):
-    """Üpdate the player's roulette highscore. It is set to the highest score present, and will not update if the latest score is lower."""
+    """Update the player's roulette highscore. It is set to the highest score present, and will not update if the latest score is lower."""
     c.execute("UPDATE 'users' SET roulette_record =? WHERE id=? AND roulette_record <?",(value,user_id,value))
     conn.commit()
