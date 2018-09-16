@@ -40,10 +40,9 @@ def view_roles(show_text=False):
     for row in rows:
         result.append(Choice(role=row[0], amount=row[1]))
 
-    result.sort()
     if not show_text:
         return result
-    
+
     msg = ""
     for row in result:
         msg += "**{}** ".format(row.role)

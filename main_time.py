@@ -94,7 +94,6 @@ async def check_time():
             await asyncio.sleep(75)
 
         await asyncio.sleep(10)
-        roulette.surrender(True)
 
 # Whenever a message is sent.
 @client.event

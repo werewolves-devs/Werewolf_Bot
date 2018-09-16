@@ -204,11 +204,15 @@ async def on_message(message):
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
 async def process_message(message,result):
-    general.add_activity(message.author.id,message.author.name)
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
+
+    if gamelog_channel.guild == message.guild:
+        general.add_activity(message.author.id,message.author.name)
+    else:
+        print('{} sent a DM to the bot!'.format(message.author.display_name))
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []

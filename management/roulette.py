@@ -166,6 +166,10 @@ def surrender(need_for_check=True,user=None):
     global bullet
     global timeout
 
+    if need_for_check:
+        if time.time() - timeout < 600:
+            return Mailbox()
+
     if challenger == None:
         return Mailbox()
     
@@ -182,12 +186,11 @@ def surrender(need_for_check=True,user=None):
             return Mailbox()
         game_channel = None
         challenger = None
-        return Mailbox().respond("<@{}> fired the round in the air, and put down the gun. Let's play this game later!".format(user.display_name))
+        game_channel = None
+        return Mailbox().respond("<@{}> fired the round in the air, and put down the gun. Let's play this game later!".format(user.id))
 
-    if need_for_check:
-        if time.time() - timeout < 600:
-            return Mailbox()
-        
+    print('Game reset!')
+
     # Reset the game
     user = None
     victim = None
@@ -204,8 +207,7 @@ def surrender(need_for_check=True,user=None):
     if user == None:
         user = Ruser(acceptant)
         winners.append(user)
-    user.kill(victim)
-    
+
     update_roulette_score(user.user.id,len(user))
     update_roulette_score(victim.user.id,len(victim))
 
@@ -222,26 +224,26 @@ def surrender(need_for_check=True,user=None):
 
     return answer
 
-def profile(user):
+def profile(user_id):
     global winners
     global deadies
 
-    answer = '**__Profile of <@{}>:__**\n'.format(user.id)
+    answer = '**__Profile of <@{}>:__**\n'.format(user_id)
     user_class = None
 
     for good_guy in winners:
-        if user == good_guy.user:
+        if user_id == good_guy.user.id:
             user_class = good_guy
     for bad_boy in deadies:
-        if user == bad_boy.user:
+        if user_id == bad_boy.user.id:
             user_class = bad_boy
-    
+
     if user_class == None:
-        answer += "**Score: 0 points.\n*Play a game to get some points!*"
+        answer += "**Score: 0 points.**\n*Play a game to get some points!*"
     else:
-        answer += "**Score: {} point".format(user_class.score)
-        if user_class.score != 1:
+        answer += "**Score: {} point".format(len(user_class))
+        if len(user_class) != 1:
             answer += "s"
-        answer += ".\n" + str(user_class)
-    
+        answer += ".**\n" + str(user_class)
+
     return Mailbox().respond(answer,True)
