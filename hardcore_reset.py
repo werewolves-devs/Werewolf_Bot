@@ -56,13 +56,13 @@ def hard_reset(skip = False):
     c.execute(inventory_table)
     
     c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, 'roulette_record' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
-    c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
-    c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
-    c.execute("CREATE TABLE 'requests' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, PRIMARY KEY('id'));")
-    c.execute("CREATE TABLE 'tokens' ( `token` TEXT NOT NULL, `owner` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `opt1` NUMERIC, `opt2` TEXT, `opt3` TEXT, `choice` TEXT, `source1` TEXT, `source2` TEXT, `creation` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, `redeemed` TEXT, `message` INTEGER NOT NULL, PRIMARY KEY(`token`,`message`) )")
+    c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, FOREIGN KEY(`id`) REFERENCES `users`(`id`), PRIMARY KEY('id'));")
+    c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, FOREIGN KEY(`id`) REFERENCES `users`(`id`));")
+    c.execute("CREATE TABLE 'requests' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, FOREIGN KEY(`id`) REFERENCES `users`(`id`));")
+    c.execute("CREATE TABLE 'tokens' ( `token` TEXT NOT NULL, `owner` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `opt1` NUMERIC, `opt2` TEXT, `opt3` TEXT, `choice` TEXT, `source1` TEXT, `source2` TEXT, `creation` TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, `redeemed` TEXT, `message` INTEGER NOT NULL, FOREIGN KEY(`owner`) REFERENCES `users`(`id`), PRIMARY KEY(`token`,`message`) )")
     c.execute("CREATE TABLE 'prizes' ('prize' INTEGER NOT NULL, 'option' INTEGER NOT NULL DEFAULT 0, 'choice' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('prize'));")
     c.execute("CREATE TABLE 'shops' ('message' INTEGER NOT NULL, 'age' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('message'));")
-    c.execute("CREATE TABLE 'sources' ('user' INTEGER NOT NULL, 'source' TEXT NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 1);")
+    c.execute("CREATE TABLE 'sources' ('user' INTEGER NOT NULL, 'source' TEXT NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 1, FOREIGN KEY(`user`) REFERENCES `users`(`id`));")
     print('Formatting completed! The bot is now ready for a new game!\n')
 
     if skip == False:
