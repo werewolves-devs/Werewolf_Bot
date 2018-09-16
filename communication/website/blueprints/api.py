@@ -130,7 +130,7 @@ def calllback():
         authorization_response=request.url
     )
     session['oauth2_token'] = token
-    return redirect('/api/v1/auth/user_data')
+    return redirect('/')
 
 @bp.route('/user/data')
 def me():
