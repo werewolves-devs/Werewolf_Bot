@@ -7,7 +7,7 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy, general as gen, boxes as box, roulette
+from management import db, dynamic as dy, general as gen, boxes as box, roulette, inventory as invt
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -36,7 +36,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             token = args[1]
             choice = args[2]
 
-            if box.token_status(token) != 2:
+            if box.token_status(token) != 1:
                 return []
             
             data = box.get_token_data(token)
@@ -46,7 +46,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
 
             box.add_choice(token,choice)
-            return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
+            invt.take_item(int(box.get_token_data(token)[1]),int(choice[1:4]),int(choice[4:7]))
+            return [Mailbox().respond("Got it! *(I hope.)* Thanks.").thank(box.get_token_data(token)[11])]
 
     # =============================================================
     #

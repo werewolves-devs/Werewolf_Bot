@@ -307,6 +307,12 @@ async def process_message(message,result):
                 for item in emoji_table:
                     await response.add_reaction(item)
 
+        for element in mailbox.thanks:
+            member = gamelog_channel.guild.get_member(box.message_owner(int(element)))
+            msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
+            msg = await msg.channel.get_message(int(element))
+            msg.delete()
+
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
             msg = await gamelog_channel.send(element.content)

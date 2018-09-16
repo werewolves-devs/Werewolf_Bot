@@ -17,6 +17,7 @@ class Mailbox:
         self.demotions = []        # Remove Mayor + Reporter role
         self.shops = []            # Create shop
         self.cleaners = []         # Delete all trash messages from given channel
+        self.thanks = []           # Send updates to people who fixed their tokens
 
         self.evaluate_polls = evaluate_polls
 
@@ -27,7 +28,7 @@ class Mailbox:
         length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
         length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
         length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
-        length += len(self.cleaners)
+        length += len(self.cleaners) + len(self.thanks)
         return length
     
     def __repr__(self):
@@ -45,6 +46,7 @@ class Mailbox:
         if self.demotions != []:        answer += "|demotions={}".format(self.demotions)
         if self.shops != []:            answer += "|shops={}".format(self.shops)
         if self.cleaners != []:         answer += "|cleaners={}".format(self.cleaners)
+        if self.thanks != []:           answer += "|thanks={}".format(self.thanks)
         answer += "|"
         answer += "|evaluate_polls={}".format(self.evaluate_polls)
         answer += ">"
@@ -198,6 +200,11 @@ class Mailbox:
     def cleanup(self,channel_id):
         """Add a channel that needs to be erased from content."""
         self.cleaners.append(channel_id)
+        return self
+    
+    def thank(self,message):
+        """Add a message that needs to be erased."""
+        self.thanks.append(message)
         return self
     
     # Commands that change one's cc status

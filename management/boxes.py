@@ -144,3 +144,15 @@ def token_status(token):
     if result == None:
         return -1
     return result[2]
+
+def message_owner(message_id):
+    """Gain the owner of a user by id."""
+    conn = sqlite3.connect(config.general_database)
+    c = conn.cursor()
+    
+    c.execute("SELECT * FROM 'tokens' WHERE message=?")
+    answer = c.fetchone()
+
+    if answer == None:
+        return None
+    return int(answer[1])
