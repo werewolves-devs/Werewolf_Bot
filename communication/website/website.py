@@ -91,13 +91,20 @@ def is_user_logged_in():
     except KeyError:
         return True
 
+def get_user_info():
+    if not is_user_logged_in:
+        return None
+    discord = make_session(token=session.get('oauth2_token'))
+    return discord.get(api_base + '/users/@me').json()
+
 @app.route('/')
 def main():
     return render_template('main-index.html', loggedin=is_user_logged_in())
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    data = get_user_info()
+    return render_template('profile.html', user=data, loggedin=is_user_logged_in())
 
 app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
