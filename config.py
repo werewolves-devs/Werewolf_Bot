@@ -49,3 +49,8 @@ reporter = 382103338550034442
 # Box
 base_url = 'https://example.com/box'
 box_token = 'wtDzVN4-30DmcDiHBe9WQ-L0lBTW-R4nd1Umi5G4y-wtDzVN430Dmc-DiHBe9WQ'
+
+# Website settings
+oauth_id = 'ID_Here'
+oauth_secret = 'Token_here'
+oauth_callback = 'http://localhost:5000/api/v1/auth/callback'
