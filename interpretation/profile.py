@@ -6,12 +6,13 @@ from discord import Message, User, Embed
 from config import ghost_prefix as prefix
 from interpretation import check
 from main_classes import Mailbox
+from management.db import isParticipant
 from management.general import get_credits
 from management.profile import ProfileModel
-from management.db import isParticipant
 
-def is_command(message,commandtable,help=False):
-    return check.is_command(message,commandtable,help,prefix)
+
+def is_command(message, commandtable, help=False):
+    return check.is_command(message, commandtable, help, prefix)
 
 
 def set_age(message: Message) -> List[Mailbox]:
@@ -24,9 +25,13 @@ def set_age(message: Message) -> List[Mailbox]:
     new_age = int(new_age)
     if new_age > 2 ** 31 - 1:
         if new_age > 15556000000:
-            return [Mailbox().respond("You sure, bud? That\'s older than the universe. Time wasn\'t a thing back then. ...there is no such thing as a **BEFORE** the Big Bang.",True)]
+            return [Mailbox().respond(
+                "You sure, bud? That\'s older than the universe. Time wasn\'t "
+                "a thing back then. ...there is no such thing as a **BEFORE** the Big Bang.",
+                True)]
         if new_age > 4560000000:
-            return [Mailbox().respond("Yeah, sure thing! The creation of our planet must\'ve been enjoyable to watch.",True)]
+            return [Mailbox().respond("Yeah, sure thing! The creation of our planet must\'ve been enjoyable to watch.",
+                                      True)]
         return [Mailbox().respond(f"Bruh, I know yo momma's as heavy as Mother Earth, "
                                   f"but that doesn't make you as old as her.", temporary=True)]
     profile = ProfileModel.get_or_insert(message.author)
@@ -57,11 +62,7 @@ def set_gender(message: Message) -> List[Mailbox]:
 def set_bio(message: Message):
     _, bio = re.split(r'\s+', message.content, 1)
     profile = ProfileModel.get_or_insert(message.author)
-    new_bio = ""
-    for char in bio:
-        if char not in ["\\","/"]:
-            new_bio += char
-    profile.bio = new_bio
+    profile.bio = bio
     profile.save()
     return [Mailbox().respond("Updated your profile!")]
 
@@ -71,7 +72,9 @@ def view_profile(message: Message):
     user: User = message.author
     if users:
         if isParticipant(message.author.id) and not isParticipant(users[0]):
-            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
+            return [Mailbox().respond(
+                "I am sorry! To prevent any accidental spoilers, you cannot "
+                "view the profile of dead players.")]
         user = message.channel.guild.get_member(users[0])
     model = ProfileModel.get_or_insert(user)
     em = Embed(
