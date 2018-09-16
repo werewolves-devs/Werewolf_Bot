@@ -52,6 +52,8 @@ bullet_number = 0
 bullet = 0
 timeout = 0
 
+rigged = False
+
 def is_playing(user):
     global challenger
     global acceptant
@@ -69,6 +71,7 @@ def take_shot(message):
     global bullet_number
     global bullet
     global timeout
+    global rigged
 
     user = message.author
     channel = message.channel
@@ -132,11 +135,17 @@ def take_shot(message):
             if user == None:
                 user = Ruser(acceptant)
                 winners.append(user)
-            user.kill(victim)
-            deadies.append(victim)
-            
-            answer = Mailbox().respond("You pull the trigger, and your brains get splattered all over the place.",False,['💀'])
-            answer.respond("**{} WINS!**".format(user.user.display_name))
+
+            if random.random() == 0.9 and not rigged:
+                user.kill(victim)
+                deadies.append(victim)
+                
+                answer = Mailbox().respond("You pull the trigger, and your brains get splattered all over the place.",False,['💀'])
+                answer.respond("**{} WINS!**".format(user.user.display_name))
+            else:
+                rigged = False
+                answer = Mailbox().respond("As you pull the trigger, you hear a **BANG**! But you only feel an empty shelf bop against your head.")
+                answer.respond("Erm... that's awkward.")
 
             challenger = None
             acceptant = None
@@ -204,7 +213,6 @@ def surrender(need_for_check=True,user=None):
     if user == None:
         user = Ruser(acceptant)
         winners.append(user)
-    user.kill(victim)
     
     update_roulette_score(user.user.id,len(user))
     update_roulette_score(victim.user.id,len(victim))
