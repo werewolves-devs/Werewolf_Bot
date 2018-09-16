@@ -98,7 +98,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['lead']):
         number = check.numbers(message)
         if not number:
-            return [Mailbox().respond(gen.gain_leaderboard(user_id))]
+            return [Mailbox().respond(gen.gain_leaderboard(user_id),True)]
         return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)),True)]
     if is_command(message, ['lead'], True):
         msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
@@ -106,7 +106,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     help_msg += "`" + prefix + "leaderboard` - See an activity leaderboard.\n"
 
     if is_command(message, ['rr','roulette','suicide']):
-        return [roulette.take_shot(message)]
+        return [roulette.surrender(True),roulette.take_shot(message)]
     if is_command(message,['rr','roulette','suicide']):
         msg = "**Usage:** Play a game of Russian roulette!\n\n`" + prefix + "rr`\n\nTry it out! It's fun."
         return [Mailbox().respond(msg,True)]
@@ -115,7 +115,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['rs','roulscore','rscore']):
         target = check.users(message,1)
         if not target:
-            return [roulette.profile(message.author)]
+            return [roulette.profile(message.author.id)]
         return [roulette.profile(target[0])]
     if is_command(message, ['rs','roulscore','rscore'],True):
         msg = "**Usage:** Check your current game progress.\n\n`" + prefix + "rs <user>`\n\n"
@@ -154,6 +154,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [answer]
 
     if message.content.startswith(prefix):
-        return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
+        return [roulette.surrender(True),Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
 
-    return []
+    return [roulette.surrender(True)]
