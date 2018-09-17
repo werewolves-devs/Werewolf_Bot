@@ -160,7 +160,7 @@ async def on_message_edit(before, after):
                 isPeasant = True
     except Exception:
         # We want the Ghost Bot to listen to the webhooks, who send data from the website.
-        isAdmin = True
+        isPeasant = True
 
     await process_message(after,process(after,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
 
@@ -181,6 +181,7 @@ async def on_message(message):
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
         except Exception:
             print('Unable to acquire role_table from {}'.format(message.author.display_name))
+            isPeasant = True
         else:
             if game_master in role_table:
                 isGameMaster = True
@@ -231,8 +232,8 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
         quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
     quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
     quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
-    for channel in db.find_spies(message.channel.id):
-        spy_channel = client.get_channel(channel)
+    for spy_channel_id in db.find_spies(message.channel.id):
+        spy_channel = client.get_channel(spy_channel_id)
         await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
@@ -337,7 +338,7 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
             member = gamelog_channel.guild.get_member(box.message_owner(int(element)))
             msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
             msg = await msg.channel.get_message(int(element))
-            msg.delete()
+            await msg.delete()
 
         for element in mailbox.box_gifts:
             box_waiters.append(element)
