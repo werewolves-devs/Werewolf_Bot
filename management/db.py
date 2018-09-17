@@ -574,3 +574,20 @@ def empty_trash_channel(channel_id):
     conn.commit()
 
     return message_table
+
+
+def add_listener(spy,innocent):
+    """Add a new listener to the database. A listener is a bridge from one channel to another.
+    This function allows roles like the flute player to keep contact with their victims."""
+    c.execute("INSERT INTO 'listener'('innocent','spy') VALUES (?,?)",(innocent,spy))
+    conn.commit()
+
+def find_spies(innocent):
+    """Find all channels that this message's content needs to be sent to."""
+    c.execute("SELECT * FROM 'listener' WHERE innocent=?",(innocent,))
+    return [listener[0] for listener in c.fetchall()]
+
+def find_innocents(spy):
+    """Find all channels this spy channel is spying on."""
+    c.execute("SELECT * FROM 'listener' WHERE spy=?",(spy,))
+    return [listener[1] for listener in c.fetchall()]

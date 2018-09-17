@@ -17,7 +17,13 @@ def pay():
 
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
-
+`
+    # Add all listeners
+    if int(dy.day_number()) == 0:
+        for spy_channel in db.get_secret_channels("Flute_Player"):
+            for innocent_channel in db.get_secret_channels("Flute_Victims"):
+                db.add_listener(spy_channel,innocent_channel)
+`
     answer = Mailbox()
     answer_table = [Mailbox(True)]
     for user_id in db.player_list():

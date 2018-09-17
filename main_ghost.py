@@ -161,7 +161,7 @@ async def on_message_edit(before, after):
         # We want the Ghost Bot to listen to the webhooks, who send data from the website.
         isPeasant = True
 
-    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
 
 # Whenever a message is sent.
 @client.event
@@ -171,7 +171,7 @@ async def on_message(message):
         #stats.increment_stat("bot_messages_sent", 1)
         return
 
-    if random.randint(0,249+general.spam_activity(message.author.id)) == 1 and not message.author.bot:
+    if random.randint(0,249+general.spam_activity(message.author.id)) == 1 and not message.author.bot and message.guild == client.get_channel(int(config.bot_spam)).guild:
         token = create_token(message.author.id)
         botspam_channel = client.get_channel(int(config.bot_spam))
         try:
@@ -202,9 +202,9 @@ async def on_message(message):
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
 
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
 
-async def process_message(message,result):
+async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
@@ -214,6 +214,20 @@ async def process_message(message,result):
         general.add_activity(message.author.id,message.author.name)
     else:
         print('{} sent a DM to the bot!'.format(message.author.display_name))
+
+    if isGameMaster:
+        quote_embed = discord.Embed(description=message.content, color=0x00ff00)
+    elif isPeasant:
+        quote_embed = discord.Embed(description=message.content, color=0x0000ff)
+    elif db.isParticipant(message.author.id):
+        quote_embed = discord.Embed(description=message.content, color=0xff0000)
+    else:
+        quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
+    quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
+    quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
+    for channel in db.find_spies(message.channel.id):
+        spy_channel = client.get_channel(channel)
+        await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
