@@ -106,9 +106,10 @@ async def on_message(message):
         await message.channel.send("It's currently {}:{}.".format(time.hour,time.minute))
 
         if int(time.hour) > 7 and int(time.hour) < 21:
-            await message.channel.send("That's {} hours and {} minutes left till the night starts.".format(20-time.hour,59-time.minute))
+            await message.channel.send("That's {} hours and {} minutes left till the night starts.".format(20-time.hour,60-time.minute))
         else:
-            await message.channel.send("That's {} hours and {} minutes left until the morning starts.".format((31-time.hour)%24,59-time.minute))
+            await message.channel.send("That's {} hours and {} minutes left until the morning starts.".format((31-time.hour)%24,60-time.minute))
+
     if is_command(message, ['pight','night','pay','day'], False, prefix) and message.author.bot:
         await message.channel.send(message.content)
 

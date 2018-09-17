@@ -383,7 +383,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().embed(embed, bot_spam, True)]
         if is_command(message, ['stats'],True):
             # TODO
-            return []
+            return todo()
         help_msg += "`" + prefix + "stats` - Show statistics."
 
         '''whois'''
@@ -1221,7 +1221,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         for phrase in eggs.randiumlooks():
             answer.respond(phrase,True)
         return [answer]
-    help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
         return [Mailbox().respond('Ayyyy!')]
