@@ -18,6 +18,12 @@ def pay():
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
 
+    # Add all listeners
+    if int(dy.day_number()) == 0:
+        for spy_channel in db.get_secret_channels("Flute_Player"):
+            for innocent_channel in db.get_secret_channels("Flute_Victims"):
+                db.add_listener(spy_channel,innocent_channel)
+
     answer = Mailbox()
     answer_table = [Mailbox(True)]
     for user_id in db.player_list():
@@ -65,7 +71,7 @@ def pay():
         # Remove zombie tag
         db_set(user_id,'bitten',0)
 
-    answer_table.append(answer)
+    answer_table.append(answer).append(Mailbox().spam(config.universal_prefix + "day"))
     return answer_table
 
 def day():
@@ -141,7 +147,7 @@ def pight():
         if user_role == "Idiot ":
             db_set(user_id,'votes',0)
         
-    return [answer]
+    return [answer,Mailbox().spam(config.universal_prefix + "night")]
 
 def night():
     """Start the second part of the day.  
@@ -168,6 +174,9 @@ def night():
                     if dy.day_number() == 0:
                         db_set(player,'uses',1)
                     break
+
+                if user_role in ['White Werewolf'] and dy.day_number() % 2 == 0:
+                    i = 1
 
                 db_set(player,'uses',i)
                 answer.msg(power.power(user_role),db_get(player,'channel'))

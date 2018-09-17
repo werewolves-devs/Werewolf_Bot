@@ -57,5 +57,7 @@ docs/_build/
 *.db
 
 config\.py
-
 stats\.json
+
+backup/
+storage/loot\.txt

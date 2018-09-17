@@ -3,11 +3,15 @@ from typing import List, Optional
 
 from discord import Message, User, Embed
 
+from config import ghost_prefix as prefix
 from interpretation import check
-from interpretation.check import is_command
 from main_classes import Mailbox
+from management.general import get_credits, get_user
 from management.profile import ProfileModel
 from management.db import isParticipant
+
+def is_command(message,commandtable,help=False):
+    return check.is_command(message,commandtable,help,prefix)
 
 
 def set_age(message: Message) -> List[Mailbox]:
@@ -19,9 +23,9 @@ def set_age(message: Message) -> List[Mailbox]:
         return [Mailbox().respond('Sorry bro, only positive whole numbers', temporary=True)]
     new_age = int(new_age)
     if new_age > 2 ** 31 - 1:
-        if new_age < 15556000000:
+        if new_age > 15556000000:
             return [Mailbox().respond("You sure, bud? That\'s older than the universe. Time wasn\'t a thing back then. ...there is no such thing as a **BEFORE** the Big Bang.",True)]
-        if new_age < 4560000000:
+        if new_age > 4560000000:
             return [Mailbox().respond("Yeah, sure thing! The creation of our planet must\'ve been enjoyable to watch.",True)]
         return [Mailbox().respond(f"Bruh, I know yo momma's as heavy as Mother Earth, "
                                   f"but that doesn't make you as old as her.", temporary=True)]
@@ -38,7 +42,14 @@ def set_gender(message: Message) -> List[Mailbox]:
             "Invalid gender. If you really need more than 255 chars to express your gender, contact a GM",
             temporary=True)]
     profile = ProfileModel.get_or_insert(message.author)
-    profile.gender = gender
+    if gender.lower().startswith('m'):
+        profile.gender = 'Male'
+    elif gender.lower().startswith('f'):
+        profile.gender = 'Female'
+    elif gender.lower().startswith('r'):
+        profile.gender = 'Randium'
+    else:
+        profile.gender = 'Other'
     profile.save()
     return [Mailbox().respond("Updated your profile!")]
 
@@ -46,7 +57,11 @@ def set_gender(message: Message) -> List[Mailbox]:
 def set_bio(message: Message):
     _, bio = re.split(r'\s+', message.content, 1)
     profile = ProfileModel.get_or_insert(message.author)
-    profile.bio = bio
+    new_bio = ""
+    for char in bio:
+        if char not in ["\\","/"]:
+            new_bio += char
+    profile.bio = new_bio
     profile.save()
     return [Mailbox().respond("Updated your profile!")]
 
@@ -56,7 +71,7 @@ def view_profile(message: Message):
     user: User = message.author
     if users:
         if isParticipant(message.author.id) and not isParticipant(users[0]):
-            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.")]
+            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.",True)]
         user = message.channel.guild.get_member(users[0])
     model = ProfileModel.get_or_insert(user)
     em = Embed(
@@ -66,7 +81,10 @@ def view_profile(message: Message):
     em.set_author(name=user.display_name, icon_url=user.avatar_url)
     em.add_field(name="Age", value=str(model.display_age))
     em.add_field(name="Gender", value=model.gender)
-    return [Mailbox().embed(em, destination=message.channel.id)]
+    em.add_field(name="Credits", value=get_credits(user.id))
+    if get_user(user.id)[4] > 0:
+        em.add_field(name="Roulette Highscore", value=get_user(user.id)[4])
+    return [Mailbox().embed(em, destination=message.channel.id, temporary=True)]
 
 
 def process_profile(message: Message, is_game_master, is_admin, is_peasant) -> Optional[List[Mailbox]]:

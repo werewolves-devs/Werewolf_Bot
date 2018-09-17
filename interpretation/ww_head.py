@@ -141,7 +141,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [answer]
         if is_command(message, ['start'], True):
             return [Mailbox().respond("**Usage:** Start the game.\n\n`" + prefix + "start`\n\nThis command can only be used by Administrators.")]
-    elif is_command(message, ['delete_category','start']):
+
+
+        '''publish_all_channels'''
+        if is_command(message, ['publish_all_channels']):
+            answer = Mailbox().respond("This is gonna take a while! I'll let ya know when I'm finished.")
+            for channel in db.get_columns():
+                channel_id = int(channel[0])
+                for user in db.player_list():
+                    answer.edit_cc(channel_id,user,4)
+            return [answer,Mailbox().respond("Done! All channels are now open to be spectated!")]
+        if is_command(message,['publish_all_channels'],True):
+            msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
+            msg += "`"+ prefix + "publish_all_channels`\n\nThis command can only be used by Administrators."
+            return [Mailbox().respond(msg,True)]
+        help_msg += "`" + prefix + "publish_all_channels` - Spoiler all channels.\n"
+
+    elif is_command(message, ['delete_category','start','publish_all_channels']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
     help_msg += "`" + prefix + "start` - Start the game.\n"
 
@@ -153,6 +169,22 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     # =============================================================
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
+
+        '''forcesignup'''
+        if is_command(message,['forcesignup']):
+            emoji = check.emojis(message)
+            user = check.users(message)
+            if not user:
+                return [Mailbox().respond("No user provided!",True)]
+            if not emoji:
+                return [Mailbox().respond("No emoji provided!",True)]
+            emoji = [emo for emo in emoji if emoji_to_player(emo) == None]
+            if emoji == []:
+                return [Mailbox().respond("That emoji is already occupied.",True)]
+            user = user[0]
+            choice_emoji = emoji[0]
+            signup(user, message.author.name, choice_emoji)
+            return [Mailbox().spam("You have successfully signed up {} with the emoji {}!".format(message.author.name,choice_emoji))]
 
         '''addrole'''
         # Before the game starts, a list of roles is kept track of.
@@ -201,8 +233,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''day'''
         # This command is used to initialize the day.
         if is_command(message, ['day']):
-            # TODO
-            return todo()
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
         if is_command(message, ['day'], True):
             msg = "**Usage:** Initiate the day if this does not happen automatically.\n\n"
             msg += "`" + prefix + "day`\n\nThis command can only be used by Game Masters."
@@ -280,8 +311,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
-            # TODO
-            return todo()
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
         if is_command(message, ['night'], True):
             msg = "**Usage:** Initiate the night if this does not happen automatically.\n\n"
             msg += "`" + prefix + "night`\n\nThis command can only be used by Game Masters."
@@ -322,6 +352,13 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg,True)]
         help_msg += "`" + prefix + "poll` - Create a poll\n"
 
+        '''smite'''
+        if is_command(message, ['smite']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("Smite whom? ***EVERYONE** shall be smitten!")]
+            return [Mailbox().respond(eggs.smite(target[0]))]
+
         '''stats'''
         # Returns the game's stats in embed form
         if is_command(message, ['stats']):
@@ -346,7 +383,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().embed(embed, bot_spam, True)]
         if is_command(message, ['stats'],True):
             # TODO
-            return []
+            return todo()
         help_msg += "`" + prefix + "stats` - Show statistics."
 
         '''whois'''
@@ -1171,7 +1208,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     '''tip'''
     if is_command(message,['tip']):
         return [Mailbox().respond(tip.random(),True)]
-    if is_command(message['tip'],True):
+    if is_command(message,['tip'],True):
         # TODO
         pass
     help_msg += "`" + prefix + "tip` - Gain a random game tip.\n"
@@ -1184,10 +1221,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         for phrase in eggs.randiumlooks():
             answer.respond(phrase,True)
         return [answer]
-    help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
-        return [answer.respond('Ayyyy!')]
+        return [Mailbox().respond('Ayyyy!')]
 
     # --------------------------------------------------------------
     #                          HELP

@@ -15,11 +15,11 @@ class GeneralBaseModel(Model):
 class ProfileModel(GeneralBaseModel):
     uid = BigIntegerField(primary_key=True)
     age = IntegerField(default=0)
-    bio = CharField(max_length=2012, default="None")
-    gender = CharField(max_length=255, default="Undefined")
+    bio = CharField(max_length=2012, default="Hey there! This is my bio!\nI am a happy villager who enjoys killing werewolves!")
+    gender = CharField(max_length=255, default="Unknown")
 
     @classmethod
-    def get_or_insert(cls, user: Union[User, Member, int]) -> 'ProfileModel':
+    def get_or_insert(cls, user: Union[User, Member, int]) -> 'profiles':
         if hasattr(user, 'id'):
             user = user.id
         model, created = cls.get_or_create(uid=user)
@@ -29,6 +29,8 @@ class ProfileModel(GeneralBaseModel):
 
     @property
     def display_age(self):
+        if self.age == 0:
+            return 'unknown'
         if self.age < 13:
             return '< 13'
         last_age = 12

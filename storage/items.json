@@ -1,0 +1,216 @@
+{
+    "common": 74,
+    "rare": 10,
+    "epic": 5,
+    "legendary": 1,
+    
+    "rewards": [
+        [
+            {
+                "name": "10 credits",
+                "code": 1000010,
+                "description": "Gain 10 free credits!"
+            },
+            {
+                "name": "1 name tag",
+                "code": 1104001,
+                "description": "Change a GM's nickname."
+            },
+            {
+                "name": "1 med kit",
+                "code": 1105001,
+                "description": "Protect another player."
+            },
+            {
+                "name": "1 villager buck",
+                "code": 1001001,
+                "description": "Gain 10 credits for each winning villager."
+            },
+            {
+                "name": "1 wolf buck",
+                "code": 1002001,
+                "description": "Gain 10 credits for each winning wolf."
+            },
+            {
+                "name": "1 white werewolf buck",
+                "code": 1003001,
+                "description": "Gain 10 credits for each winning white werewolf."
+            },
+            {
+                "name": "1 angel buck",
+                "code": 1004001,
+                "description": "Gain 10 credits for each winning angel"
+            }
+        ],
+        [
+            {
+                "name": "25 credits",
+                "code": 2000025,
+                "description": "Gain 25 free credits!"
+            },
+            {
+                "name": "1 bucket of water",
+                "code": 2101001,
+                "description": "If you are powdered, you will lose the effect."
+            },
+            {
+                "name": "1 invisibility cloak",
+                "code": 2100001,
+                "description": "Gain protection for one night."
+            },
+            {
+                "name": "1 disguise",
+                "code": 2103001,
+                "description": "Disguise yourself as any given role."
+            }
+        ],
+        [
+            {
+                "name": "100 credits",
+                "code": 3000100,
+                "description": "Gain 100 free credits!"
+            },
+            {
+                "name": "2 invisibility cloaks",
+                "code": 3100002,
+                "description": "Gain protection for two nights."
+            },
+            {
+                "name": "3 med kits",
+                "code": 3105003,
+                "description": "Protect other players from dying."
+            },
+            {
+                "name": "1 royal sword",
+                "code": 3102001,
+                "description": "Prevent a lynch from being executed."
+            }
+        ],
+        [
+            {
+                "name": "250 credits",
+                "code": 4000250,
+                "description": "Gain 250 free credits!"
+            },
+            {
+                "name": "3 invisibility cloaks",
+                "code": 4100003,
+                "description": "Gain protection for three nights."
+            },
+            {
+                "name": "1 dagger",
+                "code": 4106001,
+                "description": "Assassinate a player."
+            },
+            {
+                "name": "5 med kits",
+                "code": 4105005,
+                "description": "Protect other players from dying."
+            },
+            {
+                "name": "5 disguises",
+                "code": 4103005,
+                "description": "Disguise yourself five times."
+            }
+        ]
+    ],
+    "items": [
+        {
+            "name": "credits",
+            "code": 0
+        },
+        {
+            "name": "villager buck",
+            "code": 1
+        },
+        {
+            "name": "wolf buck",
+            "code": 2
+        },
+        {
+            "name": "white werewolf buck",
+            "code": 3
+        },
+        {
+            "name": "angel buck",
+            "code": 4
+        },
+        {
+            "name": "despot buck",
+            "code": 5
+        },
+        {
+            "name": "devil buck",
+            "code": 6
+        },
+        {
+            "name": "flute buck",
+            "code": 7
+        },
+        {
+            "name": "horseman buck",
+            "code": 8
+        },
+        {
+            "name": "ice buck",
+            "code": 9
+        },
+        {
+            "name": "immortal buck",
+            "code": 10
+        },
+        {
+            "name": "psycho buck",
+            "code": 11
+        },
+        {
+            "name": "pyro buck",
+            "code": 12
+        },
+        {
+            "name": "thing buck",
+            "code": 13
+        },
+        {
+            "name": "vampire buck",
+            "code": 14
+        },
+        {
+            "name": "zombie buck",
+            "code": 15
+        },
+        {
+            "name": "invisibility cloak",
+            "code": 100
+        },
+        {
+            "name": "bucket of water",
+            "code": 101
+        },
+        {
+            "name": "royal sword",
+            "code": 102
+        },
+        {
+            "name": "disguise",
+            "code": 103
+        },
+        {
+            "name": "name tag",
+            "code": 104
+        },
+        {
+            "name": "med kit",
+            "code": 105
+        },
+        {
+            "name": "dagger",
+            "code": 106
+        },
+        {
+            "name": "rigged",
+            "code": 200
+        }
+    ],
+    "add_command": "ALTER TABLE 'channels' ADD COLUMN '{}' INTEGER NOT NULL DEFAULT 0"
+}
