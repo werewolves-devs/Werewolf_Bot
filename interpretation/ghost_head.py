@@ -57,6 +57,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isAdmin == True:
         help_msg += "\n __Admin commands:__\n"
 
+        if is_command(message, ['gift']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("No target provided! Please provide a target.",True)]
+            answer = Mailbox()
+
+            for user_id in target:
+                answer.gift(user_id)
+            return [answer]
+
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
 

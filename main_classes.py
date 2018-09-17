@@ -18,6 +18,7 @@ class Mailbox:
         self.shops = []            # Create shop
         self.cleaners = []         # Delete all trash messages from given channel
         self.thanks = []           # Send updates to people who fixed their tokens
+        self.box_gifts = []        # Send a free lootbox to these lads!
 
         self.evaluate_polls = evaluate_polls
 
@@ -28,7 +29,7 @@ class Mailbox:
         length = len(self.gamelog) + len(self.botspam) + len(self.storytime) + len(self.answer)
         length += len(self.channel) + len(self.player) + len(self.newchannels) + len(self.oldchannels)
         length += len(self.polls) + len(self.deletecategories) + len(self.demotions) + len(self.shops)
-        length += len(self.cleaners) + len(self.thanks)
+        length += len(self.cleaners) + len(self.thanks) + len(self.box_gifts)
         return length
     
     def __repr__(self):
@@ -47,6 +48,7 @@ class Mailbox:
         if self.shops != []:            answer += "|shops={}".format(self.shops)
         if self.cleaners != []:         answer += "|cleaners={}".format(self.cleaners)
         if self.thanks != []:           answer += "|thanks={}".format(self.thanks)
+        if self.box_gifts != []:        answer += "|box_gifts={}".format(self.box_gifts)
         answer += "|"
         answer += "|evaluate_polls={}".format(self.evaluate_polls)
         answer += ">"
@@ -207,6 +209,11 @@ class Mailbox:
         self.thanks.append(message)
         return self
     
+    def gift(self,user_id):
+        """Add a user that is given a gift."""
+        self.box_gifts.append(user_id)
+        return self
+
     # Commands that change one's cc status
     def freeze(self,user_id):
         """Freeze a user.  

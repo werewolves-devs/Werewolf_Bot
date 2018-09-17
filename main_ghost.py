@@ -62,6 +62,7 @@ from emoji import emojize
 
 
 client = discord.Client()
+box_waiters = []
 
 def get_role(server_roles, target_id):
     for each in server_roles:
@@ -171,19 +172,6 @@ async def on_message(message):
         #stats.increment_stat("bot_messages_sent", 1)
         return
 
-    if random.randint(0,249+general.spam_activity(message.author.id)) == 1 and not message.author.bot and message.guild == client.get_channel(int(config.bot_spam)).guild:
-        token = create_token(message.author.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        try:
-            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
-        except:
-            await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
-            await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
-        else:
-            box.add_token(token,message.author.id,msg.id)
-            await message.add_reaction('🎁')
-            await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
-
     #check role of sender
     isGameMaster = False
     isAdmin = False
@@ -200,6 +188,25 @@ async def on_message(message):
                 isAdmin = True
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
+
+    global box_waiters
+
+    if (random.randint(0,249+general.spam_activity(message.author.id)) == 1 or message.author.id in box_waiters) and not message.author.bot and message.guild == client.get_channel(int(config.bot_spam)).guild:
+        if message.author.id in box_waiters:
+            box_waiters.remove(message.author.id)
+            print('Current box waiters: {}'.format(box_waiters))
+        
+        token = create_token(message.author.id)
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        try:
+            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+        except:
+            await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
+            await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
+        else:
+            box.add_token(token,message.author.id,msg.id)
+            await message.add_reaction('🎁')
+            await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
 
@@ -230,6 +237,7 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
+    global box_waiters
 
     for mailbox in result:
 
@@ -330,6 +338,10 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
             msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
             msg = await msg.channel.get_message(int(element))
             msg.delete()
+
+        for element in mailbox.box_gifts:
+            box_waiters.append(element)
+            print('Current box waiters: {}'.format(box_waiters))
 
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
