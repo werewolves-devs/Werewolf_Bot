@@ -585,9 +585,9 @@ def add_listener(spy,innocent):
 def find_spies(innocent):
     """Find all channels that this message's content needs to be sent to."""
     c.execute("SELECT * FROM 'listener' WHERE innocent=?",(innocent,))
-    return [listener[0] for listener in c.fetchall()]
+    return [listener[1] for listener in c.fetchall()]
 
 def find_innocents(spy):
     """Find all channels this spy channel is spying on."""
     c.execute("SELECT * FROM 'listener' WHERE spy=?",(spy,))
-    return [listener[1] for listener in c.fetchall()]
+    return [listener[0] for listener in c.fetchall()]

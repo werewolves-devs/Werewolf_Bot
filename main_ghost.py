@@ -224,9 +224,9 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
     else:
         quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
     quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
-    quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
-    for channel in db.find_spies(message.channel.id):
-        spy_channel = client.get_channel(channel)
+    quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
+    for spy_channel_id in db.find_spies(message.channel.id):
+        spy_channel = client.get_channel(spy_channel_id)
         await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
