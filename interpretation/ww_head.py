@@ -352,6 +352,13 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg,True)]
         help_msg += "`" + prefix + "poll` - Create a poll\n"
 
+        '''smite'''
+        if is_command(message, ['smite']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("Smite whom? ***EVERYONE** shall be smitten!")]
+            return [Mailbox().respond(eggs.smite(target[0]))]
+
         '''stats'''
         # Returns the game's stats in embed form
         if is_command(message, ['stats']):
