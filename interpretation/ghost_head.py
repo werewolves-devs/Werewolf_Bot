@@ -7,7 +7,7 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management import db, dynamic as dy, general as gen, boxes as box, roulette
+from management import db, dynamic as dy, general as gen, boxes as box, roulette, inventory as invt
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -31,22 +31,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
     if isPeasant == True:
-        
-        if is_command(message,['success']):
+
+        if check.is_command(message,['success'],False,unip):
             token = args[1]
             choice = args[2]
 
-            if box.token_status(token) != 2:
-                return []
-            
+            if box.token_status(token) != 1:
+                return [Mailbox().respond("Wrong status, buddy.")]
+
             data = box.get_token_data(token)
             given_options = [int(data[3]),int(data[4]),int(data[5])]
-        
-            if choice not in given_options:
+
+            if int(choice) not in given_options:
                 return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
 
             box.add_choice(token,choice)
-            return [Mailbox().respond("Got it! Thanks.\n*(Well, not really, this still needs to be done, but...)*")]
+            invt.take_item(int(box.get_token_data(token)[1]),int(choice[1:4]),int(choice[4:7]))
+            return [Mailbox().respond("Got it! *(I hope.)* Thanks.",True).thank(box.get_token_data(token)[11])]
 
     # =============================================================
     #
@@ -55,6 +56,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     # =============================================================
     if isAdmin == True:
         help_msg += "\n __Admin commands:__\n"
+
+        if is_command(message, ['gift']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("No target provided! Please provide a target.",True)]
+            answer = Mailbox()
+
+            for user_id in target:
+                answer.gift(user_id)
+            return [answer]
 
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
@@ -97,7 +108,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['lead']):
         number = check.numbers(message)
         if not number:
-            return [Mailbox().respond(gen.gain_leaderboard(user_id))]
+            return [Mailbox().respond(gen.gain_leaderboard(user_id),True)]
         return [Mailbox().respond(gen.gain_leaderboard(user_id,max(number)),True)]
     if is_command(message, ['lead'], True):
         msg = "**Usage:** Gain a list of the most active users on the server.\n\n`" + prefix + "leaderboard <number>`\n\n"
@@ -105,7 +116,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     help_msg += "`" + prefix + "leaderboard` - See an activity leaderboard.\n"
 
     if is_command(message, ['rr','roulette','suicide']):
-        return [roulette.take_shot(message)]
+        return [roulette.surrender(True),roulette.take_shot(message)]
     if is_command(message,['rr','roulette','suicide']):
         msg = "**Usage:** Play a game of Russian roulette!\n\n`" + prefix + "rr`\n\nTry it out! It's fun."
         return [Mailbox().respond(msg,True)]
@@ -114,7 +125,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['rs','roulscore','rscore']):
         target = check.users(message,1)
         if not target:
-            return [roulette.profile(message.author)]
+            return [roulette.profile(message.author.id)]
         return [roulette.profile(target[0])]
     if is_command(message, ['rs','roulscore','rscore'],True):
         msg = "**Usage:** Check your current game progress.\n\n`" + prefix + "rs <user>`\n\n"
@@ -153,6 +164,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         return [answer]
 
     if message.content.startswith(prefix):
-        return [Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
+        return [roulette.surrender(True),Mailbox().respond("Sorry bud, couldn't find what you were looking for.", True)]
 
-    return []
+    return [roulette.surrender(True)]

@@ -29,7 +29,7 @@ def choose_reward(token,choice):
         return render_template('notoken.html', reason='ERROR: {} is not a valid option.'.format(choice))
     
     box.add_source2(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
-    webhook.send_private_message(config.universal_prefix + "SUCCESS {} {}".format(token,choice))
+    webhook.send_private_message(config.universal_prefix + "SUCCESS {} {} <@{}>".format(token,choice,box.get_token_data(token)[1]))
     return render_template('finish.html')
 
 

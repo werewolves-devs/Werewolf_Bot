@@ -1,11 +1,6 @@
 splash = '''
 
-==========================================================
-G H O S T B O T
-==========================================================
-WHAM! SUPER BIG AND IMPRESSIVE AND STUFF!
-I DON'T HAVE ASCII ART!
-DAYUM, THAT'S IMPRESSIVE!
+DEVIL BOT
 
                          - = https://github.com/werewolves-devs/werewolf_bot = -
 
@@ -44,25 +39,20 @@ import asyncio
 import story_time.cc_creation as creation_messages
 import story_time.powerup as secret_messages
 from config import welcome_channel, game_master, dead_participant, frozen_participant, administrator, peasant
-from config import ghost_prefix as prefix
+from config import devil_prefix as prefix
 from management.db import db_set, db_get
-from interpretation.ghost_head import process
+from interpretation.devil_head import process
 from interpretation.polls import count_votes
-from interpretation.basecode import create_token
 import config
-import random
-import shop
-import stats
 import management.db as db
 import management.dynamic as dy
 import management.shop as db_shop
-import management.general as general
-import management.boxes as box
+import shop
+import stats
 from emoji import emojize
 
 
 client = discord.Client()
-box_waiters = []
 
 def get_role(server_roles, target_id):
     for each in server_roles:
@@ -85,52 +75,7 @@ already_quoted = []
 
 @client.event
 async def on_reaction_add(reaction, user):
-    if user != client.user and db_shop.is_shop(reaction.message.id):
-        # For shop
-        bought_item = await shop.find_item_from_key("emoji", reaction.emoji, reaction.message.id)
-        await reaction.message.remove_reaction(reaction.emoji, user)
-        await reaction.message.channel.send("{} just bought {} for {} {}!".format(user.mention, bought_item["name"], bought_item["price"], shop.find_shop_by_id(reaction.message.id)["currency"]))
-    elif user != client.user and reaction.emoji == "⭐":
-        # For Quoting
-        stats.increment_stat("quotes_submitted", 1)
-        if reaction.message.id in already_quoted:
-            return
-        already_quoted.append(reaction.message.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        quote_channel = client.get_channel(int(config.quotes))
-        request_embed = discord.Embed(title="Quote Request [Pending]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0x0000ff)
-        request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-        request_embed.set_footer(text="React with ✅ to accept or ❎ to deny.")
-        request = await botspam_channel.send(embed=request_embed)
-        await request.add_reaction("✅")
-        await request.add_reaction("❎")
-
-        def check(reaction, user):
-            return config.game_master in [y.id for y in user.roles] and reaction.message.id == request.id
-
-        try:
-            reaction_confirm, user = await client.wait_for('reaction_add', timeout=172800, check=check)
-        except asyncio.TimeoutError:
-            request_embed = discord.Embed(title="Quote Request [Timed Out]", description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,user.mention), color=0xff0000)
-            request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-            await request.edit(embed=request_embed)
-            await reaction_confirm.message.clear_reactions()
-        else:
-            if reaction_confirm.emoji == "✅":
-                request_embed = discord.Embed(title="Quote Request [Approved By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0x00ff00)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
-                quote_embed = discord.Embed(description=reaction.message.content, color=0x0000ff)
-                quote_embed.set_author(name=str(reaction.message.author), icon_url=reaction.message.author.avatar_url)
-                quote_embed.set_footer(text="{} | {} (UTC)".format(reaction.message.guild.name, reaction.message.created_at.strftime('%d %B %H:%M:%S')))
-                await quote_channel.send(embed=quote_embed)
-            if reaction_confirm.emoji == "❎":
-                stats.increment_stat("quotes_denied", 1)
-                request_embed = discord.Embed(title="Quote Request [Denied By {}]".format(user), description="Message from {} in <#{}> requested for quote by {}:".format(reaction.message.author.mention,reaction.message.channel.id,reaction.message.author.mention), color=0xff0000)
-                request_embed.add_field(name="Message Content", value="```" + reaction.message.content.replace('`', '`\u200B') + "```")
-                await request.edit(embed=request_embed)
-                await reaction_confirm.message.clear_reactions()
+    return
 
 
 # Whenever a message is edited
@@ -140,6 +85,8 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
+    stats.increment_stat("messages_edited", 1)
+    stats.increment_user_stat(before.author.id, "messages_edited", 1)
 
     if before.id != after.id:
         db.add_trash_message(after.id,after.channel.id)
@@ -159,18 +106,21 @@ async def on_message_edit(before, after):
             if peasant in role_table and after.author.bot == True:
                 isPeasant = True
     except Exception:
-        # We want the Ghost Bot to listen to the webhooks, who send data from the website.
-        isPeasant = True
+        pass
 
-    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
 # Whenever a message is sent.
 @client.event
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
-        #stats.increment_stat("bot_messages_sent", 1)
         return
+    stats.increment_stat("messages_sent", 1)
+    stats.increment_user_stat(message.author.id, "messages_sent", 1)
+
+    # Add trash messages
+    db.add_trash_message(message.id,message.channel.id)
 
     #check role of sender
     isGameMaster = False
@@ -181,7 +131,6 @@ async def on_message(message):
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
         except Exception:
             print('Unable to acquire role_table from {}'.format(message.author.display_name))
-            isPeasant = True
         else:
             if game_master in role_table:
                 isGameMaster = True
@@ -190,55 +139,16 @@ async def on_message(message):
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
 
-    global box_waiters
+    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
-    if (random.randint(0,249+general.spam_activity(message.author.id)) == 1 or message.author.id in box_waiters) and not message.author.bot and message.guild == client.get_channel(int(config.bot_spam)).guild:
-        if message.author.id in box_waiters:
-            box_waiters.remove(message.author.id)
-            print('Current box waiters: {}'.format(box_waiters))
-        
-        token = create_token(message.author.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        try:
-            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
-        except:
-            await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
-            await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
-        else:
-            box.add_token(token,message.author.id,msg.id)
-            await message.add_reaction('🎁')
-            await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
-
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
-
-async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
+async def process_message(message,result):
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
-    if gamelog_channel.guild == message.guild:
-        general.add_activity(message.author.id,message.author.name)
-    else:
-        print('{} sent a DM to the bot!'.format(message.author.display_name))
-
-    if isGameMaster:
-        quote_embed = discord.Embed(description=message.content, color=0x00ff00)
-    elif isPeasant:
-        quote_embed = discord.Embed(description=message.content, color=0x0000ff)
-    elif db.isParticipant(message.author.id):
-        quote_embed = discord.Embed(description=message.content, color=0xff0000)
-    else:
-        quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
-    quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
-    quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
-    for spy_channel_id in db.find_spies(message.channel.id):
-        spy_channel = client.get_channel(spy_channel_id)
-        await spy_channel.send(embed=quote_embed)
-
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
-    global box_waiters
 
     for mailbox in result:
 
@@ -266,7 +176,7 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
 
                 log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
 
-                await gamelog_channel.send(log)
+                await botspam_channel.send(log)
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
@@ -277,10 +187,16 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
                         dy.set_mayor(chosen_one)
-                        # TODO: give Mayor role
+                        member = gamelog_channel.guild.get_member(int(chosen_one))
+                        if member != None:
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".format(member.display_name))
                     elif poll.purpose == 'Reporter':
                         dy.set_reporter(chosen_one)
-                        # TODO: give Reporter role
+                        for channel_id in db.get_secret_channels("Reporter"):
+                            mailbox.edit_cc(channel_id,chosen_one,1)
+                        member = gamelog_channel.guild.get_member(int(chosen_one))
+                        if member != None:
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Mayor".fprmat(member.display_name))
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
@@ -333,16 +249,6 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
 
                 for item in emoji_table:
                     await response.add_reaction(item)
-
-        for element in mailbox.thanks:
-            member = gamelog_channel.guild.get_member(box.message_owner(int(element)))
-            msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
-            msg = await msg.channel.get_message(int(element))
-            await msg.delete()
-
-        for element in mailbox.box_gifts:
-            box_waiters.append(element)
-            print('Current box waiters: {}'.format(box_waiters))
 
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
@@ -742,12 +648,12 @@ async def on_ready():
     print('   | > ' + client.user.name)
     print('   | > ' + str(client.user.id))
 
-    await client.get_channel(welcome_channel).send('Beep *booooo.....*p! I just went online!')
+    await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
 
 print(splash)
 print(' --> "' + random.choice(splashes) + '"')
 print(' --> Please wait whilst we connect to the Discord API...')
 try:
-    client.run(config.GH_TOKEN)
+    client.run(config.DV_TOKEN)
 except:
     print('   | > Error logging in. Check your token is valid and you are connected to the Internet.')

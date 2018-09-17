@@ -154,6 +154,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message,['publish_all_channels'],True):
             msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
             msg += "`"+ prefix + "publish_all_channels`\n\nThis command can only be used by Administrators."
+            return [Mailbox().respond(msg,True)]
+        help_msg += "`" + prefix + "publish_all_channels` - Spoiler all channels.\n"
 
     elif is_command(message, ['delete_category','start','publish_all_channels']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
@@ -231,8 +233,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''day'''
         # This command is used to initialize the day.
         if is_command(message, ['day']):
-            # TODO
-            return todo()
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
         if is_command(message, ['day'], True):
             msg = "**Usage:** Initiate the day if this does not happen automatically.\n\n"
             msg += "`" + prefix + "day`\n\nThis command can only be used by Game Masters."
@@ -310,8 +311,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
-            # TODO
-            return todo()
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
         if is_command(message, ['night'], True):
             msg = "**Usage:** Initiate the night if this does not happen automatically.\n\n"
             msg += "`" + prefix + "night`\n\nThis command can only be used by Game Masters."
@@ -352,6 +352,13 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().respond(msg,True)]
         help_msg += "`" + prefix + "poll` - Create a poll\n"
 
+        '''smite'''
+        if is_command(message, ['smite']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("Smite whom? ***EVERYONE** shall be smitten!")]
+            return [Mailbox().respond(eggs.smite(target[0]))]
+
         '''stats'''
         # Returns the game's stats in embed form
         if is_command(message, ['stats']):
@@ -376,7 +383,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             return [Mailbox().embed(embed, bot_spam, True)]
         if is_command(message, ['stats'],True):
             # TODO
-            return []
+            return todo()
         help_msg += "`" + prefix + "stats` - Show statistics."
 
         '''whois'''
@@ -1214,7 +1221,6 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         for phrase in eggs.randiumlooks():
             answer.respond(phrase,True)
         return [answer]
-    help_msg += "`" + prefix + "tip` - Gain a random tip for the game.\n"
 
     if message.content.startswith('Eyyy'):
         return [Mailbox().respond('Ayyyy!')]
