@@ -31,23 +31,23 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
     if isPeasant == True:
-        
-        if is_command(message,['success']):
+
+        if check.is_command(message,['success'],False,unip):
             token = args[1]
             choice = args[2]
 
             if box.token_status(token) != 1:
-                return []
-            
+                return [Mailbox().respond("Wrong status, buddy.")]
+
             data = box.get_token_data(token)
             given_options = [int(data[3]),int(data[4]),int(data[5])]
-        
-            if choice not in given_options:
+
+            if int(choice) not in given_options:
                 return [Mailbox().respond("Invalid choice!",True).spam("A webhook has given an invalid bug. This means one of the following two things;\n1. There's bug;\n2. Someone's trying to hack the bots through a webhook.\n\nBoth are not good.")]
 
             box.add_choice(token,choice)
             invt.take_item(int(box.get_token_data(token)[1]),int(choice[1:4]),int(choice[4:7]))
-            return [Mailbox().respond("Got it! *(I hope.)* Thanks.").thank(box.get_token_data(token)[11])]
+            return [Mailbox().respond("Got it! *(I hope.)* Thanks.",True).thank(box.get_token_data(token)[11])]
 
     # =============================================================
     #

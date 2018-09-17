@@ -159,7 +159,7 @@ async def on_message_edit(before, after):
                 isPeasant = True
     except Exception:
         # We want the Ghost Bot to listen to the webhooks, who send data from the website.
-        isAdmin = True
+        isPeasant = True
 
     await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
 
@@ -193,6 +193,7 @@ async def on_message(message):
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
         except Exception:
             print('Unable to acquire role_table from {}'.format(message.author.display_name))
+            isPeasant = True
         else:
             if game_master in role_table:
                 isGameMaster = True
@@ -315,7 +316,7 @@ async def process_message(message,result):
             member = gamelog_channel.guild.get_member(box.message_owner(int(element)))
             msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
             msg = await msg.channel.get_message(int(element))
-            msg.delete()
+            await msg.delete()
 
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:

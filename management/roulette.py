@@ -136,7 +136,7 @@ def take_shot(message):
                 user = Ruser(acceptant)
                 winners.append(user)
 
-            if random.random() == 0.9 and not rigged:
+            if random.random() < 0.9 and not rigged:
                 user.kill(victim)
                 deadies.append(victim)
                 
