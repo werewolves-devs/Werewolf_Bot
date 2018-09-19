@@ -50,7 +50,7 @@ def hard_reset(skip = False):
         print('Progress deleted!\n')
         print('Creating space for a new database....')
     c.execute("CREATE TABLE 'inventory' ('id' INTEGER NOT NULL, 'item' INTEGER NOT NULL, 'amount' INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`id`) REFERENCES `users`(`id`));")  
-    c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, 'roulette_record' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
+    c.execute("CREATE TABLE 'users' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'credits' INTEGER NOT NULL DEFAULT 0, 'activity' INTEGER NOT NULL DEFAULT 0, 'roulette_record' INTEGER NOT NULL DEFAULT 0, 'refer_score' INTEGER NOT NULL DEFAULT 0, 'referrer' INTEGER NOT NULL DEFAULT 0, PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'activity' ('id' INTEGER NOT NULL, 'name' TEXT NOT NULL, 'activity' INTEGER NOT NULL DEFAULT 0, 'spam_activity' REAL NOT NULL DEFAULT 0, 'spam_filter' INTEGER NOT NULL DEFAULT 200, 'record_activity' REAL NOT NULL DEFAULT 0, FOREIGN KEY(`id`) REFERENCES `users`(`id`), PRIMARY KEY('id'));")
     c.execute("CREATE TABLE 'offers' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, FOREIGN KEY(`id`) REFERENCES `users`(`id`));")
     c.execute("CREATE TABLE 'requests' ('id' INTEGER NOT NULL, 'emoji' TEXT NOT NULL, 'price' INTEGER NOT NULL, 'owner' INTEGER NOT NULL, FOREIGN KEY(`id`) REFERENCES `users`(`id`));")

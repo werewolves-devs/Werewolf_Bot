@@ -1,7 +1,7 @@
 import sqlite3
 import random
 from config import general_database
-from management.position import positionof
+from management.position import gen_position as positionof
 from management.db import db_set
 
 conn = sqlite3.connect(general_database)
@@ -107,3 +107,41 @@ def update_roulette_score(user_id,value):
     """Update the player's roulette highscore. It is set to the highest score present, and will not update if the latest score is lower."""
     c.execute("UPDATE 'users' SET roulette_record =? WHERE id=? AND roulette_record <?",(value,user_id,value))
     conn.commit()
+
+# Gather a user's bit of information from the database.
+def gen_get(user_id,column):
+    """Gain a specific bit of information from a given player
+
+    Keyword arguments:
+    user_id -> the user's id
+    column -> the relevant part of info
+    """
+    values = get_user(user_id)
+    if values == None:
+        return None
+    return values[positionof(column)]
+
+# Change a user's bit of information in the database.
+def gen_set(user_id,column,value):
+    """Alter a specific bit of information of a given player
+
+    Keyword argumentsL
+    user_id -> the user's id
+    column -> the relevant part of info
+    value -> the new value it should be set to
+    """
+    positionof(column) # Make sure the value is valid.
+    c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
+    conn.commit()
+
+def update_refer(user_id,referrer):
+    """Set the user who referred the given user to this server.
+    Returns true if referrer was chosen, False if the user already had reffered somone."""
+
+    if gen_get(user_id,"referrer") != 0:
+        return False
+    
+    gen_set(user_id,"referrer",referrer)
+    number = gen_get(referrer,"refer_score")
+    gen_set(referrer,"refer_score",number+1)
+    return True
