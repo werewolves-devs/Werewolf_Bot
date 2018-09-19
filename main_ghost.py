@@ -84,6 +84,19 @@ async def remove_all_game_roles(member):
 already_quoted = []
 
 @client.event
+async def on_member_join(member):
+    welcome = client.get_channel(welcome_channel)
+    if member.guild != welcome.guild:
+        return
+    
+    await welcome.send("Eyyyy! Welcome to the *Werewolves* server, <@{}>!".format(member.id))
+    await welcome.send("Lemme ask ya this; who brought you here? Give them (and yourself) a welcome reward by typing `$refer @user#1234`!")
+
+@client.event
+async def on_member_remove(member):
+    await client.get_channel(config.bot_spam).send("<@{}> has left the server.".format(member.id))
+
+@client.event
 async def on_reaction_add(reaction, user):
     if user != client.user and db_shop.is_shop(reaction.message.id):
         # For shop
