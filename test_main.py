@@ -46,10 +46,10 @@ def test_database():
   db.signup(1,'Randium003',u':smirk:')
   assert db.get_user(1) == (1, u'Randium003', u':smirk:', 0, game_log, 'Spectator', 'Spectator', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, '', 0, 0, 0, 0)
   assert db.db_get(1,'channel') == game_log
-  assert db.isParticipant(1) == False
-  assert db.isParticipant(1,True) == True
-  assert db.isParticipant(2) == False
-  assert db.isParticipant(2,True) == False
+  assert db.is_participant(1) == False
+  assert db.is_participant(1, True) == True
+  assert db.is_participant(2) == False
+  assert db.is_participant(2, True) == False
   db.db_set(1,'frozen',1)
   assert db.poll_list() == [(1,u':smirk:',1,0)]
 

@@ -1,6 +1,6 @@
 import config
 from emoji import UNICODE_EMOJI
-from management.db import emoji_to_player, isParticipant
+from management.db import emoji_to_player, is_participant
 from management.position import roles_list
 
 # Makes sure the message has at least the needed amount of users.
@@ -24,7 +24,7 @@ def users(message,amount = -1, delete_duplicates = True, must_be_participant = F
 
     if must_be_participant == True:
         for user in user_table:
-            if not isParticipant(user):
+            if not is_participant(user):
                 user_table.remove(user)
 
     if delete_duplicates == True:

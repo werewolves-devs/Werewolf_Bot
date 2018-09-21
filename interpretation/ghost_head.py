@@ -5,7 +5,7 @@ from config import max_cc_per_user, season, universal_prefix as unip, max_partic
 from config import ghost_prefix as prefix
 from interpretation import check
 from main_classes import Mailbox
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
+from management.db import is_participant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from management import db, dynamic as dy, general as gen, boxes as box
 from .profile import process_profile
@@ -77,7 +77,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
 
-    if isParticipant(user_id):
+    if is_participant(user_id):
         help_msg += "\n__Participant commands:__\n"
 
         user_undead = int(db_get(user_id,'undead'))

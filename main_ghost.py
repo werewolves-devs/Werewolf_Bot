@@ -234,7 +234,7 @@ async def process_message(message,result):
                         users = await emoji.users().flatten()
 
                         for person in users:
-                            if db.isParticipant(person.id):
+                            if db.is_participant(person.id):
                                 user_table.append([person.id,emoji.emoji])
 
                 log, result, chosen_emoji = count_votes(user_table,poll.purpose,dy.get_mayor())
@@ -414,11 +414,11 @@ async def process_message(message,result):
                         if int(db_get(member.id,'frozen')) == 0:
                             raise NotImplementedError("This is a purposeful error raise!")
                     except Exception:
-                        if db.isParticipant(member.id):
+                        if db.is_participant(member.id):
                             await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
-                        elif db.isParticipant(member.id,True,True):
+                        elif db.is_participant(member.id, True, True):
                             await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
-                        elif db.isParticipant(member.id,True,True,True):
+                        elif db.is_participant(member.id, True, True, True):
                             await member.add_roles(get_role(main_guild.roles, config.suspended), reason="Updating CC Permissions")
                     else:
                         await member.add_roles(get_role(main_guild.roles, config.frozen_participant), reason="Updating CC Permissions")
@@ -433,7 +433,7 @@ async def process_message(message,result):
                     await member.add_roles(get_role(main_guild.roles, config.participant), reason="Updating CC Permissions")
                 elif element.number == 4:
                     await channel.set_permissions(user, read_messages=True, send_messages=False)
-                    if db.isParticipant(member.id,False,True):
+                    if db.is_participant(member.id, False, True):
                         await member.add_roles(get_role(main_guild.roles, config.dead_participant), reason="Updating CC Permissions")
                 elif element.number == 5:
                     await channel.set_permissions(user, read_messages=True, send_messages=False)
@@ -450,7 +450,7 @@ async def process_message(message,result):
                 else:
                     await msg.channel.send('Something went wrong! Please contact a Game Master.')
                     return
-                if db.isParticipant(element.victim,True,True):
+                if db.is_participant(element.victim, True, True):
                     db.set_user_in_channel(element.channel,element.victim,element.number)
 
 
@@ -495,12 +495,12 @@ async def process_message(message,result):
                     if member == None:
                         await botspam_channel.send("That\'s problematic! I couldn\'t add <@{0}> to a cc. *(<#{0}> <@&{0}> ?)*".format(element.victim))
                         await message.author.send("It doesn't seem like <@{}> is part of the server! I am sorry, I can't add them to your **conspiracy channel**.".format(user))
-                    elif db.isParticipant(user,False,True) == True:
+                    elif db.is_participant(user, False, True) == True:
                         if int(db_get(user,'abducted')) == 1:
                             abductees.append(member)
                         elif int(db_get(user,'frozen')) == 1:
                             frozones.append(member)
-                        elif db.isParticipant(user,False,False) == False:
+                        elif db.is_participant(user, False, False) == False:
                             deadies.append(member)
                         else:
                             viewers.append(member)
@@ -581,7 +581,7 @@ async def process_message(message,result):
                     for member in abductees:
                         db.set_user_in_channel(channel.id,member.id,3)
                     for member in deadies:
-                        if db.isParticipant(member.id,True,True) == True:
+                        if db.is_participant(member.id, True, True) == True:
                             db.set_user_in_channel(channel.id,member.id,4)
 
 
@@ -616,7 +616,7 @@ async def process_message(message,result):
             i = 0
 
             for user in db.poll_list():
-                if db.isParticipant(int(user[0])):
+                if db.is_participant(int(user[0])):
                     i += 1
                     msg += user[1] + " - <@" + str(user[0]) + "> "
 

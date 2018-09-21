@@ -37,7 +37,7 @@ async def check_time():
                 activity = db.db_get(user,'activity')
                 db.db_set(user,'activity',activity + 1)
 
-                if db.isParticipant(user):
+                if db.is_participant(user):
                     if activity_hours - activity == 24:
                         await client.get_channel(bot_spam).send(prefix + "warn <@{}>".format(user))
                     elif activity >= activity_hours:

@@ -266,7 +266,7 @@ def ignite(user_id):
 
     # Ignite all living players.
     for user in db.player_list(True,True):
-        if db.isParticipant(user) and db_get(user,'role') != 'Pyromancer':
+        if db.is_participant(user) and db_get(user, 'role') != 'Pyromancer':
             db.add_kill(int(user),'Pyromancer',user_id)
 
     answer = Mailbox().log("The **{}** <@{}> has ignited all powdered players!".format(user_role,user_id))
@@ -617,7 +617,7 @@ def freeze_all(user_id):
     incorrect = 0
 
     for frozone in db.get_freezers(user_id):
-        if not db.isParticipant(frozone[0]) or int(db_get(frozone[0],'abducted')) == 1:
+        if not db.is_participant(frozone[0]) or int(db_get(frozone[0], 'abducted')) == 1:
             db.delete_freezer(user_id,frozone[0])
         elif frozone[1] != db_get(frozone[0],'role'):
             incorrect += 1

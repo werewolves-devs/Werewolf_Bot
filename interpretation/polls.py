@@ -1,4 +1,4 @@
-from management.db import db_get, emoji_to_player, player_list, isParticipant
+from management.db import db_get, emoji_to_player, player_list, is_participant
 from management.dynamic import day_number
 from interpretation.check import check_for_int
 

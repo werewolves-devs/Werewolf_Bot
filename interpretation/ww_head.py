@@ -8,7 +8,7 @@ from config import ww_prefix as prefix, bot_spam
 from interpretation.check import is_command
 from main_classes import Mailbox
 from management.position import valid_distribution
-from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
+from management.db import is_participant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from story_time.commands import cc_goodbye, cc_welcome
 from roles_n_rules.role_data import attack
@@ -201,7 +201,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 return [Mailbox().respond("No role provided! Please provide us with a role!")]
             if user == False:
                 return [Mailbox().respond("No user found! Please provide us with a user!")]
-            if isParticipant(user[0], True, True) == False:
+            if is_participant(user[0], True, True) == False:
                 return [Mailbox().respond(
                     "I am terribly sorry. You cannot assign a role to a user that hasn\'t signed up!")]
 
@@ -436,7 +436,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     #
     # =============================================================
 
-    if isParticipant(user_id):
+    if is_participant(user_id):
         help_msg += "\n__Participant commands:__\n"
 
         user_undead = int(db_get(user_id,'undead'))
@@ -454,7 +454,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
             command = Mailbox()
             for member in members_to_add:
-                if isParticipant(member) == False:
+                if is_participant(member) == False:
                     command.edit_cc(message_channel, member, 4)
                 elif int(db_get(member, 'abducted')) == 1:
                     command.edit_cc(message_channel, member, 3)
@@ -1156,7 +1156,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
                 choice_emoji = emoji
                 break
 
-        if isParticipant(user_id, True, True):
+        if is_participant(user_id, True, True):
             if choice_emoji == "":
                 return [Mailbox().respond(
                     "You are already signed up with the {} emoji! Also, your emoji was occupied.".format(

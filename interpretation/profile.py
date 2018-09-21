@@ -6,7 +6,7 @@ from discord import Message, User, Embed
 from config import ghost_prefix as prefix
 from interpretation import check
 from main_classes import Mailbox
-from management.db import isParticipant
+from management.db import is_participant
 from management.general import get_credits
 from management.profile import ProfileModel
 
@@ -71,7 +71,7 @@ def view_profile(message: Message):
     users = check.users(message, amount=1, delete_duplicates=True, must_be_participant=False)
     user: User = message.author
     if users:
-        if isParticipant(message.author.id) and not isParticipant(users[0]):
+        if is_participant(message.author.id) and not is_participant(users[0]):
             return [Mailbox().respond(
                 "I am sorry! To prevent any accidental spoilers, you cannot "
                 "view the profile of dead players.")]
