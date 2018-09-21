@@ -31,6 +31,8 @@ def pay():
 
         # Remove potential night uses
         for i in range(len(roles.night_users)):
+            elif user_role in ["White Werewolf"] and dy.day_number() % 2 == 0 and dy.day_number > 0:
+                db_set(user_id,'uses',1)
             if user_role in roles.night_users[i]:
                 if i > 0:
                     db_set(user_id,'uses',0)
