@@ -311,7 +311,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
-            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pight')]
         if is_command(message, ['night'], True):
             msg = "**Usage:** Initiate the night if this does not happen automatically.\n\n"
             msg += "`" + prefix + "night`\n\nThis command can only be used by Game Masters."
@@ -356,7 +356,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message, ['smite']):
             target = check.users(message)
             if not target:
-                return [Mailbox().respond("Smite whom? ***EVERYONE** shall be smitten!")]
+                return [Mailbox().respond("Smite whom? ***EVERYONE*** shall be smitten!")]
             return [Mailbox().respond(eggs.smite(target[0]))]
 
         '''stats'''
