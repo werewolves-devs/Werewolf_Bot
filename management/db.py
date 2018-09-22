@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Union
+from typing import Union, List, Any, Optional
 
 from config import database, max_channels_per_category, max_participants
 from management.position import positionof, wolf_pack
@@ -18,7 +18,7 @@ class PollToEvaluate:
                           int(database_tuple[i + 4]) != 0]
 
 
-def poll_list():
+def poll_list() -> List[List[Any]]:
     """Return a list of users to be added to the poll.
     The first argument is the user's id, the second is their emoji, and the third and fourth are arguments that no longer\
     allow the user to vote on them."""
@@ -28,7 +28,7 @@ def poll_list():
     return c.fetchall()
 
 
-def player_list(alive_only=False, available_only=False):
+def player_list(alive_only: bool = False, available_only: bool = False) -> List[List[Any]]:
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
     extra = "1=1"
     if alive_only:
@@ -41,7 +41,7 @@ def player_list(alive_only=False, available_only=False):
 
 # This function takes an argument and looks up if there's a user with a matching emoji.
 # If found multiple, which it shouldn't, it takes the first result and ignores the rest.
-def emoji_to_player(emoji):
+def emoji_to_player(emoji: str) -> Optional[str]:
     """Look up the user's id that corresponds with the given emoji. Returns None if the user doesn't exist, \
     and returns the user's id if present.
 
@@ -49,7 +49,7 @@ def emoji_to_player(emoji):
     emoji -> given emoji
     """
 
-    c.execute("SELECT id FROM game WHERE emoji =?", (emoji,))
+    c.execute("SELECT id FROM game WHERE emoji = ?", (emoji,))
 
     try:
         return c.fetchone()[0]
@@ -60,7 +60,7 @@ def emoji_to_player(emoji):
 
 
 # Get all of a user's data from the database
-def get_user(id):
+def get_user(id: int) -> Optional[List[Any]]:
     """Gather all of a user's data from the database.
 
     Keyword arguments:
@@ -79,7 +79,7 @@ def get_user(id):
 
 # This function makes sure the user is a participant.
 # If the user is a spectator, it returns whatever spectator is set to.
-def is_participant(id, spectator=False, dead=False, suspended=False):
+def is_participant(id: int, spectator: bool = False, dead: bool = False, suspended: bool = False) -> bool:
     """Checks if the user is a registered participant in the database
 
     Keyword arguments:
@@ -104,7 +104,7 @@ def is_participant(id, spectator=False, dead=False, suspended=False):
 
 
 # This function returns a user's personal channel.
-def personal_channel(user_id, channel_id):
+def personal_channel(user_id: int, channel_id: int) -> bool:
     """Returns True if the given channel is the user's personal channel.
 
     Keyword arguments:
@@ -117,7 +117,7 @@ def personal_channel(user_id, channel_id):
 
 
 # Gather a user's bit of information from the database.
-def db_get(user_id, column):
+def db_get(user_id: int, column: str) -> Any:
     """Gain a specific bit of information from a given player
 
     Keyword arguments:
@@ -131,7 +131,7 @@ def db_get(user_id, column):
 
 
 # Change a user's bit of information in the database.
-def db_set(user_id, column, value):
+def db_set(user_id: int, column: str, value: Any):
     """Alter a specific bit of information of a given player
 
     Keyword argumentsL
@@ -146,7 +146,7 @@ def db_set(user_id, column, value):
 
 # Add a kill to the kill queue.
 # Apply in case of an end-effect kill.
-def add_kill(victim_id, role, murderer=""):
+def add_kill(victim_id: int, role: str, murderer: str = ""):
     """Add a new order to the kill queue.
 
     Keyword arguments:
@@ -157,11 +157,10 @@ def add_kill(victim_id, role, murderer=""):
     data = [victim_id, role, murderer]
     c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)", data)
     conn.commit()
-    return
 
 
 # Gather a kill from the kill queue. Pay attention; the function auto-deletes the kill from the list
-def get_kill():
+def get_kill() -> Optional[List[Any]]:
     """Receive a kill from the kill queue. Receiving the file also deletes the order from the database."""
     c.execute("SELECT * FROM 'death-row'")
 
@@ -176,13 +175,13 @@ def get_kill():
         return None
 
     kill = [order[i] for i in range(4)]
-    c.execute("DELETE FROM 'death-row' WHERE (id =?)", (kill[0],))
+    c.execute("DELETE FROM 'death-row' WHERE (id = ?)", (kill[0],))
     conn.commit()
     return kill
 
 
 # Register a new channel to the database
-def add_channel(channel_id, owner, secret=False):
+def add_channel(channel_id: int, owner: int, secret: bool = False):
     """Add a channel to the database.
 
     Keyword arguments:
@@ -201,7 +200,7 @@ def add_channel(channel_id, owner, secret=False):
 
 
 # Change a user's value in a specific channel
-def set_user_in_channel(channel_id, user_id, number):
+def set_user_in_channel(channel_id: int, user_id: int, number: int):
     """Set a specific user's value in a given channel.
     0 - no access
     1 - access
@@ -221,7 +220,7 @@ def set_user_in_channel(channel_id, user_id, number):
 
 # This function visits every channel where the user has value "old" and sets it to value "new"
 # It then returns all channels that it has changed.
-def channel_change_all(user_id, old, new):
+def channel_change_all(user_id: int, old: int, new: int) -> List[int]:
     """Change all values from one to another for a given user. Returns a list of altered channels.
 
     Keyword arguments:
@@ -270,13 +269,13 @@ def channel_get(channel_id: int, user_id: Union[None, str, int] = None) -> Union
         return int(c.fetchone()[0])
 
 
-def get_columns():
+def get_columns() -> List[List[Any]]:
     """Gain all data about ALL channels. Usage not recommended."""
     c.execute("SELECT * FROM channel_rows")
     return c.fetchall()
 
 
-def get_category(secret=False):
+def get_category(secret: bool = False) -> Optional[int]:
     """Receives the category that the current cc should be created in. If it cannot find a category,
     or if the category is full, it will return None with the intention that a new category is created in main.py"""
 
@@ -296,7 +295,7 @@ def get_category(secret=False):
     return int(category[1])
 
 
-def add_category(id, secret=False):
+def add_category(id: int, secret: bool = False):
     """Let the datbase know a new category has been appointed for the cc's, which has the given id.
 
     Keyword arguments:
@@ -311,7 +310,7 @@ def add_category(id, secret=False):
     conn.commit()
 
 
-def is_owner(user_id, channel_id):
+def is_owner(user_id: int, channel_id: int) -> bool:
     """This function returns True is the given user is the owner of a given cc.
     Returns False if the user is not the owner, if the user doesn't exist or if the channel isn't found.
 
@@ -327,7 +326,7 @@ def is_owner(user_id, channel_id):
     return int(owner) == int(user_id)
 
 
-def count_categories(secret=False):
+def count_categories(secret: bool = False) -> int:
     """This function counts how many categories are currently registered, and returns the value as an integer."""
     if not secret:
         c.execute("SELECT COUNT(*) FROM 'categories';")
@@ -336,7 +335,7 @@ def count_categories(secret=False):
     return c.fetchone()[0]
 
 
-def get_channel_members(channel_id, number=1):
+def get_channel_members(channel_id: int, number: int = 1) -> List[int]:
     """This function returns a list of user ids that have the given number in a given channel.
     If it finds none or if the channel wasn't found, the function returns an empty list.
 
@@ -354,7 +353,7 @@ def get_channel_members(channel_id, number=1):
     return members
 
 
-def get_secret_channels(role):
+def get_secret_channels(role: str) -> List[int]:
     """Get a list of secret channels that have a certain role. The function returns a list of integers.
 
     Keyword arguments:
@@ -365,7 +364,7 @@ def get_secret_channels(role):
     return [int(pointer[0]) for pointer in c.fetchall()]
 
 
-def add_secret_channel(channel_id, role):
+def add_secret_channel(channel_id: int, role: str):
     """Add a pointer towards a new secret channel in the database. Note this only adds the pointer, not the actual channel.
 
     Keyword arguments:
@@ -376,7 +375,7 @@ def add_secret_channel(channel_id, role):
     conn.commit()
 
 
-def amulets(user_id):
+def amulets(user_id: int):
     """Display a list of amulets that the given user owns."""
     amulet_channels = []
     for channel_id in get_secret_channels('Amulet_Holder'):
@@ -385,18 +384,18 @@ def amulets(user_id):
     return amulet_channels
 
 
-def has_amulet(user_id):
+def has_amulet(user_id: int) -> bool:
     """Returns boolean whether the user has an amulet or not."""
     return bool(amulets(user_id))
 
 
-def insert_deadie(user_id):
+def insert_deadie(user_id: int):
     """Add a new deadie to the list. This list will be evaluated for the storytime."""
     c.execute("INSERT OR IGNORE INTO deadies (user_id) VALUES (?)", (user_id,))
     conn.commit()
 
 
-def get_deadies():
+def get_deadies() -> List[int]:
     """Gain the list of deadies from the database."""
     c.execute("SELECT user_id FROM 'deadies'")
     return [int(buddy[0]) for buddy in c.fetchall()]
@@ -409,7 +408,7 @@ def delete_deadies():
 
 
 # Add a new participant to the database
-def signup(user_id, name, emoji):
+def signup(user_id: int, name: str, emoji: str):
     c.execute("INSERT INTO 'game' ('id','name','emoji') VALUES (?,?,?);", (user_id, name, emoji))
     c.execute("SELECT * FROM channel_rows WHERE id = ?", (user_id,))
     if c.fetchall():
@@ -418,7 +417,7 @@ def signup(user_id, name, emoji):
     conn.commit()
 
 
-def add_poll(msg_table, purpose, channel_id, user_id=0):
+def add_poll(msg_table: List[int], purpose: str, channel_id: int, user_id: int = 0):
     """Add a new poll to the database. The poll is saved so it can be evaluated later on.
 
     msg_table -> the list of messages that contain the poll
@@ -442,7 +441,7 @@ def add_poll(msg_table, purpose, channel_id, user_id=0):
     conn.commit()
 
 
-def get_all_polls():
+def get_all_polls() -> List[PollToEvaluate]:
     """Gain the polls registered the database. As all polls are always evaluated simultaneously,
     the polls are deleted from the database. If they really need to be kept, they can always be saved again."""
     c.execute("SELECT * FROM 'polls'")
@@ -453,7 +452,7 @@ def get_all_polls():
     return [PollToEvaluate(item) for item in answer_table]
 
 
-def add_freezer(user_id, victim_id, role):
+def add_freezer(user_id: int, victim_id: int, role: str) -> Optional[str]:
     """This function saves an ice king's guess in the database. If a guess about that player already exists,
     it is overwritten, and the old role is returned.
 
@@ -471,7 +470,7 @@ def add_freezer(user_id, victim_id, role):
     return answer[0]
 
 
-def get_freezers(user_id):
+def get_freezers(user_id: int) -> List[List[str]]:
     """Get a list of all the guesses an ice king has made so far, including their roles.
 
     user_id -> the id of the ice king"""
@@ -479,7 +478,7 @@ def get_freezers(user_id):
     return c.fetchall()
 
 
-def delete_freezer(user_id, victim_id):
+def delete_freezer(user_id: int, victim_id: int) -> bool:
     """Remove a guessed user from the database. If the user wasn't in the database, return False.
     Else, return True when removed successfully.
 
@@ -493,7 +492,7 @@ def delete_freezer(user_id, victim_id):
     return True
 
 
-def add_standoff(victim_id, role, murderer):
+def add_standoff(victim_id: int, role: str, murderer: int):
     """Add a new order to the kill queue.
 
     Keyword arguments:
@@ -504,10 +503,9 @@ def add_standoff(victim_id, role, murderer):
     data = [victim_id, role, murderer]
     c.execute("INSERT INTO 'standoff' ('id', 'victim', 'role', 'murderer') VALUES (NULL,?,?,?)", data)
     conn.commit()
-    return
 
 
-def get_standoff(user_id):
+def get_standoff(user_id: int) -> List[List[Any]]:
     """Gain a list of standoffs from a user; this is a list of players they will take with them when they die."""
     c.execute("SELECT * FROM 'standoff' WHERE murderer =?", (user_id,))
 
@@ -518,7 +516,7 @@ def get_standoff(user_id):
     return returntable
 
 
-def delete_standoff(standoff_id):
+def delete_standoff(standoff_id: int):
     """Remove a standoff from the database. This is generally not needed, but
     is used for occasions like the huntress who chooses a new target.
 
@@ -535,7 +533,7 @@ def delete_hookers():
     conn.commit()
 
 
-def random_wolf():
+def random_wolf() -> Union[int, str]:
     """Find and get a random wolf pack member"""
     c.execute("SELECT id FROM game WHERE role IN {!r} ORDER BY RANDOM() LIMIT 1".format(tuple(wolf_pack)))
     wolfies = c.fetchone()
@@ -545,17 +543,18 @@ def random_wolf():
     return wolfies[0]
 
 
-def random_cult():
+def random_cult() -> Union[int, str]:
     """Find and get a random cult leader/member"""
     c.execute("SELECT id FROM game WHERE role IN ('Cult Leader', 'Cult Member') ORDER BY RANDOM() LIMIT 1")
     culties = c.fetchone()
     if culties is None:
-        print("This is strange! A random cult is called, which shouldn't happen if there aren't any cult people around.")
+        print(
+            "This is strange! A random cult is called, which shouldn't happen if there aren't any cult people around.")
         return ''
     return culties[0]
 
 
-def add_trash_channel(channel_id):
+def add_trash_channel(channel_id: int):
     """Add a new trash channel to the database."""
     c.execute("SELECT * FROM 'trashy' WHERE 'channel' = ?;", (channel_id,))
     if c.fetchall():
@@ -563,7 +562,7 @@ def add_trash_channel(channel_id):
         conn.commit()
 
 
-def add_trash_message(message_id, channel_id):
+def add_trash_message(message_id: int, channel_id: int):
     """Add a message to the trash bin. The function makes sure the channel's a trash channel.
     If it's not, then the message isn't stored in the database."""
 
@@ -573,11 +572,11 @@ def add_trash_message(message_id, channel_id):
         conn.commit()
 
 
-def empty_trash_channel(channel_id):
+def empty_trash_channel(channel_id: int) -> List[int]:
     """Remove all messages stored from a given channel.
     The function returns a list of message ids that were linked to the given channel id."""
     c.execute("SELECT message FROM 'trashcan' WHERE channel = ?;", (channel_id,))
-    message_table = [item[0] for item in c.fetchall()]
+    message_table = [int(item[0]) for item in c.fetchall()]
 
     c.execute("DELETE FROM 'trashcan' WHERE channel = ?", (channel_id,))
     conn.commit()
