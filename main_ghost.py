@@ -213,7 +213,7 @@ async def on_message(message):
         token = create_token(message.author.id)
         botspam_channel = client.get_channel(int(config.bot_spam))
         try:
-            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+            msg = await message.author.send("Hey there! Thank you for playing on the Werewolves server! Follow this link to get an awesome reward!\nhttp://werewolves.1913-gaming.co.uk/unbox/" + token)
         except:
             await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
             await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))

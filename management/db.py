@@ -78,6 +78,7 @@ def get_user(id):
     """
 
     c.execute("SELECT * FROM game WHERE id=?", (id,))
+    conn.commit()
 
     try:
         return c.fetchone()

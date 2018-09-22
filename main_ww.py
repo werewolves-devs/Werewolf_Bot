@@ -194,23 +194,23 @@ async def process_message(message,result):
                 await poll_channel.send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
-                chosen_one = int(chosen_one)
 
                 if chosen_emoji != '' and chosen_one != None:
+                    chosen_one = int(chosen_one)
                     if poll.purpose == 'lynch':
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
                         dy.set_mayor(chosen_one)
                         member = gamelog_channel.guild.get_member(int(chosen_one))
                         if member != None:
-                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".format(member.display_name))
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Mayor".format(member.display_name))
                     elif poll.purpose == 'Reporter':
                         dy.set_reporter(chosen_one)
                         for channel_id in db.get_secret_channels("Reporter"):
                             mailbox.edit_cc(channel_id,chosen_one,1)
                         member = gamelog_channel.guild.get_member(int(chosen_one))
                         if member != None:
-                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Mayor".fprmat(member.display_name))
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Reporter".format(member.display_name))
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
