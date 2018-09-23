@@ -90,7 +90,8 @@ def story_time(victims):
         msg += "*Written by Kudels.*"
         msg_table.append(msg)
 
-
+    if msg_table == []:
+        msg_table.append("Lots of peeps died! Oh no!")
 
     return msg_table[random.randint(0,len(msg_table)-1)]
 

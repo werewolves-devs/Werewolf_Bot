@@ -26,14 +26,16 @@ def pay():
 
     answer = Mailbox()
     answer_table = [Mailbox(True)]
+
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
         # Remove potential night uses
         for i in range(len(roles.night_users)):
-            elif user_role in ["White Werewolf"] and dy.day_number() % 2 == 0 and dy.day_number > 0:
+            if user_role in ["White Werewolf"] and (dy.day_number() % 2 == 0) and dy.day_number() > 0:
                 db_set(user_id,'uses',1)
-            if user_role in roles.night_users[i]:
+                break
+            elif user_role in roles.night_users[i]:
                 if i > 0:
                     db_set(user_id,'uses',0)
                 break
@@ -73,7 +75,8 @@ def pay():
         # Remove zombie tag
         db_set(user_id,'bitten',0)
 
-    answer_table.append(answer).append(Mailbox().spam(config.universal_prefix + "day"))
+    answer_table.append(answer)
+    answer_table.append(Mailbox().spam(config.universal_prefix + "day"))
     return answer_table
 
 def day():
