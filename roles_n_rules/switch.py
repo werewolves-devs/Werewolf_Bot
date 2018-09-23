@@ -142,13 +142,6 @@ def pight():
                     db_set(user_id,'uses',0)
                 break
         
-        # Give the user their votes back
-        db_set(user_id,'votes',1)
-        if user_role == "Immortal":
-            db_set(user_id,'votes',3)
-        if user_role == "Idiot ":
-            db_set(user_id,'votes',0)
-        
     return [answer,Mailbox().spam(config.universal_prefix + "night")]
 
 def night():
@@ -167,6 +160,13 @@ def night():
         threat = db.get_kill()
 
     for player in db.player_list(True):
+        # Give the user their votes back
+        db_set(user_id,'votes',1)
+        if user_role == "Immortal":
+            db_set(user_id,'votes',3)
+        if user_role == "Idiot ":
+            db_set(user_id,'votes',0)
+
         # Give potential night uses
         user_role = db_get(player,'role')
         for i in range(len(roles.night_users)):
