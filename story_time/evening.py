@@ -31,6 +31,11 @@ def evening(victims):
         msg += "*Written by dayy.*"
         msg_table.append(msg)
 
+        msg = "<@{}>, with tears in their eyes, begged for the town not to punish them. "
+        msg += "Their cries were in vain, for the Participants did not listen. ".format(victims[0])
+        msg += "At the very least, they were put out of their misery much more quickly since they were out of breath.\n"
+        msg += "*Written by BlueGlues.*"
+
     if msg_table == []:
         msg = "Oof, lots of people died.\nThen this is a great moment to make an advertisement, @everyone!\n\n"
         msg += "Don't you think too the bot lacks a bit of storytime? So do we! Please, help us by writing something "
