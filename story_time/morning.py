@@ -5,9 +5,9 @@ def story_time(victims):
     msg_table = []
 
     if amount == 0:
-        return 'No-one died last night. Yay!'
+        msg = 'No-one died last night. Yay!'
+        msg_table.append(msg)
 
-    # Story written by TROPICALCYCLONEALERT
     if amount == 1:
         msg = "A wispy wind billowed throughout the night. "
         msg += "Dawn was quickly approaching, and only the slightest amount of townsfolk were coming around. "
@@ -24,7 +24,7 @@ def story_time(victims):
         msg += "*Written by TROPICALCYCLONEALERT.*"
         msg_table.append(msg)
 
-        msg += "The sound of a whistling kettle broke the dawn for <@{}>'s neighbour as they prepared their morning ".format(victims[0])
+        msg = "The sound of a whistling kettle broke the dawn for <@{}>'s neighbour as they prepared their morning ".format(victims[0])
         msg += "pick-me-up coffee. To their discontent, the cofee tin had naught but a bean left.\n"
         msg += "*\"Rats thumbs are afoot,\" the shouted, and wrathfully stumbled outside to their neighbour, <@{}>.* ".format(victims[0])
         msg += "After banging on the door with no luck, the neighbour attempted to open the door. The morning sun "
@@ -33,7 +33,23 @@ def story_time(victims):
         msg += "transpired that night.\n*Written by Kudels.*"
         msg_table.append(msg)
 
-    # Story written by Kudels
+    	msg = "Light had begun to shine through the village, when the whole town heard something, "
+        msg += "almost like the sound of sticks snapping in a strong wind. With curiosity, "
+        msg += "they emerged from their houses, only to find the horrible hnawed and mangled body of <@{}>. ".format(victims[0])
+        msg += "What kind d of creature could have done such a thing?\n*Written by Regicide.*"
+        msg_table.append(msg)
+
+        msg = "It was around midnight when everyone awoke. In the town square they found the body "
+        msg += " of <@{}> smoldering on wooden stakes. By their feet was a charred drawing of a cross. ".format(victims[0])
+        msg += "Who killed these poor souls? The town saw only one way to find out.\n*Written by Regicide.*"
+        msg_table.append(msg)
+
+    if amount == 2:
+        msg = "It was around midnight when everyone awoke. In the town square they found the bodies "
+        msg += " of <@{}> and <@{}> smoldering on wooden stakes. By their feet was a charred drawing of a cross. ".format(victims[0],victims[1])
+        msg += "Who killed these poor souls? The town saw only one way to find out.\n*Written by Regicide.*"
+        msg_table.append(msg)
+
     if amount == 3:
         msg = "Loud seagulls bellowed at dawn, waking the townsfolk to an eerie atmosphere. "
         msg += "The gray clouded sky silhouetted carrion birds circling the town with loud cawing, "
@@ -45,7 +61,13 @@ def story_time(victims):
         msg += "*Written by Kudels.*"
         msg_table.append(msg)
 
-    # Story written by Kudels
+        msg = "As the sun rose, a faint crackling was heard across town. "
+        msg += "The houses of <@{}>, <@{}> and <@{}>, much to the Participants' dismay, ".format(victims[0],victims[1],victims[2])
+        msg += "were the source of the sound--all that remained were some burnt wooden boards, "
+        msg += "hot pieces of metal, and ashes. The smell of charred flesh that lingered around the site was unnerving - "
+        msg += "for the Participants knew whom it belonged to.\n*Written by BlueGlues*"
+        msg_table.append(msg)
+
     if amount == 4:
         msg = "Loud seagulls bellowed at dawn, waking the townsfolk to an eerie atmosphere. "
         msg += "The gray clouded sky silhouetted carrion birds circling the town with loud cawing, "
@@ -57,7 +79,6 @@ def story_time(victims):
         msg += "*Written by Kudels.*"
         msg_table.append(msg)
 
-    # Story written by Kudels
     if amount == 5:
         msg = "Loud seagulls bellowed at dawn, waking the townsfolk to an eerie atmosphere. "
         msg += "The gray clouded sky silhouetted carrion birds circling the town with loud cawing, "
@@ -68,6 +89,8 @@ def story_time(victims):
         msg += "Will this just be the appetiser?\n"
         msg += "*Written by Kudels.*"
         msg_table.append(msg)
+
+
 
     return msg_table[random.randint(0,len(msg_table)-1)]
 
