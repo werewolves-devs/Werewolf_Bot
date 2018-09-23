@@ -117,6 +117,8 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     if is_command(message, ['refer']):
         target = check.users(message,1)
+        if target[0] == user_id:
+            return [Mailbox().respond("Sorry, bud! You cannot refer yourself.")]
         if not target:
             return [Mailbox().respond("No target provided! Please provide us with a target!")]
         if gen.update_refer(user_id,target[0]) == True:

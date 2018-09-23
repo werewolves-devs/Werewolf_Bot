@@ -23,7 +23,7 @@ def take_item(user_id,item,amount=-1):
     if c.fetchone() == None:
         c.execute("INSERT INTO 'inventory'('id','item','amount') VALUES (?,?,?);",(user_id,number,amount))
     else:
-        c.execute("UPDATE 'inventory' SET amount = amount + ? WHERE item=?")
+        c.execute("UPDATE 'inventory' SET amount = amount + ? WHERE item=?",(amount,number))
     c.execute("DELETE FROM 'inventory' WHERE amount =0")
     conn.commit()
 
