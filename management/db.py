@@ -3,8 +3,8 @@ import random
 from config import database, max_channels_per_category, max_participants
 from management.position import positionof, check_for_int, wolf_pack
 
-conn = sqlite3.connect(database)
-c = conn.cursor()
+connection = sqlite3.connect(database)
+cursor = connection.cursor()
 
 class PollToEvaluate:
     def __init__(self,database_tuple):
@@ -21,20 +21,20 @@ def execute(cmd_string):
     cmd_string -> the command to be executed upon the database
     """
 
-    c.execute(cmd_string)
+    cursor.execute(cmd_string)
 
-    conn.commit()
+    connection.commit()
 
-    return c.fetchall()
+    return cursor.fetchall()
 
 def poll_list():
     """Return a list of users to be added to the poll.
     The first argument is the user's id, the second is their emoji, and the third and fourth are arguments that no longer\
     allow the user to vote on them."""
 
-    c.execute("SELECT id, emoji, frozen, abducted FROM game")
+    cursor.execute("SELECT id, emoji, frozen, abducted FROM game")
 
-    return c.fetchall()
+    return cursor.fetchall()
 
 def player_list(alive_only = False,available_only = False):
     """Return a list of users that are signed up in the database. Dead players and spectators are returned as well."""
@@ -58,10 +58,10 @@ def emoji_to_player(emoji):
     emoji -> given emoji
     """
 
-    c.execute("SELECT id FROM game WHERE emoji =?", (emoji,))
+    cursor.execute("SELECT id FROM game WHERE emoji =?", (emoji,))
 
     try:
-        return c.fetchall()[0][0]
+        return cursor.fetchall()[0][0]
     except TypeError:
         return None
     except IndexError:
@@ -77,10 +77,10 @@ def get_user(id):
     id -> the user's id
     """
 
-    c.execute("SELECT * FROM game WHERE id=?", (id,))
+    cursor.execute("SELECT * FROM game WHERE id=?", (id,))
 
     try:
-        return c.fetchone()
+        return cursor.fetchone()
     except TypeError:
         return None
     except IndexError:
@@ -148,8 +148,8 @@ def db_set(user_id,column,value):
     value -> the new value it should be set to
     """
     positionof(column) # Make sure the value is valid.
-    c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
-    conn.commit()
+    cursor.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value, user_id))
+    connection.commit()
 
 # Add a kill to the kill queue.
 # Apply in case of an end-effect kill.
@@ -162,17 +162,17 @@ def add_kill(victim_id,role,murderer = ""):
     murderer -> id of the attacker (random attacker if multiple)
     """
     data = [victim_id,role,murderer]
-    c.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)
-    conn.commit()
+    cursor.execute("INSERT INTO 'death-row' ('id','victim','role','murderer') VALUES (NULL,?,?,?)", data)
+    connection.commit()
     return
 
 # Gather a kill from the kill queue. Pay attention; the function auto-deletes the kill from the list
 def get_kill():
     """Receive a kill from the kill queue. Receiving the file also deletes the order from the database."""
-    c.execute("SELECT * FROM 'death-row'")
+    cursor.execute("SELECT * FROM 'death-row'")
 
     try:
-        order = c.fetchone()
+        order = cursor.fetchone()
 
         if order == None:
             return None
@@ -182,8 +182,8 @@ def get_kill():
         return None
 
     kill = [order[i] for i in range(4)]
-    c.execute("DELETE FROM 'death-row' WHERE (id =?)",(kill[0],))
-    conn.commit()
+    cursor.execute("DELETE FROM 'death-row' WHERE (id =?)", (kill[0],))
+    connection.commit()
     return kill
 
 # Register a new channel to the database
@@ -195,16 +195,16 @@ def add_channel(channel_id,owner,secret=False):
     channel_id -> the channel's id
     owner -> the owner's id
     """
-    c.execute("SELECT * FROM categories")
+    cursor.execute("SELECT * FROM categories")
 
     # Tell the categories database the given category has yet received another channel
     if not secret:
-        c.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
+        cursor.execute("UPDATE categories SET channels = channels + 1 WHERE current = 1")
     else:
-        c.execute("UPDATE 'secret_categories' SET channels = channels + 1 WHERE current = 1")
+        cursor.execute("UPDATE 'secret_categories' SET channels = channels + 1 WHERE current = 1")
 
-    c.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)",(channel_id,owner))
-    conn.commit()
+    cursor.execute("INSERT INTO 'channels' ('channel_id','owner') VALUES (?,?)", (channel_id, owner))
+    connection.commit()
 
 # Change a user's value in a specific channel
 def set_user_in_channel(channel_id,user_id,number):
@@ -222,8 +222,8 @@ def set_user_in_channel(channel_id,user_id,number):
     number -> the value to set
     """
     data = [number,channel_id]
-    c.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id),data)
-    conn.commit()
+    cursor.execute("UPDATE \"channels\" SET \"id{}\"=? WHERE \"channel_id\" =?".format(user_id), data)
+    connection.commit()
 
 # This function visits every channel where the user has value "old" and sets it to value "new"
 # It then returns all channels that it has changed.
@@ -235,12 +235,12 @@ def channel_change_all(user_id,old,new):
     old -> the old value to change
     new -> the new value to change to
     """
-    c.execute("SELECT channel_id FROM 'channels' WHERE id{} =?".format(user_id),(old,))
-    change_list = c.fetchall()
+    cursor.execute("SELECT channel_id FROM 'channels' WHERE id{} =?".format(user_id), (old,))
+    change_list = cursor.fetchall()
     data = [new,old]
-    c.execute("UPDATE 'channels' SET 'id{0}'=? WHERE id{0} =?".format(user_id),data)
+    cursor.execute("UPDATE 'channels' SET 'id{0}'=? WHERE id{0} =?".format(user_id), data)
 
-    conn.commit()
+    connection.commit()
 
     return [int(element[0]) for element in change_list]
 
@@ -256,11 +256,11 @@ def channel_get(channel_id,user_id = ''):
     """
 
     if user_id == '':
-        c.execute("SELECT * FROM 'channels' WHERE channel_id =?",(channel_id,))
+        cursor.execute("SELECT * FROM 'channels' WHERE channel_id =?", (channel_id,))
     elif user_id == 'owner':
-        c.execute("SELECT owner FROM 'channels' WHERE channel_id =?",(channel_id,))
+        cursor.execute("SELECT owner FROM 'channels' WHERE channel_id =?", (channel_id,))
         try:
-            return c.fetchone()[0]
+            return cursor.fetchone()[0]
         except ValueError:
             return None
         except TypeError:
@@ -268,19 +268,19 @@ def channel_get(channel_id,user_id = ''):
         else:
             return None
     else:
-        c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-        if c.fetchone() == None:
+        cursor.execute("SELECT * FROM channel_rows WHERE id =?", (user_id,))
+        if cursor.fetchone() == None:
             return None
 
         column = 'id' + str(user_id)
-        c.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(column),(channel_id,))
-        return c.fetchone()[0]
-    return c.fetchone()
+        cursor.execute("SELECT {} FROM 'channels' WHERE channel_id =?".format(column), (channel_id,))
+        return cursor.fetchone()[0]
+    return cursor.fetchone()
 
 def get_columns():
     """Gain all data about ALL channels. Usage not recommended."""
-    c.execute("SELECT * FROM channel_rows")
-    return c.fetchall()
+    cursor.execute("SELECT * FROM channel_rows")
+    return cursor.fetchall()
 
 def get_category(secret = False):
     """Receives the category that the current cc should be created in. If it cannot find a category,
@@ -288,11 +288,11 @@ def get_category(secret = False):
 
     # Keep in mind; secret channels and conspiracy channels use different categories.
     if not secret:
-        c.execute("SELECT * FROM categories WHERE current = 1")
+        cursor.execute("SELECT * FROM categories WHERE current = 1")
     else:
-        c.execute("SELECT * FROM 'secret_categories' WHERE current = 1")
+        cursor.execute("SELECT * FROM 'secret_categories' WHERE current = 1")
 
-    category = c.fetchone()
+    category = cursor.fetchone()
 
     if category == None:
         return None
@@ -307,13 +307,13 @@ def add_category(id,secret=False):
     Keyword arguments:
     id -> the id of the category"""
     if not secret:
-        c.execute("UPDATE categories SET current = 0;")
-        c.execute("INSERT INTO categories ('id') VALUES (?);",(id,))
+        cursor.execute("UPDATE categories SET current = 0;")
+        cursor.execute("INSERT INTO categories ('id') VALUES (?);", (id,))
     else:
-        c.execute("UPDATE 'secret_categories' SET current = 0;")
-        c.execute("INSERT INTO 'secret_categories' ('id') VALUES (?);",(id,))
+        cursor.execute("UPDATE 'secret_categories' SET current = 0;")
+        cursor.execute("INSERT INTO 'secret_categories' ('id') VALUES (?);", (id,))
 
-    conn.commit()
+    connection.commit()
 
 def is_owner(user_id,channel_id):
     """This function returns True is the given user is the owner of a given cc.
@@ -324,8 +324,8 @@ def is_owner(user_id,channel_id):
     channel_id -> the id of the channel"""
 
     # Check if the user exists
-    c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-    if c.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id) == False:
+    cursor.execute("SELECT * FROM channel_rows WHERE id =?", (user_id,))
+    if cursor.fetchone() == None or check_for_int(user_id) == False or check_for_int(channel_id) == False:
         print('Column doesn\'t exist!')
         return False
 
@@ -341,10 +341,10 @@ def is_owner(user_id,channel_id):
 def count_categories(secret=False):
     """This function counts how many categories are currently registered, and returns the value as an integer."""
     if not secret:
-        c.execute("SELECT COUNT(*) FROM 'categories';")
+        cursor.execute("SELECT COUNT(*) FROM 'categories';")
     else:
-        c.execute("SELECT COUNT(*) FROM 'secret_categories';")
-    return c.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM 'secret_categories';")
+    return cursor.fetchone()[0]
 
 def get_channel_members(channel_id, number = 1):
     """This function returns a list of user ids that have the given number in a given channel.
@@ -353,10 +353,10 @@ def get_channel_members(channel_id, number = 1):
     Keyword arguments:
     channel_id -> id of the channel
     number -> number that is to be selected"""
-    c.execute("SELECT * FROM 'channel_rows'")
+    cursor.execute("SELECT * FROM 'channel_rows'")
     members = []
 
-    for user in c.fetchall():
+    for user in cursor.fetchall():
         if channel_get(channel_id,int(user[0])) == None:
             print("Warning: The bot has attempted to look for a channel that does not exist!")
             return []
@@ -370,9 +370,9 @@ def get_secret_channels(role):
     Keyword arguments:  
     role -> the role of which the channel was created"""
 
-    c.execute("SELECT * FROM 'secret_channels' WHERE role =?",(role,))
+    cursor.execute("SELECT * FROM 'secret_channels' WHERE role =?", (role,))
 
-    return [int(pointer[1]) for pointer in c.fetchall()]
+    return [int(pointer[1]) for pointer in cursor.fetchall()]
 
 def add_secret_channel(channel_id,role):
     """Add a pointer towards a new secret channel in the database. Note this only adds the pointer, not the actual channel.  
@@ -381,8 +381,8 @@ def add_secret_channel(channel_id,role):
     channel_id -> the id of the secret channel  
     role -> the role that owns the channel"""
 
-    c.execute("INSERT INTO 'secret_channels' ('role','channel_id') VALUES (?,?);",(role,channel_id))
-    conn.commit()
+    cursor.execute("INSERT INTO 'secret_channels' ('role','channel_id') VALUES (?,?);", (role, channel_id))
+    connection.commit()
 
 def amulets(user_id):
     """Display a list of amulets that the given user owns."""
@@ -400,29 +400,29 @@ def has_amulet(user_id):
 
 def insert_deadie(user_id):
     """Add a new deadie to the list. This list will be evaluated for the storytime."""
-    c.execute("SELECT * FROM 'deadies' WHERE user_id =?",(user_id,))
-    if c.fetchall() == []:
-        c.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);",(user_id,))
-    conn.commit()
+    cursor.execute("SELECT * FROM 'deadies' WHERE user_id =?", (user_id,))
+    if cursor.fetchall() == []:
+        cursor.execute("INSERT INTO 'deadies' ('user_id') VALUES (?);", (user_id,))
+    connection.commit()
 
 def get_deadies():
     """Gain the list of deadies from the database."""
-    c.execute("SELECT * FROM 'deadies'")
-    return [int(buddy[0]) for buddy in c.fetchall()]
+    cursor.execute("SELECT user_id, reason FROM 'deadies'")
+    return [(int(row[0]),str(row[1])) for row in cursor.fetchall()]
 
 def delete_deadies():
     """Remove all deadies from the database."""
-    c.execute("DELETE FROM 'deadies'")
-    conn.commit()
+    cursor.execute("DELETE FROM 'deadies'")
+    connection.commit()
 
 # Add a new participant to the database
 def signup(user_id,name,emoji):
-    c.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id,name,emoji))
-    c.execute("SELECT * FROM channel_rows WHERE id =?",(user_id,))
-    if c.fetchall() == []:
-        c.execute("ALTER TABLE 'channels' ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
-        c.execute("INSERT INTO 'channel_rows' ('id') VALUES (?)",(user_id,))
-    conn.commit()
+    cursor.execute("INSERT INTO 'game'('id','name','emoji') VALUES (?,?,?);", (user_id, name, emoji))
+    cursor.execute("SELECT * FROM channel_rows WHERE id =?", (user_id,))
+    if cursor.fetchall() == []:
+        cursor.execute("ALTER TABLE 'channels' ADD COLUMN 'id{}' TEXT NOT NULL DEFAULT 0".format(user_id))
+        cursor.execute("INSERT INTO 'channel_rows' ('id') VALUES (?)", (user_id,))
+    connection.commit()
 
 def add_poll(msg_table,purpose,channel_id,user_id = 0):
     """Add a new poll to the database. The poll is saved so it can be evaluated later on.
@@ -445,16 +445,16 @@ def add_poll(msg_table,purpose,channel_id,user_id = 0):
         request2_msg += ",{}".format(msg_table[i].id)
 
     query = request_msg + request2_msg + ");"
-    c.execute(query)
-    conn.commit()
+    cursor.execute(query)
+    connection.commit()
 
 def get_all_polls():
     """Gain the polls registered the database. As all polls are always evaluated simultaneously,
     the polls are deleted from the database. If they really need to be kept, they can always be saved again."""
-    c.execute("SELECT * FROM 'polls'")
-    answer_table = c.fetchall()
-    c.execute("DELETE FROM 'polls'")
-    conn.commit()
+    cursor.execute("SELECT * FROM 'polls'")
+    answer_table = cursor.fetchall()
+    cursor.execute("DELETE FROM 'polls'")
+    connection.commit()
 
     return [PollToEvaluate(item) for item in answer_table]
 
@@ -465,22 +465,22 @@ def add_freezer(user_id,victim_id,role):
     user_id -> the role of the ice king casting the guess
     victim_id -> the player whose role is guessed
     role -> the role that victim_id is guessed to be  """
-    c.execute("SELECT role FROM 'freezers' WHERE victim =? AND king =?",(victim_id,user_id))
-    answer = c.fetchone()
+    cursor.execute("SELECT role FROM 'freezers' WHERE victim =? AND king =?", (victim_id, user_id))
+    answer = cursor.fetchone()
     if answer == None:
-        c.execute("INSERT INTO 'freezers' (king,victim,role) VALUES (?,?,?)",(user_id,victim_id,role))
-        conn.commit()
+        cursor.execute("INSERT INTO 'freezers' (king,victim,role) VALUES (?,?,?)", (user_id, victim_id, role))
+        connection.commit()
         return None
-    c.execute("UPDATE 'freezers' SET 'role' =? WHERE king =? AND victim =?",(role,user_id,victim_id))
-    conn.commit()
+    cursor.execute("UPDATE 'freezers' SET 'role' =? WHERE king =? AND victim =?", (role, user_id, victim_id))
+    connection.commit()
     return answer[0]
 
 def get_freezers(user_id):
     """Get a list of all the guesses an ice king has made so far, including their roles.
 
     user_id -> the id of the ice king"""
-    c.execute("SELECT victim, role FROM freezers WHERE king =?",(user_id,))
-    return c.fetchall()
+    cursor.execute("SELECT victim, role FROM freezers WHERE king =?", (user_id,))
+    return cursor.fetchall()
 
 def delete_freezer(user_id,victim_id):
     """Remove a guessed user from the database. If the user wasn\'t in the database, return False.
@@ -488,11 +488,11 @@ def delete_freezer(user_id,victim_id):
 
     user_id -> the player removing the guess
     victim_id -> the player being guessed"""
-    c.execute("SELECT * FROM freezers WHERE king =? AND victim =?",(user_id,victim_id))
-    if c.fetchone() == None:
+    cursor.execute("SELECT * FROM freezers WHERE king =? AND victim =?", (user_id, victim_id))
+    if cursor.fetchone() == None:
         return False
-    c.execute("DELETE FROM freezers WHERE king =? AND victim =?",(user_id,victim_id))
-    conn.commit()
+    cursor.execute("DELETE FROM freezers WHERE king =? AND victim =?", (user_id, victim_id))
+    connection.commit()
     return True
 
 def add_standoff(victim_id,role,murderer):
@@ -504,16 +504,16 @@ def add_standoff(victim_id,role,murderer):
     murderer -> id of the attacker (random attacker if multiple)
     """
     data = [victim_id,role,murderer]
-    c.execute("INSERT INTO 'standoff' ('id','victim','role','murderer') VALUES (NULL,?,?,?)",data)
-    conn.commit()
+    cursor.execute("INSERT INTO 'standoff' ('id','victim','role','murderer') VALUES (NULL,?,?,?)", data)
+    connection.commit()
     return
 
 def get_standoff(user_id):
     """Gain a list of standoffs from a user; this is a list of players they will take with them when they die."""
-    c.execute("SELECT * FROM 'standoff' WHERE murderer =?",(user_id,))
+    cursor.execute("SELECT * FROM 'standoff' WHERE murderer =?", (user_id,))
 
     returntable = []
-    for element in c.fetchall():
+    for element in cursor.fetchall():
         returntable.append([element[i] for i in range(4)])
 
     return returntable
@@ -523,14 +523,14 @@ def delete_standoff(standoff_id):
 
     Keyword arguments:
     standoff_id -> the database id of the standoff"""
-    c.execute("DELETE FROM 'standoff' WHERE id =?",(standoff_id,))
-    conn.commit()
+    cursor.execute("DELETE FROM 'standoff' WHERE id =?", (standoff_id,))
+    connection.commit()
 
 def delete_hookers():
     """Remove all hooker standoffs from the database."""
-    c.execute("DELETE FROM 'standoff' WHERE role =='Hooker'")
-    c.execute("UPDATE 'game' SET sleepingover =0")
-    conn.commit()
+    cursor.execute("DELETE FROM 'standoff' WHERE role =='Hooker'")
+    cursor.execute("UPDATE 'game' SET sleepingover =0")
+    connection.commit()
 
 def random_wolf():
     """Find and get a random wolf pack member"""
@@ -550,27 +550,27 @@ def random_cult():
 
 def add_trash_channel(channel_id):
     """Add a new trash channel to the database."""
-    c.execute("SELECT * FROM 'trashy' WHERE 'channel' =?;",(channel_id,))
-    if c.fetchall() == []:
-        c.execute("INSERT INTO 'trashy'('channel') VALUES (?);",(channel_id,))
-        conn.commit()
+    cursor.execute("SELECT * FROM 'trashy' WHERE 'channel' =?;", (channel_id,))
+    if cursor.fetchall() == []:
+        cursor.execute("INSERT INTO 'trashy'('channel') VALUES (?);", (channel_id,))
+        connection.commit()
 
 def add_trash_message(message_id,channel_id):
     """Add a message to the trash bin. The function makes sure the channel's a trash channel.
     If it's not, then the message isn't stored in the database."""
 
-    c.execute("SELECT * FROM 'trashy' WHERE 'channel' =?",(channel_id,))
-    if c.fetchall() != []:
-        c.execute("INSERT INTO 'trashcan'('message','channel') VALUES (?,?);",(message_id,channel_id))
-        conn.commit()
+    cursor.execute("SELECT * FROM 'trashy' WHERE 'channel' =?", (channel_id,))
+    if cursor.fetchall() != []:
+        cursor.execute("INSERT INTO 'trashcan'('message','channel') VALUES (?,?);", (message_id, channel_id))
+        connection.commit()
 
 def empty_trash_channel(channel_id):
     """Remove all messages stored from a given channel.  
     The function returns a list of message ids that were linked to the given channel id."""
-    c.execute("SELECT * FROM 'trashcan' WHERE 'channel' =?;",(channel_id))
-    message_table = [item[0] for item in c.fetchall()]
+    cursor.execute("SELECT * FROM 'trashcan' WHERE 'channel' =?;", (channel_id))
+    message_table = [item[0] for item in cursor.fetchall()]
 
-    c.execute("DELETE FROM 'trashcan' WHERE 'channel' =?",(channel_id,))
-    conn.commit()
+    cursor.execute("DELETE FROM 'trashcan' WHERE 'channel' =?", (channel_id,))
+    connection.commit()
 
     return message_table

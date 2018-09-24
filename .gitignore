@@ -1,3 +1,7 @@
+# Jetbrains
+.idea
+
+
 .pytest_cache/
 polls.json
 venv/

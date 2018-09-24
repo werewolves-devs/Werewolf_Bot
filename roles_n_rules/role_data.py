@@ -29,7 +29,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     if role == 'Inactive':
         answer.log_add(recursive + success + skull + "<@{}> was killed due to inactivity.".format(user_id))
-        return instant_death(user_id, role, answer, recursive + next)
+        return instant_death(user_id, role, 'Inactive', answer, recursive + next)
 
     # Prevent Pyromancer from causing way too long lines
     # No, I didn't add this during debugging.
@@ -59,7 +59,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     if role == 'Cupid':
         answer.log_add(recursive + success + skull + '<@{}> committed suicide.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Cupid', answer, recursive+next)
         if int(db_get(user_id,'abducted')) != int(db_get(murderer,'abducted')):
             answer.dm("Abducted or not, you know your lover has deceased! ",user_id)
             answer.dm_add("You couldn't handle the pain, and that's why you decided to put an end to it.\n")
@@ -128,13 +128,13 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
             answer.log_add(recursive + success + '<@{}> did not die to their own wage.')
             return answer
         answer.log_add(recursive + success + skull + '<@{}> was killed by the wager.')
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Wager', answer, recursive+next)
         return answer
 
     # Let all zombies kill all other zombies.
     if role == "Zombie":
         answer.log_add(recursive + success + skull + '<@{}> has decayed.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Zombie', answer, recursive+next)
         return answer
 
     # Kill abducted players (or The Thing himself)
@@ -158,7 +158,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
         if replacements == []:
             answer.log_add(recursive + success + skull + '<@{}> was killed by an angry mob.'.format(user_id))
-            answer = instant_death(user_id, role, answer, recursive+next)
+            answer = instant_death(user_id, role, 'Lynch', answer, recursive+next)
             
         else:
             answer.log_add(recursive + success + '<@{}> escaped death as the Executioner.')
@@ -168,7 +168,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
             for standoff in replacements:
                 db.delete_standoff(standoff[0])
-                answer = instant_death(standoff[1], standoff[2], answer, recursive+next)
+                answer = instant_death(standoff[1], standoff[2], 'Lynch', answer, recursive+next)
 
         return answer
 
@@ -176,7 +176,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     if role == "Barber":
         if user_role != 'Idiot':
             answer.log_add(recursive + success + skull + '<@{}> was cut to death.'.format(user_id))
-            answer = instant_death(user_id, role, answer, recursive+next)
+            answer = instant_death(user_id, role, 'Barber', answer, recursive+next)
             answer.story(barber_kill_story(murderer,user_id))
 
         else:
@@ -200,19 +200,19 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     # End if the user sleeps with another.
     if role == "Hooker" and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was slept with <@{}>.'.format(user_id,murderer))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Hooker', answer, recursive+next)
         return answer
     
     # End if player dies in someone else's place.
     if role == "Executioner":
         answer.log_add(recursive + success + skull + '<@{}> was executed.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Executioner', answer, recursive+next)
         return answer
     
     # End if player dies in someone else's place.
     if role == "Huntress" and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was shot.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Huntress',answer, recursive+next)
         return answer
 
     # Check if user has an amulet.
@@ -226,23 +226,23 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
     # Kill assassinations
     if role == 'Assassin' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was assassinated.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Assassin', answer, recursive+next)
         return answer
     if role == 'Cult Leader' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was killed by the cult.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Cult', answer, recursive+next)
         return answer
     if role == 'Priest' and not demonized:
         if user_role in pos.wolf_team:
             answer.log_add(recursive + success + skull + '<@{}> was holified.'.format(user_id))
-            answer = instant_death(user_id, role, answer, recursive+next)
+            answer = instant_death(user_id, role, 'Priest', answer, recursive+next)
         else:
             answer.log_add(recursive + success + skull + '<@{}> holified themselves.'.format(murderer))
-            answer = instant_death(user_id, role, answer, recursive+next)
+            answer = instant_death(user_id, role, 'Priest', answer, recursive+next)
         return answer
     if role == 'Witch' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was poisoned.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Witch', answer, recursive+next)
         return answer
     
     # Kill wolf attacked
@@ -279,21 +279,21 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
             return answer
         if not demonized:
             answer.log_add(recursive + success + skull + '<@{}> was eaten by a werewolf.'.format(user_id))
-            answer = instant_death(user_id, role, answer, recursive+next)
+            answer = instant_death(user_id, role, 'Werewolf', answer, recursive+next)
             return answer
     
     # Kill solo attacked
     if role == 'Demon' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was sent to hell.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Demon', answer, recursive+next)
         return answer
     if role == 'Horseman' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> was apocalypsed.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Horseman', answer, recursive+next)
         return answer
     if role == 'Pyromancer' and not demonized:
         answer.log_add(recursive + success + skull + '<@{}> went up in flames.'.format(user_id))
-        answer = instant_death(user_id, role, answer, recursive+next)
+        answer = instant_death(user_id, role, 'Pyromancer', answer, recursive+next)
         return answer
 
     # Assume they were supposed to be killed, but that they are demonized. Let's turn them undead!
@@ -324,7 +324,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     return answer
 
-def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
+def instant_death(user_id, role, deathType, answer=Mailbox().log(''),recursive=''):
     """Eliminate the given user."""
 
     # If the user was reporter or mayor, get rid of that.
@@ -368,7 +368,7 @@ def instant_death(user_id, role, answer=Mailbox().log(''),recursive=''):
     answer.spam(unip + 'kill <@{}>'.format(user_id))
 
     if int(db_get(user_id,'abducted')) != 1 and role not in ["Barber"]:
-        db.insert_deadie(user_id)
+        db.insert_deadie(user_id, deathType)
     
     # Kill all standoffs
     for taker in db.get_standoff(user_id):
