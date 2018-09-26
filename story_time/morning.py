@@ -33,7 +33,7 @@ def story_time(victims):
         msg += "transpired that night.\n*Written by Kudels.*"
         msg_table.append(msg)
 
-    	msg = "Light had begun to shine through the village, when the whole town heard something, "
+        msg = "Light had begun to shine through the village, when the whole town heard something, "
         msg += "almost like the sound of sticks snapping in a strong wind. With curiosity, "
         msg += "they emerged from their houses, only to find the horrible hnawed and mangled body of <@{}>. ".format(victims[0])
         msg += "What kind d of creature could have done such a thing?\n*Written by Regicide.*"
