@@ -163,12 +163,13 @@ def night():
         threat = db.get_kill()
 
     for player in db.player_list(True):
+        user_role = db_get(player,'role')
         # Give the user their votes back
-        db_set(user_id,'votes',1)
+        db_set(player,'votes',1)
         if user_role == "Immortal":
-            db_set(user_id,'votes',3)
+            db_set(player,'votes',3)
         if user_role == "Idiot ":
-            db_set(user_id,'votes',0)
+            db_set(player,'votes',0)
 
         # Give potential night uses
         user_role = db_get(player,'role')
