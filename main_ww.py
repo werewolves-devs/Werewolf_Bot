@@ -192,6 +192,8 @@ async def process_message(message,result):
 
                 await botspam_channel.send(log)
                 await poll_channel.send(result)
+                for graveyard in db.get_secet_channels("Graveyard"):
+                    await client.get_channel(graveyard).send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
 
