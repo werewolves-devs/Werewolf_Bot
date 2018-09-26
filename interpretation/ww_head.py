@@ -149,7 +149,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             for channel in db.get_columns():
                 channel_id = int(channel[0])
                 for user in db.player_list():
-                    answer.edit_cc(channel_id,user,4)
+                    answer.edit_cc(int(channel_id),int(user),4)
             return [answer,Mailbox().respond("Done! All channels are now open to be spectated!")]
         if is_command(message,['publish_all_channels'],True):
             msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
