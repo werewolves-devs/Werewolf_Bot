@@ -199,7 +199,7 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     # End if the user sleeps with another.
     if role == "Hooker" and not demonized:
-        answer.log_add(recursive + success + skull + '<@{}> was slept with <@{}>.'.format(user_id,murderer))
+        answer.log_add(recursive + success + skull + '<@{}> slept with <@{}>.'.format(user_id,murderer))
         answer = instant_death(user_id, role, answer, recursive+next)
         return answer
     
