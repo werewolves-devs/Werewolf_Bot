@@ -354,6 +354,7 @@ async def process_message(message,result):
             # element.victim - person's permission to be changed;
             # element.number - type of setting to set to: see issue #83 for more info.
 
+            print('Editing permissions of {} for channel {}...'.format(element.victim,element.channel))
             channel = client.get_channel(element.channel)
             user = client.get_user(int(element.victim))
             main_guild = botspam_channel.guild

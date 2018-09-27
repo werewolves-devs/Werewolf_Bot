@@ -127,7 +127,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     if is_command(message, ['rr','roulette','suicide']):
         return [roulette.surrender(True),roulette.take_shot(message)]
-    if is_command(message,['rr','roulette','suicide']):
+    if is_command(message,['rr','roulette','suicide'],True):
         msg = "**Usage:** Play a game of Russian roulette!\n\n`" + prefix + "rr`\n\nTry it out! It's fun."
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "rr` - Play some Russian roulette!\n"
