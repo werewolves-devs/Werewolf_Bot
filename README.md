@@ -14,10 +14,6 @@ git clone https://github.com/werewolves-devs/werewolf-bot
 ```
 Can be run from the cloned directory.
 
-## Usage example
-
-This product should only be used on Official Werewolves Servers(tm)
-
 ## Development setup
 
 How to install your dependencies
