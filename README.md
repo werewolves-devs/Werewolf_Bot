@@ -7,8 +7,6 @@ A bot for the werewolves server.
 
 ## Installation
 
-All Git-supported OSes:
-
 ```sh
 git clone https://github.com/werewolves-devs/werewolf-bot
 ```
