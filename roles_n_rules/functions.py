@@ -182,7 +182,6 @@ def nightly_kill(user_id,victim_id):
     if user_id == victim_id:
         return Mailbox().respond("I am sorry, but you cannot attempt suicide!\nNot because it's not an option, no, just because we want to see you SUFFER!",True)
 
-    # TODO: Prevent targeting of abducted/frozen players.
     if int(db_get(user_id,'undead')) == 1 or db_get(user_id,'role') == 'Undead':
         return Mailbox().respond("I am sorry! Now that you are Undead, you can no longer use this power.",True)
     if int(db_get(victim_id,'abducted')) == 1:
