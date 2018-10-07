@@ -90,7 +90,15 @@ def gen_position(column):
     if column == "name":
         return 1
     if column == "credits":
-        return 2    
+        return 2
+    if column == "activity":
+        return 3
+    if column == "roulette_record":
+        return 4
+    if column == "refer_score":
+        return 5
+    if column == "referrer":
+        return 6
 
 
     raise SyntaxError("Unable to convert \'{}\' to SQLite position.".format(column))

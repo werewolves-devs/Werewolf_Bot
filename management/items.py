@@ -71,5 +71,11 @@ def import_reward(data_number):
     print("ERROR: Reward {} not found in {}!".format(data_number,config.item_file))
     return {'name': 'NOT FOUND!', 'code': data_number, 'description': 'Come \'n\' get your NOT FOUND! Who doesn\'t want a NOT FOUND? (Please report this)' }
 
+def item_to_int(title):
+    for item in jget("items"):
+        if item["name"] == title:
+            return item["code"]
+    return None
+
 if  __name__ == '__main__':
     print(jget("items"))

@@ -6,7 +6,7 @@ from discord import Message, User, Embed
 from config import ghost_prefix as prefix
 from interpretation import check
 from main_classes import Mailbox
-from management.general import get_credits, get_user
+from management.general import get_credits, get_user, gen_get
 from management.profile import ProfileModel
 from management.db import isParticipant
 
@@ -82,6 +82,7 @@ def view_profile(message: Message):
     em.add_field(name="Age", value=str(model.display_age))
     em.add_field(name="Gender", value=model.gender)
     em.add_field(name="Credits", value=get_credits(user.id))
+    em.add_field(name="Referral score", value=gen_get(user.id,'refer_score'))
     if get_user(user.id)[4] > 0:
         em.add_field(name="Roulette Highscore", value=get_user(user.id)[4])
     return [Mailbox().embed(em, destination=message.channel.id, temporary=True)]

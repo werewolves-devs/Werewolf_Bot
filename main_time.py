@@ -26,13 +26,15 @@ async def check_time():
     print('   | > Event loop triggered')
     await asyncio.sleep(1)
 
+    current_hour = "0"
+
     while True:
         time = datetime.datetime.now()
 
-
         # Give the hour signal
-        if str(time.minute) == "0":
+        if str(time.hour) != current_hour:
             print("--> We've reached the hour! It's now %s00 hours." % (time.hour))
+            current_hour = str(time.hour)
 
             # Set each user's activity one up.
             for user in db.player_list():
@@ -61,8 +63,6 @@ async def check_time():
                 if dy.get_stage() != "NA":
                     print('Another day has started!')
                     await client.get_channel(bot_spam).send(prefix + "pay")
-                    await asyncio.sleep(45)
-                    await client.get_channel(bot_spam).send(prefix + "day")
                 else:
                     await client.get_channel(bot_spam).send("Beep boop! Another day has begun!")
 
@@ -71,8 +71,6 @@ async def check_time():
                 if dy.get_stage() != "NA":
                     print('Another night has begun!')
                     await client.get_channel(bot_spam).send(prefix + "pight")
-                    await asyncio.sleep(45)
-                    await client.get_channel(bot_spam).send(prefix + "night")
                 else:
                     await client.get_channel(bot_spam).send("Beep boop! The night has started!")
 
@@ -80,21 +78,20 @@ async def check_time():
             newpath = 'backup/{}_{}/{}_{}h/'.format(time.year,time.month,time.day,time.hour)
             if not os.path.exists(newpath):
                 os.makedirs(newpath)
-            open('backup/{}_{}/{}_{}h/{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            open('backup/{}_{}/{}_{}h/{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            open('backup/{}_{}/{}_{}h/{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            open('backup/{}_{}/{}_{}h/{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            open('backup/{}_{}/{}_{}h/{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
-            copy(config.database,'backup/{}_{}/{}_{}h/{}_backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
-            copy(config.general_database,'backup/{}_{}/{}_{}h/{}_backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute))
-            copy(config.stats_file,'backup/{}_{}/{}_{}h/{}_backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute))
-            copy(config.dynamic_config,'backup/{}_{}/{}_{}h/{}_backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))
-            copy('config.py','backup/{}_{}/{}_{}h/{}_backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute))
+            open('backup/{}_{}/{}_{}h/backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h/backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h/backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h/backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            open('backup/{}_{}/{}_{}h/backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute), 'a').close()
+            copy(config.database,'backup/{}_{}/{}_{}h/backup_game.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.general_database,'backup/{}_{}/{}_{}h/backup_general.db'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.stats_file,'backup/{}_{}/{}_{}h/backup_stats.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy(config.dynamic_config,'backup/{}_{}/{}_{}h/backup_dynamic.json'.format(time.year,time.month,time.day,time.hour,time.minute))
+            copy('config.py','backup/{}_{}/{}_{}h/backup_config.py'.format(time.year,time.month,time.day,time.hour,time.minute))
 
             await asyncio.sleep(75)
 
         await asyncio.sleep(10)
-        roulette.surrender(True)
 
 # Whenever a message is sent.
 @client.event
@@ -109,9 +106,12 @@ async def on_message(message):
         await message.channel.send("It's currently {}:{}.".format(time.hour,time.minute))
 
         if int(time.hour) > 7 and int(time.hour) < 21:
-            await message.channel.send("That's {} hours and {} minutes left till the night starts.".format(20-time.hour,59-time.minute))
+            await message.channel.send("That's {} hours and {} minutes left till the night starts.".format(20-time.hour,60-time.minute))
         else:
-            await message.channel.send("That's {} hours and {} minutes left until the morning starts.".format((31-time.hour)%24,59-time.minute))
+            await message.channel.send("That's {} hours and {} minutes left until the morning starts.".format((31-time.hour)%24,60-time.minute))
+
+    if is_command(message, ['pight','night','pay','day'], False, prefix) and message.author.bot:
+        await message.channel.send(message.content)
 
 
 # Whenever the bot regains his connection with the Discord API.

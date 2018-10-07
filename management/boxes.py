@@ -111,7 +111,6 @@ def add_choice(token,choice):
     conn.commit()
 
     c.execute("SELECT * FROM 'tokens' WHERE token =?",(token,))
-    webhook.send_private_message(config.universal_prefix + 'SUCCESS {}'.format(token))
     return c.fetchone()
 
 def get_token_data(token):
@@ -144,3 +143,15 @@ def token_status(token):
     if result == None:
         return -1
     return result[2]
+
+def message_owner(message_id):
+    """Gain the owner of a user by id."""
+    conn = sqlite3.connect(config.general_database)
+    c = conn.cursor()
+    
+    c.execute("SELECT * FROM 'tokens' WHERE message=?",(message_id,))
+    answer = c.fetchone()
+
+    if answer == None:
+        return None
+    return int(answer[1])
