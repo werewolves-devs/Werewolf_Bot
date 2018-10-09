@@ -222,7 +222,9 @@ async def on_message(message):
             await message.add_reaction('🎁')
             await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
+    t = time.time()
+    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,result,isGameMaster,isAdmin,isPeasant)
 
 async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
 

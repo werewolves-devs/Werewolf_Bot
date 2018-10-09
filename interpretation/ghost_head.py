@@ -66,6 +66,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             for user_id in target:
                 answer.gift(user_id)
             return [answer]
+        
+        if is_command(message, ['botanswer']):
+            return [Mailbox().respond("Sounds pretty cool! How about you did something about it? *cough cough*")]
 
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
