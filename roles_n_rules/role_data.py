@@ -203,6 +203,10 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
         answer = instant_death(user_id, role, answer, recursive+next)
         return answer
     
+    if int(db_get(user_id,'sleepingover')) == 1:
+        answer.log_add(recursive + success + '<@{}> wasn\'t at home.'.format(user_id))
+        return answer
+
     # End if player dies in someone else's place.
     if role == "Executioner":
         answer.log_add(recursive + success + skull + '<@{}> was executed.'.format(user_id))
