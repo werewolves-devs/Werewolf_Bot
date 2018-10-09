@@ -284,7 +284,9 @@ def start_game():
                 if user_role == "Witch":
                     db_set(user_id,'uses',3)
             
-            answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
+            roles_distributed = chosen_roles
+            roles_distributed.sort()
+            answer.story('The current distribution is {}'.format(roles_distributed)) # TODO
             answer.story('I know, I know. That looks ugly as hell. We\'re trying to make it look good!')
 
             if "Flute Player" in chosen_roles:

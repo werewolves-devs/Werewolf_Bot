@@ -1197,6 +1197,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
         if dy.get_signup() == 1:
             reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
+            reaction.story("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
         else:
             reaction.spam("<@{}> has started to spectate.".format(user_id))
         return [reaction]

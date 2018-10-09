@@ -8,7 +8,7 @@ from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from management.inventory import take_item, has_item
-from roles_n_rules.item-usage import use_item
+from roles_n_rules.item_usage import use_item
 from management import db, dynamic as dy, general as gen, boxes as box, roulette, items
 from .profile import process_profile
 
@@ -85,7 +85,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
         for item in items.jget("items"):
             if has_item(user_id,item["code"]):
-                answer.dm_add('\n' + item["name"] + ' - *(' + has_item(user_id,item["code"],False) + ')*')
+                answer.dm_add('\n' + item["name"] + ' - *({})*'.format(has_item(user_id,item["code"],False)))
         return [answer]
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()

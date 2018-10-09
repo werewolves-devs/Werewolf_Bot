@@ -648,7 +648,7 @@ async def on_ready():
     print('   | > ' + client.user.name)
     print('   | > ' + str(client.user.id))
 
-    await client.get_channel(welcome_channel).send('Beep boop! I just went online!')
+    await client.get_channel(welcome_channel).send('🔥👹🔥 ***BEEP BOOP! I JUST WENT ONLINE!*** 🔥👹🔥')
 
 print(splash)
 print(' --> "' + random.choice(splashes) + '"')
