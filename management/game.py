@@ -12,8 +12,8 @@ def db_get(user_id,column):
     user_id -> the user's id  
     column -> the relevant part of info  
     """
-    c.execute("SELECT {} FROM gane WHERE id=?",(user_id,))
-    value = c.fetchone
+    c.execute("SELECT {} FROM game WHERE id=?".format(column),(user_id,))
+    value = c.fetchone()
     if value == None:
         return None
     return value[0]
