@@ -94,6 +94,20 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     '''disguise'''
     if is_command(message,['disguise','dis']):
         return [use_item(103,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "disguise` - Disguise a participant.\n"
+
+    '''hide'''
+    if is_command(message,['hide']):
+        return [use_item(100,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "hide` - Become invisible for the night.\n"
 
     # --------------------------------------------------------------
     #                          HELP
