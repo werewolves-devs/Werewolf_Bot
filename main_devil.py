@@ -116,8 +116,8 @@ async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-    stats.increment_stat("messages_sent", 1)
-    stats.increment_user_stat(message.author.id, "messages_sent", 1)
+    #stats.increment_stat("messages_sent", 1)
+    #stats.increment_user_stat(message.author.id, "messages_sent", 1)
 
     # Add trash messages
     db.add_trash_message(message.id,message.channel.id)
