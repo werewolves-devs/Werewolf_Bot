@@ -1,4 +1,3 @@
-tinydb
 discord.py
 emoji
 https://github.com/Rapptz/discord.py/archive/rewrite.zip
