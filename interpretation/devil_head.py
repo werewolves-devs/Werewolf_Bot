@@ -96,6 +96,18 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
+    '''buy'''
+    if is_command(message, ['buy']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().dm("No amount provided! Please provide me with a number!",True)]
+        answer = [Mailbox().dm(shop.buy(user_id,number[0],message.author.name),user_id)]
+    if is_command(message, ['buy'], True):
+        msg = "**Usage:** Buy an item from the shop.\n\n`" + prefix + "buy <n>`\n\n"
+        msg += "**Example:** `" + prefix + "buy 1`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "buy` - Buy item from the shop.\n"
+
     '''inventory'''
     if is_command(message, ['inv','inventory','bal','balance']):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
@@ -106,6 +118,18 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()
     help_msg += "`" + prefix + "inventory` - View your inventory.\n"
+
+    '''sell'''
+    if is_command(message, ['sell']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().dm("No amount provided! Please provide me with a number!",True)]
+        answer = [Mailbox().dm(shop.sell(user_id,number[0],message.author.name),user_id)]
+    if is_command(message, ['sell'], True):
+        msg = "**Usage:** Sell an item from the shop.\n\n`" + prefix + "sell <n>`\n\n"
+        msg += "**Example:** `" + prefix + "sell 1`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "sell` - Buy item from the shop.\n"
 
     '''shop'''
     if is_command(message, ['shop']):

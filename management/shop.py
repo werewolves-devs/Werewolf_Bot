@@ -49,7 +49,7 @@ def get_market_message():
     msg_table.append(msg)
     return msg_table
 
-def buy(user_id,number):
+def buy(user_id,number,user_name="0"):
     i = int(number) - 1
     shop = __create_shop()
 
@@ -68,9 +68,11 @@ def buy(user_id,number):
 
     __item_traded_for_price(item[0],price_to_buy)
 
+    if user_name != "0":
+        print("User {} has bought one {}!".format(user_name,item_name))
     return "You have successfuly bought one {}!\nType `".format(item_name) + config.devil_prefix + "inventory` to view your inveentory."
 
-def sell(user_id,number):
+def sell(user_id,number,user_name = "0"):
     i = int(number) - 1
     shop = __create_shop()
 
@@ -89,6 +91,8 @@ def sell(user_id,number):
 
     __item_traded_for_price(item[0],price_to_sell)
 
+    if user_name != "0":
+        print("User {} has sold one {}!".format(user_name,item_name))
     return "You have successfuly sold one {}!\nType `".format(item_name) + config.devil_prefix + "inventory` to view your inventory."
 
 def refresh_market():
