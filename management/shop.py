@@ -44,6 +44,9 @@ def get_market_message():
         msg += item_text
     
     msg_table.append(msg)
+    msg = "To buy an item, type `" + config.devil_prefix + "buy <n>`, where `<n>` is the corresponding number.\n"
+    msg += "To sell an item, type `" + config.devil_prefix + "sell <n>`, where `<n>` is the corresponding number.\n"
+    msg_table.append(msg)
     return msg_table
 
 def buy(user_id,number):

@@ -7,9 +7,9 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management.inventory import take_item, has_item
+from management.inventory import give_item, has_item
 from roles_n_rules.item_usage import use_item
-from management import db, dynamic as dy, general as gen, boxes as box, roulette, items
+from management import db, dynamic as dy, general as gen, boxes as box, roulette, items, shop
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -96,6 +96,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
+    '''inventory'''
     if is_command(message, ['inv','inventory','bal','balance']):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
         for item in items.jget("items"):
@@ -105,6 +106,25 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()
     help_msg += "`" + prefix + "inventory` - View your inventory.\n"
+
+    '''shop'''
+    if is_command(message, ['shop']):
+        answer = Mailbox()
+
+        for msg in shop.get_market_message():
+            answer.respond(msg,True)
+        
+        return answer
+    if is_command(message, ['shop']):
+        msg = "**Usage:** View the Devil Bot's shop.\n\n`" + prefix + "shop`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "shop` - View the Devil's shop."
+
+    help_msg += "\n\n__Item specific commands:__"
+
+    '''attack'''
+    if is_command(message, ['attack', 'dagger', 'kill']):
+        pass # TODO
 
     '''disguise'''
     if is_command(message,['disguise','dis']):
