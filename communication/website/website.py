@@ -28,7 +28,11 @@ def choose_reward(token,choice):
     if choice not in given_options:
         return render_template('notoken.html', reason='ERROR: {} is not a valid option.'.format(choice))
     
-    box.add_source2(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
+    headers_list = request.headers.getlist("X-Forwarded-For")
+    user_source = headers_list[0] if headers_list else request.remote_addr
+    box.add_source2(token,user_source)
+    print(user_source)
+
     webhook.send_private_message(config.universal_prefix + "SUCCESS {} {} <@{}>".format(token,choice,box.get_token_data(token)[1]))
     return render_template('finish.html')
 
@@ -68,7 +72,10 @@ def get_rewards(token):
             option3={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},)
     
     given_options = items.get_rewards()
-    box.add_source1(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
+    headers_list = request.headers.getlist("X-Forwarded-For")
+    user_source = headers_list[0] if headers_list else request.remote_addr
+    box.add_source1(token,user_source)
+    print(user_source)
     box.add_options(token,given_options[0]["code"],given_options[1]["code"],given_options[2]["code"])
 
     # Make an announcement if any legendaries found

@@ -66,6 +66,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             for user_id in target:
                 answer.gift(user_id)
             return [answer]
+        
+        if is_command(message, ['botanswer']):
+            return [Mailbox().respond("Sounds pretty cool! How about you did something about it? *cough cough*")]
 
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
@@ -115,9 +118,19 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         msg += "**Example:** `" + prefix + "lead 10`.\nThe number is optional, and doesn't have to be given."
     help_msg += "`" + prefix + "leaderboard` - See an activity leaderboard.\n"
 
+    if is_command(message, ['refer']):
+        target = check.users(message,1)
+        if target[0] == user_id:
+            return [Mailbox().respond("Sorry, bud! You cannot refer yourself.")]
+        if not target:
+            return [Mailbox().respond("No target provided! Please provide us with a target!")]
+        if gen.update_refer(user_id,target[0]) == True:
+            return [Mailbox().respond("Alright! Expect you and <@{}> to have some extra luck getting a lootbox soon... ;)".format(target[0])).gift(user_id).gift(target[0])]
+        return [Mailbox().respond("**ERROR:** You have already referred someone!")]
+
     if is_command(message, ['rr','roulette','suicide']):
         return [roulette.surrender(True),roulette.take_shot(message)]
-    if is_command(message,['rr','roulette','suicide']):
+    if is_command(message,['rr','roulette','suicide'],True):
         msg = "**Usage:** Play a game of Russian roulette!\n\n`" + prefix + "rr`\n\nTry it out! It's fun."
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "rr` - Play some Russian roulette!\n"

@@ -78,6 +78,7 @@ def get_user(id):
     """
 
     c.execute("SELECT * FROM game WHERE id=?", (id,))
+    conn.commit()
 
     try:
         return c.fetchone()
@@ -279,7 +280,7 @@ def channel_get(channel_id,user_id = ''):
 
 def get_columns():
     """Gain all data about ALL channels. Usage not recommended."""
-    c.execute("SELECT * FROM channel_rows")
+    c.execute("SELECT * FROM channels")
     return c.fetchall()
 
 def get_category(secret = False):

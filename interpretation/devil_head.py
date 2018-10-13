@@ -8,6 +8,7 @@ from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
 from management.inventory import take_item, has_item
+from roles_n_rules.item_usage import use_item
 from management import db, dynamic as dy, general as gen, boxes as box, roulette, items
 from .profile import process_profile
 
@@ -54,6 +55,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
+        if is_command(message, ['inv','inventory','bal','balance']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo target provided!",True)]
+
+            answer = Mailbox().spam("**__<@{}>'S BALANCE__**",target[0])
+
+            for item in items.jget("items"):
+                if has_item(target[0],item["code"]):
+                    answer.spam_add('{}x - **'.format(has_item(target[0],item["code"],False)) + item["name"] + '**')
+            return [answer]
+        if is_command(message, ['userinv','userinventory'], True):
+            return todo()
+        help_msg += "`" + prefix + "userinv` - View a user's inventory.\n"
+
     elif is_command(message, []):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
@@ -84,11 +100,29 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
         for item in items.jget("items"):
             if has_item(user_id,item["code"]):
-                answer.dm_add('\n' + item["name"] + ' - *(' + has_item(user_id,item["code"],False) + ')*')
+                answer.dm_add('{}x - **'.format(has_item(user_id,item["code"],False)) + item["name"] + '**')
         return [answer]
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()
     help_msg += "`" + prefix + "inventory` - View your inventory.\n"
+
+    '''disguise'''
+    if is_command(message,['disguise','dis']):
+        return [use_item(103,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "disguise` - Disguise a participant.\n"
+
+    '''hide'''
+    if is_command(message,['hide']):
+        return [use_item(100,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "hide` - Become invisible for the night.\n"
 
     # --------------------------------------------------------------
     #                          HELP

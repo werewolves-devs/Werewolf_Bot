@@ -84,6 +84,19 @@ async def remove_all_game_roles(member):
 already_quoted = []
 
 @client.event
+async def on_member_join(member):
+    welcome = client.get_channel(welcome_channel)
+    if member.guild != welcome.guild:
+        return
+    
+    await welcome.send("Eyyyy! Welcome to the *Werewolves* server, <@{}>!".format(member.id))
+    await welcome.send("Lemme ask ya this; who brought you here? Give them (and yourself) a welcome reward by typing `$refer @user#1234`!")
+
+@client.event
+async def on_member_remove(member):
+    await client.get_channel(config.bot_spam).send("<@{}> has left the server.".format(member.id))
+
+@client.event
 async def on_reaction_add(reaction, user):
     if user != client.user and db_shop.is_shop(reaction.message.id):
         # For shop
@@ -200,7 +213,7 @@ async def on_message(message):
         token = create_token(message.author.id)
         botspam_channel = client.get_channel(int(config.bot_spam))
         try:
-            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
+            msg = await message.author.send("Hey there! Thank you for playing on the Werewolves server! Follow this link to get an awesome reward!\nhttp://werewolves.1913-gaming.co.uk/unbox/" + token)
         except:
             await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
             await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
@@ -209,7 +222,9 @@ async def on_message(message):
             await message.add_reaction('🎁')
             await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
+    t = time.time()
+    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,result,isGameMaster,isAdmin,isPeasant)
 
 async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
 
@@ -222,19 +237,20 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
     else:
         print('{} sent a DM to the bot!'.format(message.author.display_name))
 
-    if isGameMaster:
-        quote_embed = discord.Embed(description=message.content, color=0x00ff00)
-    elif isPeasant:
-        quote_embed = discord.Embed(description=message.content, color=0x0000ff)
-    elif db.isParticipant(message.author.id):
-        quote_embed = discord.Embed(description=message.content, color=0xff0000)
-    else:
-        quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
-    quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
-    quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
-    for spy_channel_id in db.find_spies(message.channel.id):
-        spy_channel = client.get_channel(spy_channel_id)
-        await spy_channel.send(embed=quote_embed)
+    if db.find_spies(message.channel.id) != []:
+        if isGameMaster:
+            quote_embed = discord.Embed(description=message.content, color=0x00ff00)
+        elif isPeasant:
+            quote_embed = discord.Embed(description=message.content, color=0x0000ff)
+        elif db.isParticipant(message.author.id):
+            quote_embed = discord.Embed(description=message.content, color=0xff0000)
+        else:
+            quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
+        quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
+        quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
+        for spy_channel_id in db.find_spies(message.channel.id):
+            spy_channel = client.get_channel(spy_channel_id)
+            await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []

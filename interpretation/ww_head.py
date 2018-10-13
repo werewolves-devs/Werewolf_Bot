@@ -149,7 +149,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             for channel in db.get_columns():
                 channel_id = int(channel[0])
                 for user in db.player_list():
-                    answer.edit_cc(channel_id,user,4)
+                    answer.edit_cc(int(channel_id),int(user),4)
             return [answer,Mailbox().respond("Done! All channels are now open to be spectated!")]
         if is_command(message,['publish_all_channels'],True):
             msg = "**Usage:** Make all channels visible to all players. To be used with caution, for this is giving spoilers to the max.\n\n"
@@ -311,7 +311,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         '''night'''
         # This command is used to initialize the day.
         if is_command(message, ['night']):
-            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pay')]
+            return [Mailbox().respond("Got it! I'll send a reminder to the Time Bot.").spam(unip + 'pight')]
         if is_command(message, ['night'], True):
             msg = "**Usage:** Initiate the night if this does not happen automatically.\n\n"
             msg += "`" + prefix + "night`\n\nThis command can only be used by Game Masters."
@@ -356,7 +356,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         if is_command(message, ['smite']):
             target = check.users(message)
             if not target:
-                return [Mailbox().respond("Smite whom? ***EVERYONE** shall be smitten!")]
+                return [Mailbox().respond("Smite whom? ***EVERYONE*** shall be smitten!")]
             return [Mailbox().respond(eggs.smite(target[0]))]
 
         '''stats'''
@@ -1197,6 +1197,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
         if dy.get_signup() == 1:
             reaction.spam("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
+            reaction.story("<@{}> has signed up with the {} emoji.".format(user_id, choice_emoji))
         else:
             reaction.spam("<@{}> has started to spectate.".format(user_id))
         return [reaction]
