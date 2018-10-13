@@ -12,9 +12,9 @@ import os
 
 # Import config data
 from shutil import copy
-from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel
+from config import universal_prefix as prefix, TM_TOKEN as token, bot_spam, activity_hours, welcome_channel, market_channel
 from interpretation.check import is_command
-from management.shop import age_shop
+from management import shop, items
 from management.general import purge_activity, deal_credits
 
 
@@ -47,8 +47,15 @@ async def check_time():
                     elif activity >= activity_hours:
                         await client.get_channel(bot_spam).send(prefix + "idle <@{}>".format(user))
         
-            # Set each shop's age one up.
-            age_shop()
+            # Refresh the shop statistics.
+            for item in shop.refresh_market():
+                value = item[1] - item[2]
+                item_name = items.int_to_item(item[0])
+
+                if value > 0:
+                    await client.get_channel(market_channel).send("⬆ {} - **{}**".format(value,item_name))
+                else:
+                    await client.get_channel(market_channel).send("🔻 {} - **{}**".format(value,item_name))
 
             # Purge activity
             purge_activity()
