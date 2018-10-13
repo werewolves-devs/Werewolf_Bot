@@ -250,7 +250,8 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
         quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
         for spy_channel_id in db.find_spies(message.channel.id):
             spy_channel = client.get_channel(spy_channel_id)
-            await spy_channel.send(embed=quote_embed)
+            if spy_channel != None:
+                await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []

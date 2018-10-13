@@ -55,16 +55,16 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
-        if is_command(message, ['inv','inventory','bal','balance']):
+        if is_command(message, ['userinv','userinventory']):
             target = check.users(message)
             if not target:
                 return [Mailbox().respond("**INVALID SYNTAX:**\nNo target provided!",True)]
 
-            answer = Mailbox().spam("**__<@{}>'S BALANCE__**",target[0])
+            answer = Mailbox().spam("**__<@{}>'S BALANCE__**".format(target[0]))
 
             for item in items.jget("items"):
                 if has_item(target[0],item["code"]):
-                    answer.spam_add('{}x - **'.format(has_item(target[0],item["code"],False)) + item["name"] + '**')
+                    answer.spam_add('\n{}x - **'.format(has_item(target[0],item["code"],False)) + item["name"] + '**')
             return [answer]
         if is_command(message, ['userinv','userinventory'], True):
             return todo()
@@ -101,7 +101,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
         for item in items.jget("items"):
             if has_item(user_id,item["code"]):
-                answer.dm_add('{}x - **'.format(has_item(user_id,item["code"],False)) + item["name"] + '**')
+                answer.dm_add('\n{}x - **'.format(has_item(user_id,item["code"],False)) + item["name"] + '**')
         return [answer]
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()
