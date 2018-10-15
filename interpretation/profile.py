@@ -53,6 +53,8 @@ def set_gender(message: Message) -> List[Mailbox]:
         profile.gender = 'Female'
     elif gender.lower().startswith('r'):
         profile.gender = 'Randium'
+    elif gender.lower().startswith('a'):
+        profile.gender = 'Attack Helicopter'
     else:
         profile.gender = 'Other'
     profile.save()
