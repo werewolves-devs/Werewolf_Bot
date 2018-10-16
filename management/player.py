@@ -1,6 +1,8 @@
 from management.game import db_get, db_set
 from management.general import gen_get, gen_set
 
+from roles_n_rules import roles
+
 next = '|            '
 success = '|---> '
 failure = '|'
@@ -17,6 +19,13 @@ class Player:
 
 
 class Participant(Player):
+
+    def start(self):
+        return roles.role_functions(self.role).start(self)
+    def day(self,number):
+        return roles.role_functions(self.role).day(self,number)
+    def night(self,number):
+        return roles.role_functions(self.role).night(self,number)
 
     def __name_get(self):
         return db_get(self.id,"name")
@@ -199,28 +208,33 @@ class Participant(Player):
     def __amulet_set(self,value):
         db_set(self.id,"amulet",value)
 
+    def __team_get(self):
+        return roles.role_functions(db_get(self.id,"role")).team
+    def __team_set(self):
+        pass
 
-    name = property(__name_get,__name_set)
-    emoji = property(__emoji_get,__emoji_set)
-    idle = property(__idle_get,__idle_set)
-    channel = property(__channel_get,__channel_set)
-    role = property(__role_get,__role_set)
-    fakerole = property(__fakerole_get,__fakerole_set)
-    uses = property(__uses_get,__uses_set)
-    votes = property(__votes_get,__votes_set)
-    threatened = property(__threatened_get,__threatened_set)
-    enchanted = property(__enchanted_get,__enchanted_set)
-    demonized = property(__demonized_get,__demonized_set)
-    powdered = property(__powdered_get,__powdered_set)
-    frozen = property(__frozen_get,__frozen_set)
-    undead = property(__undead_get,__undead_set)
-    bites = property(__bites_get,__bites_set)
-    bitten = property(__bitten_get,__bitten_set)
-    souls = property(__souls_get,__souls_set)
-    soulless = property(__soulless_get,__soulless_set)
-    sleepingover = property(__sleepingover_get,__sleepingover_set)
-    protected = property(__protected_get,__protected_set)
-    abducted = property(__abducted_get,__abducted_set)
-    ccs = property(__ccs_get,__ccs_set)
-    horseman = property(__horseman_get,__horseman_set)
-    amulet = property(__amulet_get,__amulet_set)
+    name =          property(__name_get,__name_set)
+    emoji =         property(__emoji_get,__emoji_set)
+    idle =          property(__idle_get,__idle_set)
+    channel =       property(__channel_get,__channel_set)
+    role =          property(__role_get,__role_set)
+    fakerole =      property(__fakerole_get,__fakerole_set)
+    uses =          property(__uses_get,__uses_set)
+    votes =         property(__votes_get,__votes_set)
+    threatened =    property(__threatened_get,__threatened_set)
+    enchanted =     property(__enchanted_get,__enchanted_set)
+    demonized =     property(__demonized_get,__demonized_set)
+    powdered =      property(__powdered_get,__powdered_set)
+    frozen =        property(__frozen_get,__frozen_set)
+    undead =        property(__undead_get,__undead_set)
+    bites =         property(__bites_get,__bites_set)
+    bitten =        property(__bitten_get,__bitten_set)
+    souls =         property(__souls_get,__souls_set)
+    soulless =      property(__soulless_get,__soulless_set)
+    sleepingover =  property(__sleepingover_get,__sleepingover_set)
+    protected =     property(__protected_get,__protected_set)
+    abducted =      property(__abducted_get,__abducted_set)
+    ccs =           property(__ccs_get,__ccs_set)
+    horseman =      property(__horseman_get,__horseman_set)
+    amulet =        property(__amulet_get,__amulet_set)
+    team =          property(__team_get,__team_set)
