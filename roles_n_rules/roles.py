@@ -28,6 +28,8 @@ skull = '💀 '
 # ------------------------------------
 
 class Innocent:
+    team = 0
+    
     def start(self):
         pass
 
@@ -60,8 +62,16 @@ class Innocent:
                 answer = instant_death(standoff[1], standoff[2], answer, recursive+next)
 
         return answer
+    
+    def has_won_game(self,user_list):
+        for other in user_list:
+            if other.alive and other.team != 0:
+                return False
+        return True
 
 class Assassin(Innocent):
+    team = 0
+    
     def start(self):
         #TODO: Create a secret channel.
         pass
@@ -88,21 +98,29 @@ class Assassin(Innocent):
         return answer
 
 class Aura_Teller(Assassin):
+    team = 0
+    
     def night(self,number):
         std_night(self)
         self.uses = 1
 
 class Baker(Innocent):
+    team = 0
+    
     def start(self):
         # TODO: Create a secret channel with all other bakers.
         pass
     
-class Butcher(Baker):
+class Butcher(Innocent):
+    team = 0
+    
     def start(self):
         # TODO: Create a secret channel with all other butchers and bloody butchers.
         pass
 
 class Barber(Innocent):
+    team = 0
+    
     def start(self):
         # TODO: Create a secret channel.
         pass
@@ -125,11 +143,15 @@ class Barber(Innocent):
         return answer
 
 class Crowd_Seeker(Assassin):
+    team = 0
+    
     def night(self,number):
         std_night(self)
         self.uses = 3
 
 class Cult_Leader(Innocent):
+    team = 0
+    
     def start(self):
         # TODO: Create a secret channel with all other cult members and cult leaders.
         pass
@@ -146,5 +168,88 @@ class Cult_Leader(Innocent):
         return answer
 
 class Cult_Member(Cult_Leader):
+    team = 0
+
+class Cupid:
+    team = 0
+    
+    # TODO
     pass
 
+class Cursed_Civilian(Innocent):
+    team = 0
+
+class Dog(Innocent):
+    team = 0
+    
+    def start(self):
+        pass # TODO: Create na secret channel
+    
+    def day(self,number):
+        std_day(self)
+        if number > 0:
+            pass # TODO: Turn the player into an Innocent.
+    
+    def night(self,number):
+        std_night(self)
+        self.uses = 1
+
+class Executioner(Innocent):
+    team = 0
+    
+    def start(self):
+        print("It worked!")
+
+    def power_execute(self):
+        pass # TODO: Add threat to player
+
+class Exorcist(Innocent):
+    team = 0
+    
+    def start(self):
+        pass # TODO: create a secret channel.
+    
+class Fortune_Teller(Innocent):
+    team = 0
+    
+    def start(self):
+        pass # TODO: create a secret channel.
+    
+    def day(self):
+        std_day(self)
+        self.uses = 0
+    
+    def night(self):
+        std_night(self)
+        self.uses = 1
+
+    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+        if self.undead:
+            answer.dm("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),self.id)
+            answer.dm_add("They were a great inspiration to you... ")
+            answer.dm_add("back when you were alive, at least. Now, your undead heart is as cold as it has ever been, ")
+            answer.dm_add("and nothing will happen to you.\n")
+            answer.dm_add("**The rules do not change. You will remain Undead.**")
+            answer.log_add(recursive + success + '<@{}> failed to become a Fortune Teller.'.format(self.id))
+            return answer            
+
+        answer.dm("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),self.id)
+        answer.dm_add("They were a great inspiration to you, and that's why ")
+        answer.dm_add("you've decided to get in their footsteps!\n")
+        answer.dm_add("**You have turned into a Fortune Teller. Find and ")
+        answer.dm_add("eliminate all werewolves, solo players and other enemies!**")
+        answer.log_add(recursive + success + '<@{}> became a Fortune Teller.'.format(self.id))
+        return answer
+
+class Fortune_Apprentice(Innocent):
+    team = 0
+    
+    def start(self):
+        pass # TODO: Create a secret channel.
+
+class Grandma(Innocent):
+    team = 0
+
+    def start(self):
+        pass # TODO: Create a secret channel.
+    
