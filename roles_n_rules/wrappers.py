@@ -58,3 +58,11 @@ def abducted(func):
             pass
         return func(*args,**kwargs)
     return validate_if_abducted
+
+def require_uses(func):
+    @wraps(func)
+    def more_than_zero_uses(*args,**kwargs):
+        if args[0].uses > 0:
+            return func(*args,**kwargs)
+        pass # TODO: Cancel the power
+    return more_than_zero_uses
