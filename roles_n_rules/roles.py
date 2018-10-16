@@ -1,9 +1,14 @@
 import roles_n_rules.wrappers as wrap
+from main_classes import Mailbox
 
-def role_functions(role_name) -> object:
+def role_functions(role_name):
     """Gain a role's class by name. Spaces are replaced by underscores.  
     :role_name: The name of the role."""
     return globals()[role_name]()
+
+def get_powers(role_name):
+    """Test if a certain command is a valid role-related command. Injection proof."""
+    return [item[6:] for item in globals()[role_name].__dict__ if item.startswith('power_')]
 
 def std_day(self):
     self.sleepingover = False
