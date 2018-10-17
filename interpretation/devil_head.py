@@ -7,8 +7,9 @@ from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant, personal_channel, db_get, db_set, signup, emoji_to_player, channel_get, \
     is_owner, get_channel_members
-from management.inventory import take_item, has_item
-from management import db, dynamic as dy, general as gen, boxes as box, roulette, items
+from management.inventory import give_item, has_item
+from roles_n_rules.item_usage import use_item
+from management import db, dynamic as dy, general as gen, boxes as box, roulette, items, shop
 from .profile import process_profile
 
 PERMISSION_MSG = "Sorry, but you can't run that command! You need to have **{}** permissions to do that."
@@ -54,6 +55,21 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
     if isGameMaster == True:
         help_msg += "\n__Game Master commands:__\n"
 
+        if is_command(message, ['userinv','userinventory']):
+            target = check.users(message)
+            if not target:
+                return [Mailbox().respond("**INVALID SYNTAX:**\nNo target provided!",True)]
+
+            answer = Mailbox().spam("**__<@{}>'S BALANCE__**".format(target[0]))
+
+            for item in items.jget("items"):
+                if has_item(target[0],item["code"]):
+                    answer.spam_add('\n{}x - **'.format(has_item(target[0],item["code"],False)) + item["name"] + '**')
+            return [answer]
+        if is_command(message, ['userinv','userinventory'], True):
+            return todo()
+        help_msg += "`" + prefix + "userinv` - View a user's inventory.\n"
+
     elif is_command(message, []):
         return [Mailbox().respond(PERMISSION_MSG.format("Game Master"), True)]
 
@@ -80,15 +96,77 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     help_msg += '\n\n'
 
+    '''buy'''
+    if is_command(message, ['buy']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().dm("No amount provided! Please provide me with a number!",True)]
+        answer = [Mailbox().dm(shop.buy(user_id,number[0],message.author.name),user_id)]
+    if is_command(message, ['buy'], True):
+        msg = "**Usage:** Buy an item from the shop.\n\n`" + prefix + "buy <n>`\n\n"
+        msg += "**Example:** `" + prefix + "buy 1`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "buy` - Buy item from the shop.\n"
+
+    '''inventory'''
     if is_command(message, ['inv','inventory','bal','balance']):
         answer = Mailbox().dm("**__YOUR CURRENT BALANCE__**",user_id)
         for item in items.jget("items"):
             if has_item(user_id,item["code"]):
-                answer.dm_add('\n' + item["name"] + ' - *(' + has_item(user_id,item["code"],False) + ')*')
+                answer.dm_add('\n{}x - **'.format(has_item(user_id,item["code"],False)) + item["name"] + '**')
         return [answer]
     if is_command(message, ['inv','inventory','bal','balance'], True):
         return todo()
     help_msg += "`" + prefix + "inventory` - View your inventory.\n"
+
+    '''sell'''
+    if is_command(message, ['sell']):
+        number = check.numbers(message)
+        if not number:
+            return [Mailbox().dm("No amount provided! Please provide me with a number!",True)]
+        answer = [Mailbox().dm(shop.sell(user_id,number[0],message.author.name),user_id)]
+    if is_command(message, ['sell'], True):
+        msg = "**Usage:** Sell an item from the shop.\n\n`" + prefix + "sell <n>`\n\n"
+        msg += "**Example:** `" + prefix + "sell 1`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "sell` - Buy item from the shop.\n"
+
+    '''shop'''
+    if is_command(message, ['shop']):
+        answer = Mailbox()
+
+        for msg in shop.get_market_message():
+            answer.respond(msg,True)
+        
+        return answer
+    if is_command(message, ['shop']):
+        msg = "**Usage:** View the Devil Bot's shop.\n\n`" + prefix + "shop`"
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "shop` - View the Devil's shop."
+
+    help_msg += "\n\n__Item specific commands:__"
+
+    '''attack'''
+    if is_command(message, ['attack', 'dagger', 'kill']):
+        pass # TODO
+
+    '''disguise'''
+    if is_command(message,['disguise','dis']):
+        return [use_item(103,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "disguise` - Disguise a participant.\n"
+
+    '''hide'''
+    if is_command(message,['hide']):
+        return [use_item(100,message)]
+    if is_command(message,['disguise','dis'],True):
+        msg = "**Usage:** Disguise a participant.\n\n`" + prefix + "disguise @Randium#6521 Innocent`\n\n"
+        msg += "This command can only be used by participants. You can disguise yourself."
+        return [Mailbox().respond(msg,True)]
+    help_msg += "`" + prefix + "hide` - Become invisible for the night.\n"
 
     # --------------------------------------------------------------
     #                          HELP

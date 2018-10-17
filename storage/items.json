@@ -120,77 +120,77 @@
             },
             {
                 "name": "3 villager bucks",
-                "code": 1001003,
+                "code": 2001003,
                 "description": "Gain 30 credits for each winning villager."
             },
             {
                 "name": "3 wolf bucks",
-                "code": 1002003,
+                "code": 2002003,
                 "description": "Gain 30 credits for each winning wolf."
             },
             {
                 "name": "3 white werewolf bucks",
-                "code": 1003003,
+                "code": 2003003,
                 "description": "Gain 30 credits for each winning white werewolf."
             },
             {
                 "name": "3 angel bucks",
-                "code": 1004003,
+                "code": 2004003,
                 "description": "Gain 30 credits for each winning angel"
             },
             {
                 "name": "3 despot bucks",
-                "code": 1005003,
+                "code": 2005003,
                 "description": "Gain 30 credits for each winning despot"
             },
             {
                 "name": "3 devil bucks",
-                "code": 1006003,
+                "code": 2006003,
                 "description": "Gain 30 credits for each winning devil"
             },
             {
                 "name": "3 flute bucks",
-                "code": 1007003,
+                "code": 2007003,
                 "description": "Gain 30 credits for each winning flute player"
             },
             {
                 "name": "3 horseman bucks",
-                "code": 1008003,
+                "code": 2008003,
                 "description": "Gain 30 credits for each winning horseman"
             },
             {
                 "name": "3 ice bucks",
-                "code": 1009003,
+                "code": 2009003,
                 "description": "Gain 30 credits for each winning ice king"
             },
             {
                 "name": "3 immortal bucks",
-                "code": 1010003,
+                "code": 2010003,
                 "description": "Gain 30 credits for each winning immortal"
             },
             {
                 "name": "3 psycho bucks",
-                "code": 1011003,
+                "code": 2011003,
                 "description": "Gain 30 credits for each winning psychopath"
             },
             {
                 "name": "3 pyro bucks",
-                "code": 1012003,
+                "code": 2012003,
                 "description": "Gain 30 credits for each winning pyromancer"
             },
             {
                 "name": "3 thing bucks",
-                "code": 1013003,
+                "code": 2013003,
                 "description": "Gain 30 credits for each winning the thing"
             },
             {
                 "name": "3 vampire bucks",
-                "code": 1014003,
+                "code": 2014003,
                 "description": "Gain 30 credits for each winning vampire"
             },
             {
                 "name": "3 zombie bucks",
-                "code": 1015003,
+                "code": 2015003,
                 "description": "Gain 30 credits for each winning zombie"
             }
         ],

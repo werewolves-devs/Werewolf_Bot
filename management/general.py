@@ -11,7 +11,6 @@ def add_activity(user_id,user_name):
     """Increase the activity score of a player."""
     c.execute("SELECT * FROM 'activity' WHERE id =?",(user_id,))
     if c.fetchone() == None:
-        c.execute("INSERT INTO 'inventory'('id','name') VALUES (?,?);",(user_id,user_name))
         c.execute("INSERT INTO 'activity'('id','name') VALUES (?,?);",(user_id,user_name))
         c.execute("INSERT INTO 'users'('id','name') VALUES (?,?);",(user_id,user_name))
     c.execute("UPDATE 'activity' SET spam_activity = spam_activity + 1 WHERE id =?",(user_id,))
@@ -19,7 +18,7 @@ def add_activity(user_id,user_name):
     db_set(user_id,'name',user_name)
 
 def spam_activity(user_id):
-    """Gain info about the user's spam activity. This is supposed to fight the encouragement to spam the channels 
+    """Gain info about the user's spam activity. This is supposed to fight the encouragement to spam the channels
     in order to get more lootboxes."""
     c.execute("SELECT * FROM 'activity' WHERE id=?",(user_id,))
     answer = c.fetchone()
@@ -131,7 +130,7 @@ def gen_set(user_id,column,value):
     value -> the new value it should be set to
     """
     positionof(column) # Make sure the value is valid.
-    c.execute("UPDATE game SET {}=? WHERE id=?".format(column), (value,user_id))
+    c.execute("UPDATE users SET {}=? WHERE id=?".format(column), (value,user_id))
     conn.commit()
 
 def update_refer(user_id,referrer):
