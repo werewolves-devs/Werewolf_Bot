@@ -1,5 +1,8 @@
+from roles_n_rules.roles import Executioner, get_powers, role_functions, Team
 from management.player import Player, Participant
+from config import Destination
 import unittest
+
 
 class User:
     def __init__(self,id,name,bot):
@@ -53,3 +56,13 @@ class Test_Player_Class(unittest.TestCase):
         player2 = Participant(User(1,"Randium",False))
         self.assertEqual(player1.demonized,player2.demonized)
         player2.demonized = False
+
+    def test_role_properties(self):
+        self.assertEqual([item for item in Executioner.__dict__ if item.startswith('st')],['start'])
+        self.assertEqual(get_powers("Executioner"),['execute'])
+        self.assertEqual(role_functions("Grandma").team,Team.village)
+    
+    def test_config(self):
+        int(Destination.game_log.value)
+        with self.assertRaises(TypeError):
+            int(Destination.game_log)

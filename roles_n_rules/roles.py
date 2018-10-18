@@ -55,7 +55,7 @@ class Innocent:
     @wrap.abducted
     @wrap.frozen
     @wrap.souls
-    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+    def attack(self,murderer,answer=Mailbox(),recursive='\n'):
         # TODO: Get the victim's standoff list, and check if it has an executioner standoff.
         replacements = [standoff for standoff in db.get_standoff(user_id) if standoff[2] == 'Executioner']
 
@@ -77,7 +77,7 @@ class Innocent:
     
     def has_won_game(self,user_list):
         for other in user_list:
-            if other.alive and other.team != 0:
+            if other.alive and other.team != Team.village:
                 return False
         return True
 
@@ -104,7 +104,7 @@ class Assassin(Innocent):
     @wrap.protected
     @wrap.souls
     @wrap.demonized
-    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+    def attack(self,murderer,answer=Mailbox(),recursive='\n'):
         answer.log_add(recursive + success + skull + '<@{}> was assassinated.'.format(user_id))
         answer = instant_death(self, "Assassin", answer, recursive+next)
         return answer
@@ -149,7 +149,7 @@ class Barber(Innocent):
     @wrap.frozen
     @wrap.protected
     @wrap.souls
-    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+    def attack(self,murderer,answer=Mailbox(),recursive='\n'):
         answer.log_add(recursive + success + skull + '<@{}> was cut into little pieces.'.format(user_id))
         answer = instant_death(self, "Barber", answer, recursive+next)
         return answer
@@ -174,7 +174,7 @@ class Cult_Leader(Innocent):
     @wrap.sleepingover
     @wrap.souls
     @wrap.demonized
-    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+    def attack(self,murderer,answer=Mailbox(),recursive='\n'):
         answer.log_add(recursive + success + skull + '<@{}> was killed by the cult.'.format(user_id))
         answer = instant_death(self, "Cult Leader", answer, recursive+next)
         return answer
@@ -235,7 +235,7 @@ class Fortune_Teller(Innocent):
         std_night(self)
         self.uses = 1
 
-    def attack(self,murderer,answer=Mailbox().log(''),recursive='\n'):
+    def attack(self,murderer,answer=Mailbox(),recursive='\n'):
         if self.undead:
             answer.dm("Your idol, the fortune teller <@{}>, has deceased. ".format(murderer),self.id)
             answer.dm_add("They were a great inspiration to you... ")
@@ -252,6 +252,18 @@ class Fortune_Teller(Innocent):
         answer.dm_add("eliminate all werewolves, solo players and other enemies!**")
         answer.log_add(recursive + success + '<@{}> became a Fortune Teller.'.format(self.id))
         return answer
+    
+    @wrap.require_uses
+    @wrap.require_users(1)
+    @wrap.power_abducted
+    def power_inspect(self,numbers,roles,users):
+        other = users[0]
+        self.uses += -1
+
+        if other.role == other.fakerole and other.undead:
+            return Mailbox().respond("{} - <@{}> has the role of the `Undead`!".format(other.emoji,other.id))
+        return Mailbox().respond("{} - <@{}> has the role of the `{}`!".format(other.emoji,other.id,other.fakerole))
+
 
 class Fortune_Apprentice(Innocent):
     team = Team.village
