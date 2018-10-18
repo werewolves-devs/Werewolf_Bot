@@ -1,3 +1,5 @@
+from enum import Enum
+
 import roles_n_rules.wrappers as wrap
 from main_classes import Mailbox
 
@@ -27,8 +29,18 @@ skull = '💀 '
 
 # ------------------------------------
 
+class Team(Enum):
+    # General role teams
+    village = 0
+    wolf = 1
+    solo = 2
+
+    # Specific role teams
+
+# ------------------------------------
+
 class Innocent:
-    team = 0
+    team = Team.village
     
     def start(self):
         pass
@@ -70,7 +82,7 @@ class Innocent:
         return True
 
 class Assassin(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         #TODO: Create a secret channel.
@@ -98,28 +110,28 @@ class Assassin(Innocent):
         return answer
 
 class Aura_Teller(Assassin):
-    team = 0
+    team = Team.village
     
     def night(self,number):
         std_night(self)
         self.uses = 1
 
 class Baker(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         # TODO: Create a secret channel with all other bakers.
         pass
     
 class Butcher(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         # TODO: Create a secret channel with all other butchers and bloody butchers.
         pass
 
 class Barber(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         # TODO: Create a secret channel.
@@ -143,14 +155,14 @@ class Barber(Innocent):
         return answer
 
 class Crowd_Seeker(Assassin):
-    team = 0
+    team = Team.village
     
     def night(self,number):
         std_night(self)
         self.uses = 3
 
 class Cult_Leader(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         # TODO: Create a secret channel with all other cult members and cult leaders.
@@ -168,19 +180,19 @@ class Cult_Leader(Innocent):
         return answer
 
 class Cult_Member(Cult_Leader):
-    team = 0
+    team = Team.village
 
 class Cupid:
-    team = 0
+    team = Team.village
     
     # TODO
     pass
 
 class Cursed_Civilian(Innocent):
-    team = 0
+    team = Team.village
 
 class Dog(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         pass # TODO: Create na secret channel
@@ -195,7 +207,7 @@ class Dog(Innocent):
         self.uses = 1
 
 class Executioner(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         print("It worked!")
@@ -204,13 +216,13 @@ class Executioner(Innocent):
         pass # TODO: Add threat to player
 
 class Exorcist(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         pass # TODO: create a secret channel.
     
 class Fortune_Teller(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         pass # TODO: create a secret channel.
@@ -242,13 +254,13 @@ class Fortune_Teller(Innocent):
         return answer
 
 class Fortune_Apprentice(Innocent):
-    team = 0
+    team = Team.village
     
     def start(self):
         pass # TODO: Create a secret channel.
 
 class Grandma(Innocent):
-    team = 0
+    team = Team.village
 
     def start(self):
         pass # TODO: Create a secret channel.
