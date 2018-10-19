@@ -1,7 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, session
+from requests_oauthlib import OAuth2Session
 from communication import webhook
 import management.items as items
 import management.boxes as box
+from communication.website.blueprints.api import bp as api_blueprint
 import random
 import config
 
@@ -27,7 +29,7 @@ def choose_reward(token,choice):
 
     if choice not in given_options:
         return render_template('notoken.html', reason='ERROR: {} is not a valid option.'.format(choice))
-    
+
     box.add_source2(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
     webhook.send_private_message(config.universal_prefix + "SUCCESS {} {}".format(token,choice))
     return render_template('finish.html')
@@ -44,11 +46,11 @@ def open_lootbox(token):
     if validity == 2:
         # Token already used
         return render_template('notoken.html', reason="This lootbox has already been redeemed!")
-    
+
     if validity == 0:
         # The user is prepared to open the lootbox.
         return render_template('open.html', token=token)
-    
+
     if validity == 1:
         # The user can make a choice.
         data = box.get_token_data(token)
@@ -56,36 +58,55 @@ def open_lootbox(token):
         choices = [items.import_reward(option) for option in choices]
 
         return render_template('choice.html', choices=choices, token=token)
-    
+
     return 'This is strange! How did you get here?\nPlease report this to the Game Masters!'
 
-@app.route('/api/v1/<token>/rewards')
-def get_rewards(token):
-    validity = box.token_status(token)
-    if validity != 0:
-        return jsonify(option1={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},
-            option2={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},
-            option3={"code": -1, "description": "NOT FOUND", "name": "NOT FOUND"},)
-    
-    given_options = items.get_rewards()
-    box.add_source1(token,request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
-    box.add_options(token,given_options[0]["code"],given_options[1]["code"],given_options[2]["code"])
+api_base = 'https://discordapp.com/api'
+TOKEN_URL = api_base + '/oauth2/token'
 
-    # Make an announcement if any legendaries found
-    legendary_amount = 0
-    for option in given_options:
-        if option["code"] > 4000000-1:
-            legendary_amount += 1
-    if legendary_amount > 3:
-        print("Invalid amount of legendaries found.")
-    if legendary_amount == 3:
-        webhook.send_public_message("**NO WAY!** <@{}> just found ***THREE LEGENDARIES*** in a lootbox!\nThat's a chance of 1 in 1 MILLION!".format(box.get_token_data(token)[1]))
-    if legendary_amount == 2:
-        webhook.send_public_message("<@{}> just opened a lootbox with two legendaries! Wow!".format(box.get_token_data(token)[1]))
-    if legendary_amount == 1:
-        webhook.send_public_message("<@{}> just found a legendary item in a lootbox!".format(box.get_token_data(token)[1]))
+def token_updater(token):
+    session['oauth2_token'] = token
 
-    return jsonify(option1=given_options[0],option2=given_options[1],option3=given_options[2])
+
+def make_session(token=None, state=None, scope=None):
+    return OAuth2Session(
+        client_id=config.oauth_id,
+        token=token,
+        state=state,
+        scope=scope,
+        redirect_uri=config.oauth_callback,
+        auto_refresh_kwargs={
+            'client_id': config.oauth_id,
+            'client_secret': config.oauth_secret,
+        },
+        auto_refresh_url=TOKEN_URL,
+        token_updater=token_updater)
+
+def is_user_logged_in():
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(api_base + '/users/@me').json()
+    try:
+        if user["code"] == 0:
+            return False
+    except KeyError:
+        return True
+
+def get_user_info():
+    if not is_user_logged_in:
+        return None
+    discord = make_session(token=session.get('oauth2_token'))
+    return discord.get(api_base + '/users/@me').json()
+
+@app.route('/')
+def main():
+    return render_template('main-index.html', loggedin=is_user_logged_in())
+
+@app.route('/profile')
+def profile():
+    data = get_user_info()
+    return render_template('profile.html', user=data, loggedin=is_user_logged_in())
+
+app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
 if __name__ == '__main__':
     app.run(debug=True)

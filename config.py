@@ -1,9 +1,6 @@
 # Discord API / Login settings
-WW_TOKEN = "NDAxNzE2MzgwODAzNTMwNzUy.Dm2kxA.r_PwUl5gZE0P9EFDZHu-7XKyyss"
-TM_TOKEN = "yo_poppas_token"
 DV_TOKEN = "yo_devils_token"
 GH_TOKEN = "yo_deadies_token"
-
 WEBHOOK_PUBLIC_ID = "488220391391887362"
 WEBHOOK_PUBLIC_TOKEN = "2fp9iH072W48g0QbSo0us0zo5v0qQvKGzo618aOq_uryjUrV1r7Bn_pIhQL0Nu9E-nNC"
 WEBHOOK_PRIVATE_ID = "488075058334400522"
@@ -29,7 +26,8 @@ stats_file = 'storage/stats.json'
 item_file = 'storage/items.json'
 max_channels_per_category = 50
 
-# List of specific channels
+# List of specific channels / Guilds
+main_guild = 375597071094382603
 welcome_channel = 425036088239980544
 game_log = 485843514379337748
 bot_spam = 394541968689987584
@@ -45,6 +43,14 @@ dead_participant = 380493972100874242
 frozen_participant = 432146998762668033
 suspended = 382947666935414784
 peasant = 396041262836351006
-
 mayor = 382103216105717760
 reporter = 382103338550034442
+
+# Box
+base_url = 'https://example.com/box'
+box_token = 'wtDzVN4-30DmcDiHBe9WQ-L0lBTW-R4nd1Umi5G4y-wtDzVN430Dmc-DiHBe9WQ'
+
+# Website settings
+oauth_id = 'ID_Here'
+oauth_secret = 'Token_here'
+oauth_callback = 'http://localhost:5000/api/v1/auth/callback'
