@@ -38,7 +38,7 @@ class Destination(Enum):
     game_log = 485843514379337748
     bot_spam = 394541968689987584
     story_time = 485843933625188352
-    market = 394541968689987584
+market_channel = 493725561269780500
     quotes = 487354468606803968
 
 # List of specific roles

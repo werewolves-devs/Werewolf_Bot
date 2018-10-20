@@ -66,6 +66,9 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
             for user_id in target:
                 answer.gift(user_id)
             return [answer]
+        
+        if is_command(message, ['botanswer']):
+            return [Mailbox().respond("Sounds pretty cool! How about you did something about it? *cough cough*")]
 
     elif is_command(message, ['delete_category','start']):
         return [Mailbox().respond(PERMISSION_MSG.format("Administrator"), True)]
@@ -127,7 +130,7 @@ def process(message, isGameMaster=False, isAdmin=False, isPeasant=False):
 
     if is_command(message, ['rr','roulette','suicide']):
         return [roulette.surrender(True),roulette.take_shot(message)]
-    if is_command(message,['rr','roulette','suicide']):
+    if is_command(message,['rr','roulette','suicide'],True):
         msg = "**Usage:** Play a game of Russian roulette!\n\n`" + prefix + "rr`\n\nTry it out! It's fun."
         return [Mailbox().respond(msg,True)]
     help_msg += "`" + prefix + "rr` - Play some Russian roulette!\n"

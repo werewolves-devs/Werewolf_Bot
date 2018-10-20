@@ -222,7 +222,9 @@ async def on_message(message):
             await message.add_reaction('🎁')
             await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
+    t = time.time()
+    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,result,isGameMaster,isAdmin,isPeasant)
 
 async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
 
@@ -248,7 +250,8 @@ async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeas
         quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
         for spy_channel_id in db.find_spies(message.channel.id):
             spy_channel = client.get_channel(spy_channel_id)
-            await spy_channel.send(embed=quote_embed)
+            if spy_channel != None:
+                await spy_channel.send(embed=quote_embed)
 
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
