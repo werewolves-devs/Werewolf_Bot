@@ -1,4 +1,5 @@
 from roles_n_rules.roles import Executioner, get_powers, role_functions, Team
+from story_time.reader import import_story, player_amount
 from management.player import Player, Participant
 from config import Destination
 import unittest
@@ -66,3 +67,12 @@ class Test_Player_Class(unittest.TestCase):
         int(Destination.game_log.value)
         with self.assertRaises(TypeError):
             int(Destination.game_log)
+    
+    def test_story_time_reader(self):
+        self.assertEqual(import_story('unittests/001.txt'),'This is a simple test!')
+        self.assertEqual(import_story('unittests/002.txt',owner='BenTechy66'),'This is a slightly more advanced test.\nAin\'t that right, BenTechy66?')
+        self.assertEqual(import_story('unittests/003.txt',player_list=['Randium','HurricanKai']),'I was told by Randium and HurricanKai that this would work.\nRandium even promised me!')
+
+        self.assertEqual(player_amount('unittests/001.txt'),0)
+        self.assertEqual(player_amount('unittests/002.txt'),0)
+        self.assertEqual(player_amount('unittests/003.txt'),2)
