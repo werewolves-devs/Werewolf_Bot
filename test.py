@@ -1,5 +1,5 @@
 from roles_n_rules.roles import Executioner, get_powers, role_functions, Team
-from story_time.reader import import_story, player_amount
+from story_time.reader import import_story, player_amount, import_random_story
 from management.player import Player, Participant
 from config import Destination
 import unittest
@@ -76,3 +76,12 @@ class Test_Player_Class(unittest.TestCase):
         self.assertEqual(player_amount('unittests/001.txt'),0)
         self.assertEqual(player_amount('unittests/002.txt'),0)
         self.assertEqual(player_amount('unittests/003.txt'),2)
+
+        self.assertEqual(import_random_story('unittests/',player_list=['Randium','HurricanKai']),"I was told by <@Randium> and <@HurricanKai> that this would work.\n<@Randium> even promised me!")
+        self.assertEqual(import_random_story('unittests',player_list=['Yo momma']),'I am terribly sorry! I could not find a story for this!')
+
+        # Unorthodox tests
+        self.assertEqual(import_story('unittests/002.txt',player_list=['BenTechy66']),'This is a slightly more advanced test.\nAin\'t that right, UNDEFINED?')
+        self.assertEqual(import_story('unittests/003.txt',owner='Randium'),'I was told by [0] and [1] that this would work.\n[0] even promised me!')
+        self.assertEqual(import_story('unittests/003.txt',player_list=['Randium','HurricanKai','BenTechy66']),'I was told by Randium and HurricanKai that this would work.\nRandium even promised me!')
+
