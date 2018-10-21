@@ -72,6 +72,31 @@ class Test_Player_Class(unittest.TestCase):
         player2.money = 0
         self.assertEqual(player1.money,0)
 
+    def _inventory(self):
+        # To be claimed: 1 lootbox
+        player1 = Participant(User(1,"Randium",False))
+
+        self.assertEqual(player1.items,[])
+
+        player1.add(1)
+        player1.add("villager buck")
+        self.assertEqual(player1.items,[(1,'villager buck',2)])
+
+        player1.add(2)
+        player1.add(2)
+        player1.remove(1)
+        player1.remove(3) # ! Make sure it doesn't give the user a negative amount.
+        self.assertEqual(player1.items,[(1,'villager buck',1),(2,'wolf buck',2)])
+
+        player2 = Participant(User(1,"Randium",False))
+        self.assertEqual(player1.items,player2.items)
+    
+        player1.remove(1)
+        player1.remove(2)
+        player1.remove(2)
+        self.assertEqual(player2.items,[])
+
+
     def test_role_properties(self):
         self.assertEqual([item for item in Executioner.__dict__ if item.startswith('st')],['start'])
         self.assertEqual(get_powers("Executioner"),['execute'])
