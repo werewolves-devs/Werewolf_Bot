@@ -77,5 +77,10 @@ def item_to_int(title):
             return item["code"]
     return None
 
+def int_to_item(number):
+    for item in jget("items"):
+        if item["code"] == number:
+            return item["name"]
+
 if  __name__ == '__main__':
     print(jget("items"))
