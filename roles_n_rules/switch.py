@@ -18,14 +18,24 @@ def pay():
     if dy.get_stage() == "Day":
         return [Mailbox().respond("Whaddaya mean, `{}pay`? It already **is** day, bud.".format(config.universal_prefix))]
 
+    # Add all listeners
+    if int(dy.day_number()) == 0:
+        for spy_channel in db.get_secret_channels("Flute_Player"):
+            for innocent_channel in db.get_secret_channels("Flute_Victims"):
+                db.add_listener(spy_channel,innocent_channel)
+
     answer = Mailbox()
     answer_table = [Mailbox(True)]
+
     for user_id in db.player_list():
         user_role = db_get(user_id,'role')
 
         # Remove potential night uses
         for i in range(len(roles.night_users)):
-            if user_role in roles.night_users[i]:
+            if user_role in ["White Werewolf"] and (dy.day_number() % 2 == 0) and dy.day_number() > 0:
+                db_set(user_id,'uses',1)
+                break
+            elif user_role in roles.night_users[i]:
                 if i > 0:
                     db_set(user_id,'uses',0)
                 break
@@ -66,6 +76,7 @@ def pay():
         db_set(user_id,'bitten',0)
 
     answer_table.append(answer)
+    answer_table.append(Mailbox().spam(config.universal_prefix + "day"))
     return answer_table
 
 def day():
@@ -134,14 +145,7 @@ def pight():
                     db_set(user_id,'uses',0)
                 break
         
-        # Give the user their votes back
-        db_set(user_id,'votes',1)
-        if user_role == "Immortal":
-            db_set(user_id,'votes',3)
-        if user_role == "Idiot ":
-            db_set(user_id,'votes',0)
-        
-    return [answer]
+    return [answer,Mailbox().spam(config.universal_prefix + "night")]
 
 def night():
     """Start the second part of the day.  
@@ -159,6 +163,14 @@ def night():
         threat = db.get_kill()
 
     for player in db.player_list(True):
+        user_role = db_get(player,'role')
+        # Give the user their votes back
+        db_set(player,'votes',1)
+        if user_role == "Immortal":
+            db_set(player,'votes',3)
+        if user_role == "Idiot ":
+            db_set(player,'votes',0)
+
         # Give potential night uses
         user_role = db_get(player,'role')
         for i in range(len(roles.night_users)):
@@ -168,6 +180,9 @@ def night():
                     if dy.day_number() == 0:
                         db_set(player,'uses',1)
                     break
+
+                if user_role in ['White Werewolf'] and dy.day_number() % 2 == 0:
+                    i = 1
 
                 db_set(player,'uses',i)
                 answer.msg(power.power(user_role),db_get(player,'channel'))
@@ -269,7 +284,9 @@ def start_game():
                 if user_role == "Witch":
                     db_set(user_id,'uses',3)
             
-            answer.story('The current distribution is {}'.format(chosen_roles)) # TODO
+            roles_distributed = chosen_roles
+            roles_distributed.sort()
+            answer.story('The current distribution is {}'.format(roles_distributed)) # TODO
             answer.story('I know, I know. That looks ugly as hell. We\'re trying to make it look good!')
 
             if "Flute Player" in chosen_roles:

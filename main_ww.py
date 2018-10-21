@@ -92,8 +92,8 @@ async def on_message_edit(before, after):
         return
     if before.content == after.content: # Ensure it wasn't just a pin
         return
-    stats.increment_stat("messages_edited", 1)
-    stats.increment_user_stat(before.author.id, "messages_edited", 1)
+    #stats.increment_stat("messages_edited", 1)
+    #stats.increment_user_stat(before.author.id, "messages_edited", 1)
 
     if before.id != after.id:
         db.add_trash_message(after.id,after.channel.id)
@@ -122,10 +122,10 @@ async def on_message_edit(before, after):
 async def on_message(message):
     # we do not want the bot to reply to itself
     if message.author == client.user:
-        stats.increment_stat("bot_messages_sent", 1)
+        #stats.increment_stat("bot_messages_sent", 1)
         return
-    stats.increment_stat("messages_sent", 1)
-    stats.increment_user_stat(message.author.id, "messages_sent", 1)
+    #stats.increment_stat("messages_sent", 1)
+    #stats.increment_user_stat(message.author.id, "messages_sent", 1)
 
     # Add trash messages
     db.add_trash_message(message.id,message.channel.id)
@@ -150,9 +150,9 @@ async def on_message(message):
     await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
 
 async def process_message(message,result):
-    if "<@&{}>".format(config.game_master) in message.content:
-        stats.increment_stat("game_master_pings", 1)
-        stats.increment_user_stat(message.author.id, "game_master_pings", 1)
+    #if "<@&{}>".format(config.game_master) in message.content:
+        #stats.increment_stat("game_master_pings", 1)
+        #stats.increment_user_stat(message.author.id, "game_master_pings", 1)
 
     if db.isParticipant(message.author.id,True,True,True):
         db_set(message.author.id,'activity',0)
@@ -192,25 +192,27 @@ async def process_message(message,result):
 
                 await botspam_channel.send(log)
                 await poll_channel.send(result)
+                for graveyard in db.get_secret_channels("Graveyard"):
+                    await client.get_channel(graveyard).send(result)
 
                 chosen_one = db.emoji_to_player(chosen_emoji)
-                chosen_one = int(chosen_one)
 
                 if chosen_emoji != '' and chosen_one != None:
+                    chosen_one = int(chosen_one)
                     if poll.purpose == 'lynch':
                         db.add_kill(chosen_one,'Innocent')
                     elif poll.purpose == 'Mayor':
                         dy.set_mayor(chosen_one)
                         member = gamelog_channel.guild.get_member(int(chosen_one))
                         if member != None:
-                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Reporter".format(member.display_name))
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.mayor), reason="Promoting {} to Mayor".format(member.display_name))
                     elif poll.purpose == 'Reporter':
                         dy.set_reporter(chosen_one)
                         for channel_id in db.get_secret_channels("Reporter"):
                             mailbox.edit_cc(channel_id,chosen_one,1)
                         member = gamelog_channel.guild.get_member(int(chosen_one))
                         if member != None:
-                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Mayor".fprmat(member.display_name))
+                            await member.add_roles(get_role(gamelog_channel.guild.roles, config.reporter), reason="Promoting {} to Reporter".format(member.display_name))
                     elif poll.purpose == 'wolf':
                         db.add_kill(chosen_one,'Werewolf',db.random_wolf())
                     elif poll.purpose == 'cult':
@@ -352,6 +354,7 @@ async def process_message(message,result):
             # element.victim - person's permission to be changed;
             # element.number - type of setting to set to: see issue #83 for more info.
 
+            print('Editing permissions of {} for channel {}...'.format(element.victim,element.channel))
             channel = client.get_channel(element.channel)
             user = client.get_user(int(element.victim))
             main_guild = botspam_channel.guild
@@ -586,7 +589,11 @@ async def process_message(message,result):
                         emoji_table.append(user[1])
 
                     if i % 20 == 19:
-                        msg = await client.get_channel(int(element.channel)).send(msg)
+                        if client.get_channel(int(element.channel)) == None:
+                            await botspam_channel.send("Failed to send message in correct channel. ({})".format(element.channel))
+                            msg = await botspam_channel.send(element.content)
+                        else:
+                            msg = await client.get_channel(int(element.channel)).send(msg)
                         for emoji in emoji_table:
                             await msg.add_reaction(emoji)
                         msg_table.append(msg)

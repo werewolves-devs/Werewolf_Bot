@@ -62,6 +62,7 @@ from emoji import emojize
 
 
 client = discord.Client()
+box_waiters = []
 
 def get_role(server_roles, target_id):
     for each in server_roles:
@@ -81,6 +82,19 @@ async def remove_all_game_roles(member):
             await member.remove_roles(role, reason="Updating CC permissions")
 
 already_quoted = []
+
+@client.event
+async def on_member_join(member):
+    welcome = client.get_channel(welcome_channel)
+    if member.guild != welcome.guild:
+        return
+    
+    await welcome.send("Eyyyy! Welcome to the *Werewolves* server, <@{}>!".format(member.id))
+    await welcome.send("Lemme ask ya this; who brought you here? Give them (and yourself) a welcome reward by typing `$refer @user#1234`!")
+
+@client.event
+async def on_member_remove(member):
+    await client.get_channel(config.bot_spam).send("<@{}> has left the server.".format(member.id))
 
 @client.event
 async def on_reaction_add(reaction, user):
@@ -159,9 +173,9 @@ async def on_message_edit(before, after):
                 isPeasant = True
     except Exception:
         # We want the Ghost Bot to listen to the webhooks, who send data from the website.
-        isAdmin = True
+        isPeasant = True
 
-    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant))
+    await process_message(after,process(after,isGameMaster,isAdmin,isPeasant),isGameMaster,isAdmin,isPeasant)
 
 # Whenever a message is sent.
 @client.event
@@ -170,19 +184,6 @@ async def on_message(message):
     if message.author == client.user:
         #stats.increment_stat("bot_messages_sent", 1)
         return
-
-    if random.randint(0,249) == 1 and not message.author.bot:
-        token = create_token(message.author.id)
-        botspam_channel = client.get_channel(int(config.bot_spam))
-        try:
-            msg = await message.author.send("Hey, so... this isn\'t completely finished yet - but you've won a lootbox!\nThis is only a testing stage, you won't actually get the prize you choose. Not yet.\nhttp://jamesbray.asuscomm.com/unbox/" + token)
-        except:
-            message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
-            botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
-        else:
-            box.add_token(token,message.author.id,msg.id,msg.channel.id)
-            await message.add_reaction('🎁')
-            botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
 
     #check role of sender
     isGameMaster = False
@@ -193,6 +194,7 @@ async def on_message(message):
             role_table = [y.id for y in message.guild.get_member(message.author.id).roles]
         except Exception:
             print('Unable to acquire role_table from {}'.format(message.author.display_name))
+            isPeasant = True
         else:
             if game_master in role_table:
                 isGameMaster = True
@@ -201,17 +203,59 @@ async def on_message(message):
             if peasant in role_table and message.author.bot == True:
                 isPeasant = True
 
-    await process_message(message,process(message,isGameMaster,isAdmin,isPeasant))
+    global box_waiters
 
-async def process_message(message,result):
-    general.add_activity(message.author.id,message.author.name)
+    if (random.randint(0,249+general.spam_activity(message.author.id)) == 1 or message.author.id in box_waiters) and not message.author.bot and message.guild == client.get_channel(int(config.bot_spam)).guild:
+        if message.author.id in box_waiters:
+            box_waiters.remove(message.author.id)
+            print('Current box waiters: {}'.format(box_waiters))
+        
+        token = create_token(message.author.id)
+        botspam_channel = client.get_channel(int(config.bot_spam))
+        try:
+            msg = await message.author.send("Hey there! Thank you for playing on the Werewolves server! Follow this link to get an awesome reward!\nhttp://werewolves.1913-gaming.co.uk/unbox/" + token)
+        except:
+            await message.channel.send('Ey, **{}**, I can\'t DM ya. Please make sure to enable this if you wish to participate on this server'.format(message.author.display_name))
+            await botspam_channel.send('I failed to send a lootbox to <@{}>. Too bad!'.format(message.author.id))
+        else:
+            box.add_token(token,message.author.id,msg.id)
+            await message.add_reaction('🎁')
+            await botspam_channel.send('I sent a lootbox to <@{}>!'.format(message.author.id))
+
+    t = time.time()
+    result = process(message,isGameMaster,isAdmin,isPeasant)
+    await process_message(message,result,isGameMaster,isAdmin,isPeasant)
+
+async def process_message(message,result,isGameMaster=False,isAdmin=False,isPeasant=False):
 
     gamelog_channel = client.get_channel(int(config.game_log))
     botspam_channel = client.get_channel(int(config.bot_spam))
     storytime_channel = client.get_channel(int(config.story_time))
 
+    if gamelog_channel.guild == message.guild:
+        general.add_activity(message.author.id,message.author.name)
+    else:
+        print('{} sent a DM to the bot!'.format(message.author.display_name))
+
+    if db.find_spies(message.channel.id) != []:
+        if isGameMaster:
+            quote_embed = discord.Embed(description=message.content, color=0x00ff00)
+        elif isPeasant:
+            quote_embed = discord.Embed(description=message.content, color=0x0000ff)
+        elif db.isParticipant(message.author.id):
+            quote_embed = discord.Embed(description=message.content, color=0xff0000)
+        else:
+            quote_embed = discord.Embed(description=message.content, color=0xc0c0c0)
+        quote_embed.set_author(name=str(message.author), icon_url=message.author.avatar_url)
+        quote_embed.set_footer(text="{} | {} (UTC)".format(message.guild.name, message.created_at.strftime('%d %B %H:%M:%S')))
+        for spy_channel_id in db.find_spies(message.channel.id):
+            spy_channel = client.get_channel(spy_channel_id)
+            if spy_channel != None:
+                await spy_channel.send(embed=quote_embed)
+
     # The temp_msg list is for keeping track of temporary messages for deletion.
     temp_msg = []
+    global box_waiters
 
     for mailbox in result:
 
@@ -306,6 +350,16 @@ async def process_message(message,result):
 
                 for item in emoji_table:
                     await response.add_reaction(item)
+
+        for element in mailbox.thanks:
+            member = gamelog_channel.guild.get_member(box.message_owner(int(element)))
+            msg = await member.send("Thank you for using the lootbox system! If I am not mistaken, your lootbox choice should now have been inserted into the database.")
+            msg = await msg.channel.get_message(int(element))
+            await msg.delete()
+
+        for element in mailbox.box_gifts:
+            box_waiters.append(element)
+            print('Current box waiters: {}'.format(box_waiters))
 
         # If the Mailbox has a message for the gamelog, this is where it's sent.
         for element in mailbox.gamelog:
