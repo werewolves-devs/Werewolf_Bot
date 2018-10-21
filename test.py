@@ -58,6 +58,20 @@ class Test_Player_Class(unittest.TestCase):
         self.assertEqual(player1.demonized,player2.demonized)
         player2.demonized = False
 
+    def test_money(self):
+        player1 = Participant(User(1,"Randium",False))
+        player1.money = 0
+        self.assertEqual(player1.money,0)
+        player1.money = 1000
+        self.assertEqual(player1.money,1000)
+        player1.money += 40
+        self.assertEqual(player1.money,1040)
+        
+        player2 = Participant(User(1,"Randium",False))
+        self.assertEqual(player2.money,1040)
+        player2.money = 0
+        self.assertEqual(player1.money,0)
+
     def test_role_properties(self):
         self.assertEqual([item for item in Executioner.__dict__ if item.startswith('st')],['start'])
         self.assertEqual(get_powers("Executioner"),['execute'])
@@ -68,6 +82,8 @@ class Test_Player_Class(unittest.TestCase):
         with self.assertRaises(TypeError):
             int(Destination.game_log)
     
+
+class Test_Story_Time(unittest.TestCase):
     def test_story_time_reader(self):
         self.assertEqual(import_story('unittests/001.txt'),'This is a simple test!')
         self.assertEqual(import_story('unittests/002.txt',owner='BenTechy66'),'This is a slightly more advanced test.\nAin\'t that right, BenTechy66?')

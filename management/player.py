@@ -16,6 +16,12 @@ class Player:
 
         # TODO: If the user does not exist in the database yet, add them.
     
+    def __money_get(self):
+        return gen_get(self.id,'credits')
+    def __money_set(self,value):
+        return gen_set(self.id,'credits',value)
+    
+    money = property(__money_get,__money_set)
 
 
 class Participant(Player):
