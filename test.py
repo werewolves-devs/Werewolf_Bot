@@ -1,9 +1,9 @@
 from roles_n_rules.roles import Executioner, get_powers, role_functions, Team
 from story_time.reader import import_story, player_amount, import_random_story
 from management.player import Player, Participant
+from hardcore_reset import new_database_required
 from config import Destination
 import unittest
-
 
 class User:
     def __init__(self,id,name,bot):
@@ -95,6 +95,21 @@ class Test_Player_Class(unittest.TestCase):
         player1.remove(2)
         player1.remove(2)
         self.assertEqual(player2.items,[])
+
+    @new_database_required
+    def _auto_registration(self):
+        # To be claimed: 1 lootbox
+        # The point of this function is to make sure that a player is added to the database if they do not exist yet.
+        # Note that they get added to the general database; they do not get signed up.
+        # See the __init__ function of the Player class.
+        
+        player1 = Player(User(1,"Randium",False))
+        self.assertEqual(player1.money,0)
+        self.assertEqual(player1.items,[])
+        self.money = 100
+        
+        player2 = Player(User(1,"Randium",False))
+        self.assertEqual(player2.money,100)
 
 
     def test_role_properties(self):
