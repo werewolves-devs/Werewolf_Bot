@@ -10,6 +10,8 @@ failure = '|'
 skull = '💀 '
 
 class Player:
+    participant = False
+    
     def __init__(self,user):
         self.id = user.id
         self.name = user.name
@@ -41,6 +43,7 @@ class Player:
 
 
 class Participant(Player):
+    participant = True
 
     def start(self):
         return roles.role_functions(self.role).start(self)
