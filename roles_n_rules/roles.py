@@ -277,3 +277,15 @@ class Grandma(Innocent):
     def start(self):
         pass # TODO: Create a secret channel.
     
+    def day(self,number):
+        std_day(self)
+        self.uses = 0
+    
+    def night(self,number):
+        std_night(self)
+        self.uses = 3
+    
+    @wrap.require_uses
+    @wrap.require_users(1)
+    def power_grandma(self,numbers,roles,users):
+        pass # TODO
