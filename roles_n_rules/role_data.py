@@ -2,7 +2,7 @@ night_users = [
     ["Cupid","Dog","Look-Alike"],
     ["Assassin","Aura Teller","Exorcist","Fortune Teller","Hooker","Innkeeper","Priest","Priestess","Raven","Curse Caster",
         "Infected Wolf","Lone Wolf","Warlock","Devil","Ice King","Pyromancer","The Thing","Vampire","Zombie"],
-    [],
+    ["Flute Player"],
     ["Crowd Seeker","Grandma"]
     ]
 
@@ -199,10 +199,14 @@ def attack(user_id,role,murderer,answer=Mailbox().log(''),recursive='\n'):
 
     # End if the user sleeps with another.
     if role == "Hooker" and not demonized:
-        answer.log_add(recursive + success + skull + '<@{}> was slept with <@{}>.'.format(user_id,murderer))
+        answer.log_add(recursive + success + skull + '<@{}> slept with <@{}>.'.format(user_id,murderer))
         answer = instant_death(user_id, role, answer, recursive+next)
         return answer
     
+    if int(db_get(user_id,'sleepingover')) == 1:
+        answer.log_add(recursive + success + '<@{}> wasn\'t at home.'.format(user_id))
+        return answer
+
     # End if player dies in someone else's place.
     if role == "Executioner":
         answer.log_add(recursive + success + skull + '<@{}> was executed.'.format(user_id))

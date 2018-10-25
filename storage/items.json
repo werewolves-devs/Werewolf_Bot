@@ -40,6 +40,61 @@
                 "name": "1 angel buck",
                 "code": 1004001,
                 "description": "Gain 10 credits for each winning angel"
+            },
+            {
+                "name": "1 despot buck",
+                "code": 1005001,
+                "description": "Gain 10 credits for each winning despot"
+            },
+            {
+                "name": "1 devil buck",
+                "code": 1006001,
+                "description": "Gain 10 credits for each winning devil"
+            },
+            {
+                "name": "1 flute buck",
+                "code": 1007001,
+                "description": "Gain 10 credits for each winning flute player"
+            },
+            {
+                "name": "1 horseman buck",
+                "code": 1008001,
+                "description": "Gain 10 credits for each winning horseman"
+            },
+            {
+                "name": "1 ice buck",
+                "code": 1009001,
+                "description": "Gain 10 credits for each winning ice king"
+            },
+            {
+                "name": "1 immortal buck",
+                "code": 1010001,
+                "description": "Gain 10 credits for each winning immortal"
+            },
+            {
+                "name": "1 psycho buck",
+                "code": 1011001,
+                "description": "Gain 10 credits for each winning psychopath"
+            },
+            {
+                "name": "1 pyro buck",
+                "code": 1012001,
+                "description": "Gain 10 credits for each winning pyromancer"
+            },
+            {
+                "name": "1 thing buck",
+                "code": 1013001,
+                "description": "Gain 10 credits for each winning the thing"
+            },
+            {
+                "name": "1 vampire buck",
+                "code": 1014001,
+                "description": "Gain 10 credits for each winning vampire"
+            },
+            {
+                "name": "1 zombie buck",
+                "code": 1015001,
+                "description": "Gain 10 credits for each winning zombie"
             }
         ],
         [
@@ -62,6 +117,81 @@
                 "name": "1 disguise",
                 "code": 2103001,
                 "description": "Disguise yourself as any given role."
+            },
+            {
+                "name": "3 villager bucks",
+                "code": 2001003,
+                "description": "Gain 30 credits for each winning villager."
+            },
+            {
+                "name": "3 wolf bucks",
+                "code": 2002003,
+                "description": "Gain 30 credits for each winning wolf."
+            },
+            {
+                "name": "3 white werewolf bucks",
+                "code": 2003003,
+                "description": "Gain 30 credits for each winning white werewolf."
+            },
+            {
+                "name": "3 angel bucks",
+                "code": 2004003,
+                "description": "Gain 30 credits for each winning angel"
+            },
+            {
+                "name": "3 despot bucks",
+                "code": 2005003,
+                "description": "Gain 30 credits for each winning despot"
+            },
+            {
+                "name": "3 devil bucks",
+                "code": 2006003,
+                "description": "Gain 30 credits for each winning devil"
+            },
+            {
+                "name": "3 flute bucks",
+                "code": 2007003,
+                "description": "Gain 30 credits for each winning flute player"
+            },
+            {
+                "name": "3 horseman bucks",
+                "code": 2008003,
+                "description": "Gain 30 credits for each winning horseman"
+            },
+            {
+                "name": "3 ice bucks",
+                "code": 2009003,
+                "description": "Gain 30 credits for each winning ice king"
+            },
+            {
+                "name": "3 immortal bucks",
+                "code": 2010003,
+                "description": "Gain 30 credits for each winning immortal"
+            },
+            {
+                "name": "3 psycho bucks",
+                "code": 2011003,
+                "description": "Gain 30 credits for each winning psychopath"
+            },
+            {
+                "name": "3 pyro bucks",
+                "code": 2012003,
+                "description": "Gain 30 credits for each winning pyromancer"
+            },
+            {
+                "name": "3 thing bucks",
+                "code": 2013003,
+                "description": "Gain 30 credits for each winning the thing"
+            },
+            {
+                "name": "3 vampire bucks",
+                "code": 2014003,
+                "description": "Gain 30 credits for each winning vampire"
+            },
+            {
+                "name": "3 zombie bucks",
+                "code": 2015003,
+                "description": "Gain 30 credits for each winning zombie"
             }
         ],
         [
@@ -206,6 +336,22 @@
         {
             "name": "dagger",
             "code": 106
+        },
+        {
+            "name": "threat",
+            "code": 107
+        },
+        {
+            "name": "fake threat",
+            "code": 108
+        },
+        {
+            "name": "infection",
+            "code": 109
+        },
+        {
+            "name": "rigged",
+            "code": 200
         }
     ],
     "add_command": "ALTER TABLE 'channels' ADD COLUMN '{}' INTEGER NOT NULL DEFAULT 0"

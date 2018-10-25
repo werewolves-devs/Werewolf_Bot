@@ -7,7 +7,7 @@ from config import ghost_prefix as prefix
 from interpretation import check
 from main_classes import Mailbox
 from management.db import isParticipant
-from management.general import get_credits
+from management.general import get_credits, get_user, gen_get
 from management.profile import ProfileModel
 
 
@@ -72,9 +72,7 @@ def view_profile(message: Message):
     user: User = message.author
     if users:
         if isParticipant(message.author.id) and not isParticipant(users[0]):
-            return [Mailbox().respond(
-                "I am sorry! To prevent any accidental spoilers, you cannot "
-                "view the profile of dead players.")]
+            return [Mailbox().respond("I am sorry! To prevent any accidental spoilers, you cannot view the profile of dead players.",True)]
         user = message.channel.guild.get_member(users[0])
     model = ProfileModel.get_or_insert(user)
     em = Embed(
@@ -85,7 +83,10 @@ def view_profile(message: Message):
     em.add_field(name="Age", value=str(model.display_age))
     em.add_field(name="Gender", value=model.gender)
     em.add_field(name="Credits", value=get_credits(user.id))
-    return [Mailbox().embed(em, destination=message.channel.id)]
+    em.add_field(name="Referral score", value=gen_get(user.id,'refer_score'))
+    if get_user(user.id)[4] > 0:
+        em.add_field(name="Roulette Highscore", value=get_user(user.id)[4])
+    return [Mailbox().embed(em, destination=message.channel.id, temporary=True)]
 
 
 def process_profile(message: Message, is_game_master, is_admin, is_peasant) -> Optional[List[Mailbox]]:
