@@ -91,6 +91,9 @@ def require_users(amount):
     def search_users(func):
         @wraps(func)
         def look_for_users(self,numbers,roles,users):
+            for user in users:
+                if not user.participant:
+                    users.remove(user)
             if len(users) < amount:
                 pass # TODO: Cancel powers due to no roles provided
             return func(self,numbers,roles,users)

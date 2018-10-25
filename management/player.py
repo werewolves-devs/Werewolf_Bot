@@ -1,6 +1,7 @@
 from management.game import db_get, db_set
 from management.general import gen_get, gen_set
 
+from management import market
 from roles_n_rules import roles
 
 next = '|            '
@@ -9,6 +10,8 @@ failure = '|'
 skull = '💀 '
 
 class Player:
+    participant = False
+    
     def __init__(self,user):
         self.id = user.id
         self.name = user.name
@@ -16,9 +19,31 @@ class Player:
 
         # TODO: If the user does not exist in the database yet, add them.
     
+    def add(self,item,amount=1):
+        pass
+        # TODO: Add item to user's inventory. The function both accepts an item's id and its name.
+    def remove(self,item,amount=1):
+        pass
+        # TODO: Remove item from user's inventory. The function both accepts an item's id and its name.
+    
+    def __items_get(self):
+        pass
+        # TODO: Return a list of tuples
+        # (id, 'item name', amount)
+    def __items_set(self):
+        pass
+    
+    def __money_get(self):
+        return gen_get(self.id,'credits')
+    def __money_set(self,value):
+        return gen_set(self.id,'credits',value)
+    
+    items = property(__items_get,__items_set)
+    money = property(__money_get,__money_set)
 
 
 class Participant(Player):
+    participant = True
 
     def start(self):
         return roles.role_functions(self.role).start(self)

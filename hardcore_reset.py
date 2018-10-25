@@ -3,7 +3,16 @@ import config
 import sqlite3
 import os
 from shutil import copy
-from management.items import jget
+from functools import wraps
+
+def new_database_required(func):
+    @wraps(func)
+    def reset_then_execute_then_reset(*args,**kwargs):
+        hard_reset(True)
+        output = func(*args,**kwargs)
+        hard_reset(True)
+        return output
+    return reset_then_execute_then_reset
 
 conn = sqlite3.connect(config.general_database)
 c = conn.cursor()
