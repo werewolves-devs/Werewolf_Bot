@@ -4,3 +4,4 @@ https://github.com/Rapptz/discord.py/archive/rewrite.zip
 peewee
 Flask
 requests
+aiohttp>=3.8.5 # not directly required, pinned by Snyk to avoid a vulnerability
